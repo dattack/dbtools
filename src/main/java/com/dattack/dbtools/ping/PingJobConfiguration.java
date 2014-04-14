@@ -19,6 +19,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.configuration.AbstractConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertyConverter;
+import org.apache.commons.configuration.SystemConfiguration;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.dattack.dbtools.Builder;
@@ -32,6 +37,8 @@ public class PingJobConfiguration implements Serializable {
 	public static class PingConfigurationBuilder implements Builder<PingJobConfiguration> {
 
 		private static final String LABEL_PREFIX = "Label-";
+		private static final String TASK_NAME_CONFIGURATION_VAR = "task.name";
+		private static final String DEFAULT_TASK_NAME = "";
 		private static final int DEFAULT_EXECUTIONS = 0; // UNLIMITED
 		private static final int DEFAULT_THREADS = 1;
 		private static final int DEFAULT_TIME_BETWEEN_EXECUTIONS = 0; // NOT WAIT
@@ -51,11 +58,20 @@ public class PingJobConfiguration implements Serializable {
 		// the time to wait between two iterations
 		private long timeBetweenExecutions;
 
+		private String logFile;
+
+		private AbstractConfiguration configuration;
+
 		public PingConfigurationBuilder() {
-			executions = DEFAULT_EXECUTIONS;
-			threads = DEFAULT_THREADS;
-			timeBetweenExecutions = DEFAULT_TIME_BETWEEN_EXECUTIONS;
+
 			queryList = new ArrayList<SQLSentence>();
+			configuration = new CompositeConfiguration(new SystemConfiguration());
+
+			// default values
+			withName(DEFAULT_TASK_NAME);
+			withExecutions(DEFAULT_EXECUTIONS);
+			withThreads(DEFAULT_THREADS);
+			withTimeBetweenExecutions(DEFAULT_TIME_BETWEEN_EXECUTIONS);
 		}
 
 		@Override
@@ -74,17 +90,15 @@ public class PingJobConfiguration implements Serializable {
 		}
 
 		public PingConfigurationBuilder withName(String name) {
+			this.configuration.setProperty(TASK_NAME_CONFIGURATION_VAR, name);
 			this.name = name;
 			return this;
 		}
 
-		// public PingConfigurationBuilder withQueryList(List<Object> list) {
-		// this.queryList = new ArrayList<SQLSentence>();
-		// for (int i = 0; i < list.size(); i++) {
-		// this.queryList.add(new SQLSentence("sql-" + i, list.get(i).toString()));
-		// }
-		// return this;
-		// }
+		public PingConfigurationBuilder withLogFile(final String logFile) {
+			this.logFile = logFile;
+			return this;
+		}
 
 		public PingConfigurationBuilder withQuery(final SQLSentence sentence) {
 			if (StringUtils.isBlank(sentence.getLabel())) {
@@ -94,20 +108,22 @@ public class PingJobConfiguration implements Serializable {
 			}
 			return this;
 		}
-		
+
 		private String computeLabel(final SQLSentence sentence) {
 			return LABEL_PREFIX + sentence.getSql().hashCode();
 		}
 
 		public PingConfigurationBuilder withThreads(int threads) {
-			if (threads > DEFAULT_THREADS) {
+			if (threads >= DEFAULT_THREADS) {
 				this.threads = threads;
 			}
 			return this;
 		}
 
 		public PingConfigurationBuilder withTimeBetweenExecutions(long timeBetweenExecutions) {
-			this.timeBetweenExecutions = timeBetweenExecutions;
+			if (timeBetweenExecutions >= 0) {
+				this.timeBetweenExecutions = timeBetweenExecutions;
+			}
 			return this;
 		}
 	}
@@ -120,6 +136,7 @@ public class PingJobConfiguration implements Serializable {
 	private List<SQLSentence> queryList;
 	private int threads;
 	private long timeBetweenExecutions;
+	private String logFile;
 
 	private PingJobConfiguration(final PingConfigurationBuilder builder) {
 		this.datasource = builder.datasource;
@@ -128,6 +145,7 @@ public class PingJobConfiguration implements Serializable {
 		this.queryList = builder.queryList;
 		this.threads = builder.threads;
 		this.timeBetweenExecutions = builder.timeBetweenExecutions;
+		this.logFile = ObjectUtils.toString(PropertyConverter.interpolate(builder.logFile, builder.configuration));
 	}
 
 	public String getDatasource() {
@@ -152,5 +170,9 @@ public class PingJobConfiguration implements Serializable {
 
 	public long getTimeBetweenExecutions() {
 		return timeBetweenExecutions;
+	}
+
+	public String getLogFile() {
+		return logFile;
 	}
 }

@@ -43,6 +43,7 @@ final class PingJobConfigurationParser {
 	private static final String QUERY_KEY = "query";
 	private static final String QUERY_LABEL_KEY = "[@label]";
 	private static final String THIS_KEY = ""; // empty
+	private static final String LOG_FILE_KEY = "log-file";
 
 	private PingJobConfigurationParser() {
 		// static class
@@ -86,6 +87,8 @@ final class PingJobConfigurationParser {
 			if (taskElement.containsKey(TIME_BETWEEN_EXECUTIONS_KEY)) {
 				builder.withTimeBetweenExecutions(taskElement.getLong(TIME_BETWEEN_EXECUTIONS_KEY));
 			}
+			
+			builder.withLogFile(taskElement.getString(LOG_FILE_KEY));
 
 			list.add(builder.build());
 		}

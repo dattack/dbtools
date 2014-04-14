@@ -91,7 +91,7 @@ public final class Ping {
 				// TODO: the sentence provider must be configured
 				SQLSentenceProvider sentenceProvider = new SQLSentenceRoundRobinProvider(pingJobConf.getQueryList());
 
-				final LogWriter logWriter = new FileLogWriter(pingJobConf.getName() + ".log");
+				final LogWriter logWriter = new FileLogWriter(pingJobConf.getLogFile());
 
 				LogHeader logHeader = new LogHeader(pingJobConf);
 				logWriter.write(logHeader);
