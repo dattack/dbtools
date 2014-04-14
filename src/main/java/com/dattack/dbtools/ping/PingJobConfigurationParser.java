@@ -34,12 +34,15 @@ final class PingJobConfigurationParser {
 
 	private static final Log log = LogFactory.getLog(PingJobConfigurationParser.class);
 
+	private static final String TASK_KEY = "task";
 	private static final String EXECUTIONS_KEY = "[@executions]";
 	private static final String NAME_KEY = "[@name]";
 	private static final String THREADS_KEY = "[@threads]";
 	private static final String TIME_BETWEEN_EXECUTIONS_KEY = "[@timeBetweenExecutions]";
 	private static final String DATASOURCE_KEY = "[@datasource]";
 	private static final String QUERY_KEY = "query";
+	private static final String QUERY_LABEL_KEY = "[@label]";
+	private static final String THIS_KEY = ""; // empty
 
 	private PingJobConfigurationParser() {
 		// static class
@@ -57,14 +60,20 @@ final class PingJobConfigurationParser {
 		config.setDelimiterParsingDisabled(true);
 		config.load(file);
 
-		final List<HierarchicalConfiguration> taskList = config.configurationsAt("task");
+		final List<HierarchicalConfiguration> taskList = config.configurationsAt(TASK_KEY);
 
 		for (final HierarchicalConfiguration taskElement : taskList) {
 
 			PingConfigurationBuilder builder = new PingConfigurationBuilder() //
 					.withName(taskElement.getString(NAME_KEY)) //
-					.withDatasource(taskElement.getString(DATASOURCE_KEY)) //
-					.withQueryList(taskElement.getList(QUERY_KEY));
+					.withDatasource(taskElement.getString(DATASOURCE_KEY));
+			
+			final List<HierarchicalConfiguration> queryElementList = taskElement.configurationsAt(QUERY_KEY);
+			for (final HierarchicalConfiguration queryElement: queryElementList) {
+				String label = queryElement.getString(QUERY_LABEL_KEY);
+				String sql = queryElement.getString(THIS_KEY);
+				builder.withQuery(new SQLSentence(label, sql));
+			}
 
 			if (taskElement.containsKey(EXECUTIONS_KEY)) {
 				builder.withExecutions(taskElement.getInt(EXECUTIONS_KEY));
