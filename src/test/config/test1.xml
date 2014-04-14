@@ -1,0 +1,21 @@
+<dbping>
+	<task name="salgrade_test" threads="1" executions="1"
+		timeBetweenExecutions="100" datasource="jdbc/db1">
+		<query>SELECT *
+			FROM salgrade
+			WHERE hisal &gt; 2500
+		</query>
+		<query>SELECT * FROM salgrade WHERE losal &lt; 1500</query>
+		<log-file>${basedir}/log/dbping_${task.name}.log</log-file>
+	</task>
+
+	<task name="emp_test" threads="1" executions="10"
+		timeBetweenExecutions="10" datasource="jdbc/db2">
+		<query>SELECT * FROM emp WHERE deptno = 10</query>
+		<query>SELECT * FROM emp WHERE deptno = 20</query>
+		<query>SELECT * FROM emp WHERE deptno = 30</query>
+		<query>SELECT * FROM emp WHERE deptno = 40</query>
+		<query>SELECT * FROM emp WHERE mgr IN (7839, 7698)</query>
+		<log-file>${basedir}/log/dbping_${task.name}.log</log-file>
+	</task>
+</dbping>
