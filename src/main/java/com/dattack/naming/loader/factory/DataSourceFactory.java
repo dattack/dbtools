@@ -18,34 +18,55 @@ package com.dattack.naming.loader.factory;
 import java.text.MessageFormat;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.dattack.ext.jdbc.SimpleDataSource;
 
 /**
  * @author cvarela
  * @since 0.1
  */
-public class DataSourceFactory implements ResourceFactory<SimpleDataSource> {
+public class DataSourceFactory implements ResourceFactory<DataSource> {
 
-	private static final String DRIVER_KEY = "driverClassName";
-	private static final String URL_KEY = "url";
-	private static final String USERNAME_KEY = "username";
-	private static final String PASSWORD_KEY = "password";
+    private static final Log log = LogFactory.getLog(DataSourceFactory.class);
 
-	public SimpleDataSource getObjectInstance(final Properties properties) {
+    private static final String DRIVER_KEY = "driverClassName";
+    private static final String URL_KEY = "url";
+    private static final String USERNAME_KEY = "username";
+    private static final String PASSWORD_KEY = "password";
+    // pool properties
+    private static final String INITIAL_SIZE_KEY = "initialSize";
 
-		final String driver = properties.getProperty(DRIVER_KEY);
-		final String url = properties.getProperty(URL_KEY);
-		final String user = properties.getProperty(USERNAME_KEY);
-		final String password = properties.getProperty(PASSWORD_KEY);
+    public DataSource getObjectInstance(final Properties properties) {
 
-		if (driver == null) {
-			throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", DRIVER_KEY));
-		}
+        final String driver = properties.getProperty(DRIVER_KEY);
+        final String url = properties.getProperty(URL_KEY);
+        final String user = properties.getProperty(USERNAME_KEY);
+        final String password = properties.getProperty(PASSWORD_KEY);
 
-		if (url == null) {
-			throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", URL_KEY));
-		}
+        if (driver == null) {
+            throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", DRIVER_KEY));
+        }
 
-		return new SimpleDataSource(driver, url, user, password);
-	}
+        if (url == null) {
+            throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", URL_KEY));
+        }
+
+        if (!StringUtils.isBlank(properties.getProperty(INITIAL_SIZE_KEY))) {
+            // a pool has been configured
+            try {
+                return BasicDataSourceFactory.createDataSource(properties);
+            } catch (Exception e) {
+                // we will use a DataSource without a connection pool
+                log.warn(e.getMessage());
+            }
+        }
+
+        return new SimpleDataSource(driver, url, user, password);
+    }
 }

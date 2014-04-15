@@ -149,11 +149,15 @@ public class FileLogWriter implements LogWriter {
 					.append(entry.getExecutionTime());
 
 			if (entry.getException() != null) {
-				csvBuilder.append(entry.getException().getMessage());
+				csvBuilder.append(normalize(entry.getException().getMessage()));
 			}
 			data = csvBuilder.eol().toString();
 			csvBuilder.clear();
 		}
 		return data;
+	}
+	
+	private String normalize(final String text) {
+	    return text.replace("\n", " ");
 	}
 }

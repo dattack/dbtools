@@ -86,7 +86,9 @@ public final class Ping {
 			List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
 			for (final PingJobConfiguration pingJobConf : pingJobConfList) {
 
-				DataSource dataSource = new DataSourceBuilder().withJNDIName(pingJobConf.getDatasource()).build();
+				DataSource dataSource = new DataSourceBuilder()
+				.withPath("")
+				.withJNDIName(pingJobConf.getDatasource()).build();
 
 				// TODO: the sentence provider must be configured
 				SQLSentenceProvider sentenceProvider = new SQLSentenceRoundRobinProvider(pingJobConf.getQueryList());

@@ -21,12 +21,19 @@ import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Hashtable;
+import java.util.Map.Entry;
 
 import javax.naming.ConfigurationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.EnvironmentConfiguration;
+import org.apache.commons.configuration.PropertyConverter;
+import org.apache.commons.configuration.SystemConfiguration;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,63 +47,73 @@ import com.dattack.naming.loader.NamingLoader;
  */
 public class StandaloneContextFactory implements InitialContextFactory {
 
-	private static volatile Context context;
+    private static volatile Context context;
 
-	private static final String DIRECTORY_PROPERTY = StandaloneContextFactory.class.getName() + ".directory";
+    private static final String DIRECTORY_PROPERTY = StandaloneContextFactory.class.getName() + ".directory";
 
-	private Log log = LogFactory.getLog(StandaloneContextFactory.class);
+    private Log log = LogFactory.getLog(StandaloneContextFactory.class);
 
-	public StandaloneContextFactory() {
-		super();
-	}
+    public StandaloneContextFactory() {
+        super();
+    }
 
-	public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
+    public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
 
-		synchronized (StandaloneContextFactory.class) {
-			if (context == null) {
+        synchronized (StandaloneContextFactory.class) {
+            if (context == null) {
 
-				final Object configDir = environment.get(DIRECTORY_PROPERTY);
-				if (configDir != null) {
+                CompositeConfiguration configuration = new CompositeConfiguration();
+                configuration.addConfiguration(new SystemConfiguration());
+                configuration.addConfiguration(new EnvironmentConfiguration());
+                BaseConfiguration baseConf = new BaseConfiguration();
+                for (Entry<?, ?> entry : environment.entrySet()) {
+                    baseConf.setProperty(ObjectUtils.toString(entry.getKey()), entry.getValue());
+                }
+                configuration.addConfiguration(baseConf);
 
-					final URL url = getClass().getClassLoader().getResource(configDir.toString());
+                final Object configDir = PropertyConverter.interpolate(configuration.getProperty(DIRECTORY_PROPERTY),
+                        configuration);
+                if (configDir != null) {
 
-					File dir = null;
-					if (url != null) {
-						try {
-							final URI uri = new URI(url.toExternalForm());
-							dir = new File(uri);
-						} catch (final Exception e) {
-							log.error(e.getMessage());
-						}
-					} else {
-						dir = new File(configDir.toString());
-					}
+                    final URL url = getClass().getClassLoader().getResource(configDir.toString());
 
-					if ((dir != null) && dir.exists()) {
-						log.info("INFO - Scanning directory '" + dir + "' for JNDI resources.");
-						final NamingLoader loader = new NamingLoader();
+                    File dir = null;
+                    if (url != null) {
+                        try {
+                            final URI uri = new URI(url.toExternalForm());
+                            dir = new File(uri);
+                        } catch (final Exception e) {
+                            log.error(e.getMessage());
+                        }
+                    } else {
+                        dir = new File(configDir.toString());
+                    }
 
-						StandaloneContext ctx = new StandaloneContext(environment);
-						try {
-							loader.loadDirectory(dir, ctx);
-						} catch (IOException e) {
-							throw new NamingException(e.getMessage());
-						}
-						context = ctx;
-					} else {
-						log.error(MessageFormat.format("JNDI configuration error: directory ''{0}'' not exists", dir));
-						throw new ConfigurationException(MessageFormat.format(
-								"JNDI configuration error: directory ''{0}'' not exists", dir));
-					}
-				} else {
-					log.error(MessageFormat.format("JNDI configuration error: missing property ''{0}''",
-							DIRECTORY_PROPERTY));
-					throw new ConfigurationException(MessageFormat.format(
-							"JNDI configuration error: missing property ''{0}''", DIRECTORY_PROPERTY));
-				}
-			}
+                    if ((dir != null) && dir.exists()) {
+                        log.info("INFO - Scanning directory '" + dir + "' for JNDI resources.");
+                        final NamingLoader loader = new NamingLoader();
 
-			return context;
-		}
-	}
+                        StandaloneContext ctx = new StandaloneContext(environment);
+                        try {
+                            loader.loadDirectory(dir, ctx);
+                        } catch (IOException e) {
+                            throw new NamingException(e.getMessage());
+                        }
+                        context = ctx;
+                    } else {
+                        log.error(MessageFormat.format("JNDI configuration error: directory ''{0}'' not exists", dir));
+                        throw new ConfigurationException(MessageFormat.format(
+                                "JNDI configuration error: directory ''{0}'' not exists", dir));
+                    }
+                } else {
+                    log.error(MessageFormat.format("JNDI configuration error: missing property ''{0}''",
+                            DIRECTORY_PROPERTY));
+                    throw new ConfigurationException(MessageFormat.format(
+                            "JNDI configuration error: missing property ''{0}''", DIRECTORY_PROPERTY));
+                }
+            }
+
+            return context;
+        }
+    }
 }

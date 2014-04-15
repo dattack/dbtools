@@ -19,8 +19,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.configuration.AbstractConfiguration;
+import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.EnvironmentConfiguration;
 import org.apache.commons.configuration.PropertyConverter;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.commons.lang.ObjectUtils;
@@ -34,145 +35,150 @@ import com.dattack.dbtools.Builder;
  */
 public class PingJobConfiguration implements Serializable {
 
-	public static class PingConfigurationBuilder implements Builder<PingJobConfiguration> {
+    public static class PingConfigurationBuilder implements Builder<PingJobConfiguration> {
 
-		private static final String LABEL_PREFIX = "Label-";
-		private static final String TASK_NAME_CONFIGURATION_VAR = "task.name";
-		private static final String DEFAULT_TASK_NAME = "";
-		private static final int DEFAULT_EXECUTIONS = 0; // UNLIMITED
-		private static final int DEFAULT_THREADS = 1;
-		private static final int DEFAULT_TIME_BETWEEN_EXECUTIONS = 0; // NOT WAIT
+        private static final String LABEL_PREFIX = "Label-";
+        private static final String TASK_NAME_CONFIGURATION_VAR = "task.name";
+        private static final String DEFAULT_TASK_NAME = "";
+        private static final int DEFAULT_EXECUTIONS = 0; // UNLIMITED
+        private static final int DEFAULT_THREADS = 1;
+        private static final int DEFAULT_TIME_BETWEEN_EXECUTIONS = 0; // NOT WAIT
 
-		private String datasource;
-		private String name;
+        private String datasource;
+        private String name;
 
-		// the number of iterations by each thread
-		private int executions;
+        // the number of iterations by each thread
+        private int executions;
 
-		// SQL query list
-		private List<SQLSentence> queryList;
+        // SQL query list
+        private List<SQLSentence> queryList;
 
-		// the number of threads to run
-		private int threads;
+        // the number of threads to run
+        private int threads;
 
-		// the time to wait between two iterations
-		private long timeBetweenExecutions;
+        // the time to wait between two iterations
+        private long timeBetweenExecutions;
 
-		private String logFile;
+        private String logFile;
 
-		private AbstractConfiguration configuration;
+        private CompositeConfiguration configuration;
+        private BaseConfiguration baseConfiguration;
 
-		public PingConfigurationBuilder() {
+        public PingConfigurationBuilder() {
 
-			queryList = new ArrayList<SQLSentence>();
-			configuration = new CompositeConfiguration(new SystemConfiguration());
+            queryList = new ArrayList<SQLSentence>();
+            baseConfiguration = new BaseConfiguration();
+            configuration = new CompositeConfiguration();
+            configuration.addConfiguration(new SystemConfiguration());
+            configuration.addConfiguration(new EnvironmentConfiguration());
+            configuration.addConfiguration(baseConfiguration);
 
-			// default values
-			withName(DEFAULT_TASK_NAME);
-			withExecutions(DEFAULT_EXECUTIONS);
-			withThreads(DEFAULT_THREADS);
-			withTimeBetweenExecutions(DEFAULT_TIME_BETWEEN_EXECUTIONS);
-		}
+            // default values
+            withName(DEFAULT_TASK_NAME);
+            withExecutions(DEFAULT_EXECUTIONS);
+            withThreads(DEFAULT_THREADS);
+            withTimeBetweenExecutions(DEFAULT_TIME_BETWEEN_EXECUTIONS);
+        }
 
-		@Override
-		public PingJobConfiguration build() {
-			return new PingJobConfiguration(this);
-		}
+        @Override
+        public PingJobConfiguration build() {
+            return new PingJobConfiguration(this);
+        }
 
-		public PingConfigurationBuilder withDatasource(String datasource) {
-			this.datasource = datasource;
-			return this;
-		}
+        public PingConfigurationBuilder withDatasource(String value) {
+            this.datasource = value;
+            return this;
+        }
 
-		public PingConfigurationBuilder withExecutions(int executions) {
-			this.executions = executions;
-			return this;
-		}
+        public PingConfigurationBuilder withExecutions(int value) {
+            this.executions = value;
+            return this;
+        }
 
-		public PingConfigurationBuilder withName(String name) {
-			this.configuration.setProperty(TASK_NAME_CONFIGURATION_VAR, name);
-			this.name = name;
-			return this;
-		}
+        public PingConfigurationBuilder withName(String value) {
+            this.baseConfiguration.setProperty(TASK_NAME_CONFIGURATION_VAR, value);
+            this.name = value;
+            return this;
+        }
 
-		public PingConfigurationBuilder withLogFile(final String logFile) {
-			this.logFile = logFile;
-			return this;
-		}
+        public PingConfigurationBuilder withLogFile(final String value) {
+            this.logFile = value;
+            return this;
+        }
 
-		public PingConfigurationBuilder withQuery(final SQLSentence sentence) {
-			if (StringUtils.isBlank(sentence.getLabel())) {
-				this.queryList.add(new SQLSentence(computeLabel(sentence), sentence.getSql()));
-			} else {
-				this.queryList.add(sentence);
-			}
-			return this;
-		}
+        public PingConfigurationBuilder withQuery(final SQLSentence sentence) {
+            if (StringUtils.isBlank(sentence.getLabel())) {
+                this.queryList.add(new SQLSentence(computeLabel(sentence), sentence.getSql()));
+            } else {
+                this.queryList.add(sentence);
+            }
+            return this;
+        }
 
-		private String computeLabel(final SQLSentence sentence) {
-			return LABEL_PREFIX + sentence.getSql().hashCode();
-		}
+        private String computeLabel(final SQLSentence sentence) {
+            return LABEL_PREFIX + sentence.getSql().hashCode();
+        }
 
-		public PingConfigurationBuilder withThreads(int threads) {
-			if (threads >= DEFAULT_THREADS) {
-				this.threads = threads;
-			}
-			return this;
-		}
+        public PingConfigurationBuilder withThreads(int value) {
+            if (value >= DEFAULT_THREADS) {
+                this.threads = value;
+            }
+            return this;
+        }
 
-		public PingConfigurationBuilder withTimeBetweenExecutions(long timeBetweenExecutions) {
-			if (timeBetweenExecutions >= 0) {
-				this.timeBetweenExecutions = timeBetweenExecutions;
-			}
-			return this;
-		}
-	}
+        public PingConfigurationBuilder withTimeBetweenExecutions(long value) {
+            if (value >= 0) {
+                this.timeBetweenExecutions = value;
+            }
+            return this;
+        }
+    }
 
-	private static final long serialVersionUID = -8595562721719896797L;
+    private static final long serialVersionUID = -8595562721719896797L;
 
-	private String datasource;
-	private int executions;
-	private String name;
-	private List<SQLSentence> queryList;
-	private int threads;
-	private long timeBetweenExecutions;
-	private String logFile;
+    private String datasource;
+    private int executions;
+    private String name;
+    private List<SQLSentence> queryList;
+    private int threads;
+    private long timeBetweenExecutions;
+    private String logFile;
 
-	private PingJobConfiguration(final PingConfigurationBuilder builder) {
-		this.datasource = builder.datasource;
-		this.executions = builder.executions;
-		this.name = builder.name;
-		this.queryList = builder.queryList;
-		this.threads = builder.threads;
-		this.timeBetweenExecutions = builder.timeBetweenExecutions;
-		this.logFile = ObjectUtils.toString(PropertyConverter.interpolate(builder.logFile, builder.configuration));
-	}
+    private PingJobConfiguration(final PingConfigurationBuilder builder) {
+        this.datasource = builder.datasource;
+        this.executions = builder.executions;
+        this.name = builder.name;
+        this.queryList = builder.queryList;
+        this.threads = builder.threads;
+        this.timeBetweenExecutions = builder.timeBetweenExecutions;
+        this.logFile = ObjectUtils.toString(PropertyConverter.interpolate(builder.logFile, builder.configuration));
+    }
 
-	public String getDatasource() {
-		return datasource;
-	}
+    public String getDatasource() {
+        return datasource;
+    }
 
-	public int getExecutions() {
-		return executions;
-	}
+    public int getExecutions() {
+        return executions;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public List<SQLSentence> getQueryList() {
-		return queryList;
-	}
+    public List<SQLSentence> getQueryList() {
+        return queryList;
+    }
 
-	public int getThreads() {
-		return threads;
-	}
+    public int getThreads() {
+        return threads;
+    }
 
-	public long getTimeBetweenExecutions() {
-		return timeBetweenExecutions;
-	}
+    public long getTimeBetweenExecutions() {
+        return timeBetweenExecutions;
+    }
 
-	public String getLogFile() {
-		return logFile;
-	}
+    public String getLogFile() {
+        return logFile;
+    }
 }

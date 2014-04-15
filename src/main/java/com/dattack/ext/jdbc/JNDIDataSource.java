@@ -71,7 +71,7 @@ public class JNDIDataSource extends AbstractDataSource {
 	private JNDIDataSource(final DataSourceBuilder builder) {
 		this.driverPath = builder.path;
 		this.jndiName = builder.jndiName;
-		init = false;
+		init = true;
 	}
 
 	private void configureClasspath() {
