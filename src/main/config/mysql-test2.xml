@@ -1,0 +1,11 @@
+<dbping>
+	<task name="dept_test" threads="1" executions="10"
+		timeBetweenExecutions="100" datasource="jdbc/mysql-db2">
+		<query>SELECT * FROM dbtools.dept</query>
+		<log-file>${basedir}/log/dbping_${task.name}.log</log-file>
+	</task>
+	<task name="error_test" threads="1" executions="1" datasource="jdbc/mysql-db2">
+		<query>SELECT * FROM dbtools.missing_table</query>
+		<log-file>${basedir}/log/dbping_${task.name}.log</log-file>
+	</task>
+</dbping>
