@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -34,97 +35,119 @@ import com.dattack.naming.loader.factory.ResourceFactoryRegistry;
  * @author cvarela
  * @since 0.1
  */
-public class NamingLoader {
+public final class NamingLoader {
 
-	private static final String TYPE_KEY = "type";
+    private static final String TYPE_KEY = "type";
 
-	private static final Log log = LogFactory.getLog(NamingLoader.class);
+    private static final Log log = LogFactory.getLog(NamingLoader.class);
 
-	private static Object getObject(Properties properties) {
+    private static Object getObject(final Properties properties, final List<String> extraClasspath) {
 
-		final String type = properties.getProperty(TYPE_KEY);
+        final String type = properties.getProperty(TYPE_KEY);
 
-		ResourceFactory<?> factory = ResourceFactoryRegistry.getConverter(type);
-		if (factory != null) {
-			return factory.getObjectInstance(properties);
-		}
+        ResourceFactory<?> factory = ResourceFactoryRegistry.getFactory(type);
+        if (factory != null) {
+            return factory.getObjectInstance(properties, extraClasspath);
+        }
 
-		log.warn(MessageFormat.format("Unable to get a factory for type ''{0}''", type));
-		return null;
-	}
+        log.warn(MessageFormat.format("Unable to get a factory for type ''{0}''", type));
+        return null;
+    }
 
-	private void put(Context context, String key, Object value) throws NamingException {
+    private void put(final Context context, final String key, final Object value) throws NamingException {
 
-		Object obj = context.lookup(key);
+        Object obj = context.lookup(key);
 
-		if (obj instanceof Context) {
-			context.destroySubcontext(key);
-			obj = null;
-		}
+        if (obj instanceof Context) {
+            context.destroySubcontext(key);
+            obj = null;
+        }
 
-		if (obj == null) {
-			context.bind(key, value);
-		} else {
-			context.rebind(key, value);
-		}
-	}
+        if (obj == null) {
+            context.bind(key, value);
+        } else {
+            context.rebind(key, value);
+        }
 
-	private void load(Properties properties, Context ctxt, Context parentCtxt, String ctxtName) throws NamingException {
-		Object value = getObject(properties);
-		if (value != null) {
-			put(parentCtxt, ctxtName, value);
-		}
-	}
+        log.info("Context.bind: " + key + " -> " + value);
+    }
 
-	public void loadDirectory(File directory, Context ctxt) throws NamingException, IOException {
-		loadDirectory(directory, ctxt, null, "");
-	}
+    private void load(final Properties properties, final Context ctxt, final Context parentCtxt, final String ctxtName,
+            final List<String> extraClasspath) throws NamingException {
 
-	private void loadDirectory(final File directory, final Context ctxt, final Context parentCtxt, final String ctxtName)
-			throws NamingException, IOException {
+        Object value = getObject(properties, extraClasspath);
+        if (value != null) {
+            put(parentCtxt, ctxtName, value);
+        }
+    }
 
-		if (!directory.isDirectory()) {
-			throw new IllegalArgumentException(MessageFormat.format("''{0}'' isn't a directory", directory));
-		}
+    /**
+     * Scans a directory hierarchy looking for <code>*.properties</code> files. Creates a subcontext for each directory
+     * in the hierarchy and binds a new resource for each <code>*.properties</code> file with a
+     * <code>ResourceFactory</code> associated.
+     * 
+     * 
+     * @param directory
+     *            the directory to scan
+     * @param ctxt
+     *            the Context to populate
+     * @param extraClasspath
+     *            additional paths to include to the classpath
+     * @throws NamingException
+     *             if a naming exception is encountered
+     * @throws IOException
+     *             if an I/O error ocurred
+     */
+    public void loadDirectory(final File directory, final Context ctxt, final List<String> extraClasspath)
+            throws NamingException, IOException {
+        loadDirectory(directory, ctxt, null, extraClasspath);
+    }
 
-		File[] files = directory.listFiles();
-		if (files == null) {
-			return;
-		}
+    private void loadDirectory(final File directory, final Context ctxt, final Context parentCtxt, //
+            final List<String> extraClasspath) throws NamingException, IOException {
 
-		for (int i = 0; i < files.length; i++) {
-			File file = files[i];
-			String name = file.getName();
+        if (!directory.isDirectory()) {
+            throw new IllegalArgumentException(MessageFormat.format("''{0}'' isn't a directory", directory));
+        }
 
-			if (file.isDirectory()) {
-				Context tmpCtxt = ctxt.createSubcontext(name);
-				loadDirectory(file, tmpCtxt, ctxt, name);
-			} else {
-				String[] extensions = new String[] { ".properties" };
-				for (int j = 0; j < extensions.length; j++) {
-					String extension = extensions[j];
-					if (name.endsWith(extension)) {
-						name = name.substring(0, name.length() - extension.length());
-						Context subcontext = ctxt.createSubcontext(name);
-						load(loadFile(file), subcontext, ctxt, name);
-					}
-				}
-			}
-		}
-	}
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return;
+        }
 
-	private Properties loadFile(File file) throws IOException {
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            String name = file.getName();
 
-		FileInputStream fin = null;
-		try {
-			fin = new FileInputStream(file);
-			Properties properties = new Properties();
-			properties.load(fin);
-			return properties;
-		} finally {
-			if (fin != null) {
-				fin.close();
-			}
-		}
-	}
+            if (file.isDirectory()) {
+                Context tmpCtxt = ctxt.createSubcontext(name);
+                loadDirectory(file, tmpCtxt, ctxt, extraClasspath);
+            } else {
+                String[] extensions = new String[] { ".properties" };
+                for (int j = 0; j < extensions.length; j++) {
+                    String extension = extensions[j];
+                    if (name.endsWith(extension)) {
+                        name = name.substring(0, name.length() - extension.length());
+                        Context subcontext = ctxt.createSubcontext(name);
+                        load(loadFile(file), subcontext, ctxt, name, extraClasspath);
+                    }
+                }
+            }
+        }
+    }
+
+    private Properties loadFile(final File file) throws IOException {
+
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(file);
+            Properties properties = new Properties();
+            properties.load(fin);
+            return properties;
+        } finally {
+            if (fin != null) {
+                fin.close();
+            }
+        }
+    }
 }

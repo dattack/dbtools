@@ -16,6 +16,7 @@
 package com.dattack.naming.loader.factory;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -25,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.dattack.ext.jdbc.DataSourceClasspathDecorator;
 import com.dattack.ext.jdbc.SimpleDataSource;
 
 /**
@@ -42,7 +44,8 @@ public class DataSourceFactory implements ResourceFactory<DataSource> {
     // pool properties
     private static final String INITIAL_SIZE_KEY = "initialSize";
 
-    public DataSource getObjectInstance(final Properties properties) {
+    @Override
+    public DataSource getObjectInstance(final Properties properties, final List<String> extraClasspath) {
 
         final String driver = properties.getProperty(DRIVER_KEY);
         final String url = properties.getProperty(URL_KEY);
@@ -57,16 +60,21 @@ public class DataSourceFactory implements ResourceFactory<DataSource> {
             throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", URL_KEY));
         }
 
+        DataSource ds = null;
         if (!StringUtils.isBlank(properties.getProperty(INITIAL_SIZE_KEY))) {
             // a pool has been configured
             try {
-                return BasicDataSourceFactory.createDataSource(properties);
+                ds = BasicDataSourceFactory.createDataSource(properties);
             } catch (Exception e) {
                 // we will use a DataSource without a connection pool
                 log.warn(e.getMessage());
             }
         }
 
-        return new SimpleDataSource(driver, url, user, password);
+        if (ds == null) {
+            ds = new SimpleDataSource(driver, url, user, password);
+        }
+
+        return new DataSourceClasspathDecorator(ds, extraClasspath);
     }
 }

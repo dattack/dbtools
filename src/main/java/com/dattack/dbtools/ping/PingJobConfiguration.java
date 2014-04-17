@@ -22,12 +22,11 @@ import java.util.List;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.EnvironmentConfiguration;
-import org.apache.commons.configuration.PropertyConverter;
 import org.apache.commons.configuration.SystemConfiguration;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.dattack.dbtools.Builder;
+import com.dattack.ext.misc.ConfigurationUtil;
 
 /**
  * @author cvarela
@@ -68,9 +67,7 @@ public class PingJobConfiguration implements Serializable {
 
             queryList = new ArrayList<SQLSentence>();
             baseConfiguration = new BaseConfiguration();
-            configuration = new CompositeConfiguration();
-            configuration.addConfiguration(new SystemConfiguration());
-            configuration.addConfiguration(new EnvironmentConfiguration());
+            configuration = ConfigurationUtil.createEnvSystemConfiguration();
             configuration.addConfiguration(baseConfiguration);
 
             // default values
@@ -151,7 +148,7 @@ public class PingJobConfiguration implements Serializable {
         this.queryList = builder.queryList;
         this.threads = builder.threads;
         this.timeBetweenExecutions = builder.timeBetweenExecutions;
-        this.logFile = ObjectUtils.toString(PropertyConverter.interpolate(builder.logFile, builder.configuration));
+        this.logFile = ConfigurationUtil.interpolate(builder.logFile, builder.configuration);
     }
 
     public String getDatasource() {

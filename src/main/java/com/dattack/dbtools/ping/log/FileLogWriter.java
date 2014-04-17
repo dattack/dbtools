@@ -82,7 +82,7 @@ public class FileLogWriter implements LogWriter {
 		} catch (final IOException e) {
 			log.warn(e.getMessage());
 		} finally {
-			IOUtils.closeQuickly(out);
+			IOUtils.closeQuietly(out);
 		}
 	}
 

@@ -97,9 +97,9 @@ class PingJob implements Runnable {
 				logWriter.write(logEntry);
 				log.warn(configuration.getName() + "@" + threadName + ": " + e.getMessage(), e);
 			} finally {
-				JDBCUtils.closeQuickly(rs);
-				JDBCUtils.closeQuickly(stmt);
-				JDBCUtils.closeQuickly(connection);
+				JDBCUtils.closeQuietly(rs);
+				JDBCUtils.closeQuietly(stmt);
+				JDBCUtils.closeQuietly(connection);
 			}
 
 			if (testLoop(iter) && configuration.getTimeBetweenExecutions() > 0) {

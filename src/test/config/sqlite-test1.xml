@@ -7,7 +7,6 @@
 		</query>
 		<query label="sql-2">SELECT * FROM salgrade WHERE losal &lt; 1500</query>
 		<logger classname="">
-		    <
 		</logger>
 		<log-file>${basedir}/log/dbping_${task.name}.log</log-file>
 	</task>

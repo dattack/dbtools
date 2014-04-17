@@ -16,6 +16,7 @@
 package com.dattack.ext.jdbc;
 
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
@@ -26,53 +27,56 @@ import javax.sql.DataSource;
  * @author cvarela
  * @since 0.1
  */
-public abstract class AbstractDataSource implements DataSource {
+public class DataSourceDecorator implements DataSource {
 
-    /*
-     * A value of zero means that the timeout is the default system timeout if there is one; otherwise, it means that
-     * there is no timeout
-     */
-    private static final int DEFAULT_TIMEOUT_VALUE = 0;
+    private final DataSource inner;
 
-    /** {@inheritDoc} */
+    public DataSourceDecorator(final DataSource inner) {
+        this.inner = inner;
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return inner.getConnection();
+    }
+
+    @Override
+    public Connection getConnection(final String username, final String password) throws SQLException {
+        return inner.getConnection(username, password);
+    }
+
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        // null -> logging is disabled
-        return null;
+        return inner.getLogWriter();
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public void setLogWriter(final PrintWriter out) throws SQLException {
+        inner.setLogWriter(out);
+    }
+
+    @Override
+    public void setLoginTimeout(final int seconds) throws SQLException {
+        inner.setLoginTimeout(seconds);
+    }
+
     @Override
     public int getLoginTimeout() throws SQLException {
-        return DEFAULT_TIMEOUT_VALUE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setLogWriter(final PrintWriter logWriter) throws SQLException {
-        // ignore
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setLoginTimeout(final int timeout) throws SQLException {
-        throw new UnsupportedOperationException("Not supported by BasicDataSource");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> T unwrap(final Class<T> iface) throws SQLException {
-        throw new SQLException("This object is not a wrapper");
+        return inner.getLoginTimeout();
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new SQLFeatureNotSupportedException();
+        return inner.getParentLogger();
+    }
+
+    @Override
+    public <T> T unwrap(final Class<T> iface) throws SQLException {
+        return inner.unwrap(iface);
+    }
+
+    @Override
+    public boolean isWrapperFor(final Class<?> iface) throws SQLException {
+        return inner.isWrapperFor(iface);
     }
 }

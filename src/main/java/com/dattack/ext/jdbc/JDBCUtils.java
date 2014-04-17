@@ -37,7 +37,13 @@ public final class JDBCUtils {
         // utility class
     }
 
-    public static void closeQuickly(final ResultSet rs) {
+    /**
+     * Close a <code>ResultSet</code> ignoring <code>null</code> values and exceptions.
+     * 
+     * @param rs
+     *            the ResultSet to close, may be null.
+     */
+    public static void closeQuietly(final ResultSet rs) {
         if (rs != null) {
             try {
                 rs.close();
@@ -47,7 +53,13 @@ public final class JDBCUtils {
         }
     }
 
-    public static void closeQuickly(final Statement stmt) {
+    /**
+     * Close a <code>Statement</code> ignoring <code>null</code> values and exceptions.
+     * 
+     * @param stmt
+     *            the Statement to close, may be null.
+     */
+    public static void closeQuietly(final Statement stmt) {
         if (stmt != null) {
             try {
                 stmt.close();
@@ -57,7 +69,13 @@ public final class JDBCUtils {
         }
     }
 
-    public static void closeQuickly(final Connection connection) {
+    /**
+     * Close a <code>Connection</code> ignoring <code>null</code> values and exceptions.
+     * 
+     * @param connection
+     *            the Connection to close, may be null.
+     */
+    public static void closeQuietly(final Connection connection) {
         if (connection != null) {
             try {
                 connection.close();

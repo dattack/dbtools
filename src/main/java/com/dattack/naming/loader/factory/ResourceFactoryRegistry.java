@@ -23,21 +23,32 @@ import java.util.Map;
  * @since 0.1
  */
 public final class ResourceFactoryRegistry {
-	
-	private static final String DATASOURCE_TYPE_KEY = "javax.sql.DataSource";
 
-	private static final Map<String, ResourceFactory<?>> mapping = new HashMap<String, ResourceFactory<?>>();
+    private static final String DATASOURCE_TYPE_KEY = "javax.sql.DataSource";
 
-	static {
-		// default factory list
-		mapping.put(DATASOURCE_TYPE_KEY, new DataSourceFactory());
-	}
+    private static final Map<String, ResourceFactory<?>> MAPPING = new HashMap<String, ResourceFactory<?>>();
 
-	private ResourceFactoryRegistry() {
-		// static class
-	}
+    static {
+        // default factory list
+        MAPPING.put(DATASOURCE_TYPE_KEY, new DataSourceFactory());
+    }
 
-	public static ResourceFactory<?> getConverter(final String type) {
-		return mapping.get(type);
-	}
+    private ResourceFactoryRegistry() {
+        // static class
+    }
+
+    /**
+     * Returns the <code>ResourceFactory</code> associated to the resource type specified. If the resource type is
+     * <code>null</code> or unknown then returns <code>null</code>.
+     * 
+     * @param type
+     *            the resource type, may be <code>null</code>
+     * @return the factory associated to the resource type, or <code>null</code> if no one exists
+     */
+    public static ResourceFactory<?> getFactory(final String type) {
+        if (type == null) {
+            return null;
+        }
+        return MAPPING.get(type);
+    }
 }

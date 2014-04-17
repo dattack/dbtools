@@ -15,20 +15,25 @@
  */
 package com.dattack.naming.loader.factory;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
  * @author cvarela
  * @since 0.1
+ * @param <T>
+ *            the type of objects instantiated by this factory
  */
 public interface ResourceFactory<T> {
 
-	/**
-	 * Creates a new instance using the specified properties.
-	 * 
-	 * @param properties
-	 *            a Properties data structure
-	 * @return an instance of T
-	 */
-	T getObjectInstance(Properties properties);
+    /**
+     * Creates a new instance using the specified properties.
+     * 
+     * @param properties
+     *            a Properties data structure
+     * @param extraClasspath
+     *            additional paths to explore
+     * @return an instance of T
+     */
+    T getObjectInstance(Properties properties, final List<String> extraClasspath);
 }

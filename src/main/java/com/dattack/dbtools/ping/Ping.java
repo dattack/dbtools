@@ -37,95 +37,93 @@ import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
  */
 public final class Ping {
 
-	private static final Log log = LogFactory.getLog(Ping.class);
+    private static final Log log = LogFactory.getLog(Ping.class);
 
-	public static void main(final String[] args) {
+    public static void main(final String[] args) {
 
-		try {
+        try {
 
-			if (args.length < 1) {
-				log.fatal("Usage: Ping <configuration_file> [<configuration_file [...]]");
-				return;
-			}
+            if (args.length < 1) {
+                log.fatal("Usage: Ping <configuration_file> [<configuration_file [...]]");
+                return;
+            }
 
-			final Ping ping = new Ping();
-			ping.execute(args);
+            final Ping ping = new Ping();
+            ping.execute(args);
 
-		} catch (final Exception e) {
-			log.fatal(e.getMessage(), e);
-		}
-	}
+        } catch (final Exception e) {
+            log.fatal(e.getMessage(), e);
+        }
+    }
 
-	// private final ExecutorService pool;
-	private final ThreadPool pool;
+    // private final ExecutorService pool;
+    private final ThreadPool pool;
 
-	public Ping() {
-		pool = new ThreadPool();
-	}
+    public Ping() {
+        pool = new ThreadPool();
+    }
 
-	private void execute(final File file) throws ConfigurationException {
+    private void execute(final File file) throws ConfigurationException {
 
-		log.info("file: " + file);
+        log.info("file: " + file);
 
-		if (file.isDirectory()) {
+        if (file.isDirectory()) {
 
-			final FilenameFilter filter = new FilenameFilter() {
+            final FilenameFilter filter = new FilenameFilter() {
 
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.toLowerCase().endsWith(".xml");
-				}
-			};
+                @Override
+                public boolean accept(final File dir, final String name) {
+                    return name.toLowerCase().endsWith(".xml");
+                }
+            };
 
-			for (final File child : file.listFiles(filter)) {
-				execute(child);
-			}
+            for (final File child : file.listFiles(filter)) {
+                execute(child);
+            }
 
-		} else {
+        } else {
 
-			List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
-			for (final PingJobConfiguration pingJobConf : pingJobConfList) {
+            List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
+            for (final PingJobConfiguration pingJobConf : pingJobConfList) {
 
-				DataSource dataSource = new DataSourceBuilder()
-				.withPath("")
-				.withJNDIName(pingJobConf.getDatasource()).build();
+                DataSource dataSource = new DataSourceBuilder().withJNDIName(pingJobConf.getDatasource()).build();
 
-				// TODO: the sentence provider must be configured
-				SQLSentenceProvider sentenceProvider = new SQLSentenceRoundRobinProvider(pingJobConf.getQueryList());
+                // TODO: the sentence provider must be configured
+                SQLSentenceProvider sentenceProvider = new SQLSentenceRoundRobinProvider(pingJobConf.getQueryList());
 
-				final LogWriter logWriter = new FileLogWriter(pingJobConf.getLogFile());
+                final LogWriter logWriter = new FileLogWriter(pingJobConf.getLogFile());
 
-				LogHeader logHeader = new LogHeader(pingJobConf);
-				logWriter.write(logHeader);
+                LogHeader logHeader = new LogHeader(pingJobConf);
+                logWriter.write(logHeader);
 
-				for (int i = 0; i < pingJobConf.getThreads(); i++) {
-					pool.submit(new PingJob(pingJobConf, dataSource, sentenceProvider, logWriter),
-							pingJobConf.getName() + "@Thread-" + i);
-				}
-			}
-		}
-	}
+                for (int i = 0; i < pingJobConf.getThreads(); i++) {
+                    pool.submit(new PingJob(pingJobConf, dataSource, sentenceProvider, logWriter),
+                            pingJobConf.getName() + "@Thread-" + i);
+                }
+            }
+        }
+    }
 
-	private void execute(final String[] args) throws ConfigurationException {
+    private void execute(final String[] args) throws ConfigurationException {
 
-		for (final String filename : args) {
-			execute(new File(filename));
-		}
-	}
+        for (final String filename : args) {
+            execute(new File(filename));
+        }
+    }
 
-	private class ThreadPool {
+    private class ThreadPool {
 
-		private List<Thread> threadList;
+        private final List<Thread> threadList;
 
-		public ThreadPool() {
-			this.threadList = new ArrayList<Thread>();
-		}
+        public ThreadPool() {
+            this.threadList = new ArrayList<Thread>();
+        }
 
-		public void submit(Runnable task, String threadName) {
+        public void submit(final Runnable task, final String threadName) {
 
-			Thread thread = new Thread(task, threadName);
-			thread.start();
-			threadList.add(thread);
-		}
-	}
+            Thread thread = new Thread(task, threadName);
+            thread.start();
+            threadList.add(thread);
+        }
+    }
 }

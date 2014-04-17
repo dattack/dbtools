@@ -19,77 +19,73 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+/**
+ * Basic datasource implementation.
+ * 
+ * @author cvarela
+ * @since 0.1
+ */
 public final class SimpleDataSource extends AbstractDataSource {
 
-	private final String username;
-	private final String password;
-	private final String url;
-	private final String driver;
+    private static final Log log = LogFactory.getLog(SimpleDataSource.class);
 
-	public SimpleDataSource(final String driver, final String url, final String username, final String password) {
-		ensureLoaded(driver);
-		this.driver = driver;
-		this.url = url;
-		this.username = username;
-		this.password = password;
-	}
+    private final String username;
+    private final String password;
+    private final String url;
+    private final String driver;
+    private volatile boolean ensureDriverLoadedNeeded;
 
-	private static boolean ensureLoaded(final String name) {
-		try {
-			Class.forName(name).newInstance();
-			return true;
-		} catch (final Exception e) {
-			return false;
-		}
-	}
+    public SimpleDataSource(final String driver, final String url, final String username, final String password) {
+        this.driver = driver;
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        ensureDriverLoadedNeeded = true;
+    }
 
-	/** {@inheritDoc} */
-	public Connection getConnection() throws SQLException {
-		return this.getConnection(username, password);
-	}
+    private synchronized void ensureDriverLoaded() {
 
-	/** {@inheritDoc} */
-	public Connection getConnection(final String user, final String pass) throws SQLException {
+        if (!ensureDriverLoadedNeeded) {
+            return;
+        }
 
-		if ((user == null) || (pass == null)) {
-			return DriverManager.getConnection(url);
-		}
+        try {
+            Class.forName(driver).newInstance();
+            ensureDriverLoadedNeeded = false;
+        } catch (final Exception e) {
+            log.error(e.getMessage());
+        }
+    }
 
-		return DriverManager.getConnection(url, user, pass);
-	}
+    /** {@inheritDoc} */
+    @Override
+    public Connection getConnection() throws SQLException {
+        if (ensureDriverLoadedNeeded) {
+            ensureDriverLoaded();
+        }
+        return this.getConnection(username, password);
+    }
 
-	@Override
-	public String toString() {
-		return driver + "::::" + url + "::::" + username;
-	}
+    /** {@inheritDoc} */
+    @Override
+    public Connection getConnection(final String user, final String pass) throws SQLException {
 
-	@Override
-	public boolean equals(final Object obj) {
+        if (ensureDriverLoadedNeeded) {
+            ensureDriverLoaded();
+        }
 
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (obj.getClass() != getClass()) {
-			return false;
-		}
+        if ((user == null) || (pass == null)) {
+            return DriverManager.getConnection(url);
+        }
 
-		SimpleDataSource other = (SimpleDataSource) obj;
-		return new EqualsBuilder() //
-				.appendSuper(super.equals(obj)) //
-				.append(url, other.url) //
-				.append(driver, other.driver) //
-				.append(username, other.username) //
-				.isEquals();
-	}
+        return DriverManager.getConnection(url, user, pass);
+    }
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(url).append(username).append(driver).toHashCode();
-	}
+    @Override
+    public String toString() {
+        return driver + ":" + username + "@" + url;
+    }
 }

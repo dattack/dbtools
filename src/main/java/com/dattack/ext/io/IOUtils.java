@@ -15,8 +15,8 @@
  */
 package com.dattack.ext.io;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +35,7 @@ public final class IOUtils {
 		// utility class
 	}
 
-	public static void closeQuickly(final FileOutputStream file) {
+	public static void closeQuietly(final OutputStream file) {
 		if (file != null) {
 			try {
 				file.close();
