@@ -22,21 +22,21 @@ import java.io.Serializable;
  */
 public class SQLSentence implements Serializable {
 
-	private static final long serialVersionUID = 6027026851333293209L;
+    private static final long serialVersionUID = 6027026851333293209L;
 
-	private final String label;
-	private final String sql;
+    private final String label;
+    private final String sql;
 
-	public SQLSentence(final String label, final String sql) {
-		this.label = label;
-		this.sql = sql;
-	}
+    public SQLSentence(final String label, final String sql) {
+        this.label = label;
+        this.sql = sql;
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public String getSql() {
-		return sql;
-	}
+    public String getSql() {
+        return sql;
+    }
 }

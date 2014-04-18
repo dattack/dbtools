@@ -19,7 +19,12 @@ package com.dattack.dbtools;
  * @author cvarela
  * @since 0.1
  */
-public class Constants {
+public final class Constants {
 
-	public static final String DBTOOLS_VERSION = "0.1";
+    /** The application's version. */
+    public static final String DBTOOLS_VERSION = "0.1";
+
+    private Constants() {
+        // utility class
+    }
 }

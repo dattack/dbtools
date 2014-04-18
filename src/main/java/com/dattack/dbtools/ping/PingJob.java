@@ -36,85 +36,85 @@ import com.dattack.ext.jdbc.JDBCUtils;
  */
 class PingJob implements Runnable {
 
-	private static final Log log = LogFactory.getLog(PingJob.class);
+    private static final Log log = LogFactory.getLog(PingJob.class);
 
-	private final PingJobConfiguration configuration;
-	private final DataSource dataSource;
-	private final SQLSentenceProvider sentenceProvider;
-	private final LogWriter logWriter;
+    private final PingJobConfiguration configuration;
+    private final DataSource dataSource;
+    private final SQLSentenceProvider sentenceProvider;
+    private final LogWriter logWriter;
 
-	public PingJob(final PingJobConfiguration configuration, final DataSource dataSource,
-			final SQLSentenceProvider sentenceProvider, final LogWriter logWriter) {
+    public PingJob(final PingJobConfiguration configuration, final DataSource dataSource,
+            final SQLSentenceProvider sentenceProvider, final LogWriter logWriter) {
 
-		this.configuration = configuration;
-		this.dataSource = dataSource;
-		this.sentenceProvider = sentenceProvider;
-		this.logWriter = logWriter;
-	}
+        this.configuration = configuration;
+        this.dataSource = dataSource;
+        this.sentenceProvider = sentenceProvider;
+        this.logWriter = logWriter;
+    }
 
-	@Override
-	public void run() {
+    @Override
+    public void run() {
 
-		log.info("Running job " + configuration.getName());
+        log.info("Running job " + configuration.getName());
 
-		long iter = 0;
+        long iter = 0;
 
-		final String threadName = Thread.currentThread().getName();
+        final String threadName = Thread.currentThread().getName();
 
-		while (testLoop(iter)) {
-			iter++;
-			Connection connection = null;
-			Statement stmt = null;
-			ResultSet rs = null;
+        while (testLoop(iter)) {
+            iter++;
+            Connection connection = null;
+            Statement stmt = null;
+            ResultSet rs = null;
 
-			// retrieve the SQL to be executed
-			SQLSentence sqlSentence = sentenceProvider.nextSQL();
+            // retrieve the SQL to be executed
+            SQLSentence sqlSentence = sentenceProvider.nextSQL();
 
-			final LogEntry logEntry = new LogEntry(configuration.getName(), threadName, iter, sqlSentence.getLabel());
+            final LogEntry logEntry = new LogEntry(configuration.getName(), threadName, iter, sqlSentence.getLabel());
 
-			try {
+            try {
 
-				connection = dataSource.getConnection();
+                connection = dataSource.getConnection();
 
-				// sets the connection time
-				logEntry.connect();
+                // sets the connection time
+                logEntry.connect();
 
-				// execute the query
-				stmt = connection.createStatement();
-				rs = stmt.executeQuery(sqlSentence.getSql());
+                // execute the query
+                stmt = connection.createStatement();
+                rs = stmt.executeQuery(sqlSentence.getSql());
 
-				while (rs.next()) {
-					logEntry.incrRows();
-				}
+                while (rs.next()) {
+                    logEntry.incrRows();
+                }
 
-				// sets the total time
-				logEntry.end();
+                // sets the total time
+                logEntry.end();
 
-				logWriter.write(logEntry);
+                logWriter.write(logEntry);
 
-			} catch (final Exception e) {
-				logEntry.setException(e);
-				logWriter.write(logEntry);
-				log.warn(configuration.getName() + "@" + threadName + ": " + e.getMessage(), e);
-			} finally {
-				JDBCUtils.closeQuietly(rs);
-				JDBCUtils.closeQuietly(stmt);
-				JDBCUtils.closeQuietly(connection);
-			}
+            } catch (final Exception e) {
+                logEntry.setException(e);
+                logWriter.write(logEntry);
+                log.warn(configuration.getName() + "@" + threadName + ": " + e.getMessage(), e);
+            } finally {
+                JDBCUtils.closeQuietly(rs);
+                JDBCUtils.closeQuietly(stmt);
+                JDBCUtils.closeQuietly(connection);
+            }
 
-			if (testLoop(iter) && configuration.getTimeBetweenExecutions() > 0) {
-				synchronized (this) {
-					try {
-						wait(configuration.getTimeBetweenExecutions());
-					} catch (final Exception e) {
-						log.warn(e.getMessage());
-					}
-				}
-			}
-		}
-	}
+            if (testLoop(iter) && configuration.getTimeBetweenExecutions() > 0) {
+                synchronized (this) {
+                    try {
+                        wait(configuration.getTimeBetweenExecutions());
+                    } catch (final Exception e) {
+                        log.warn(e.getMessage());
+                    }
+                }
+            }
+        }
+    }
 
-	private boolean testLoop(long iteration) {
-		return configuration.getExecutions() <= 0 || iteration < configuration.getExecutions();
-	}
+    private boolean testLoop(final long iteration) {
+        return configuration.getExecutions() <= 0 || iteration < configuration.getExecutions();
+    }
 }

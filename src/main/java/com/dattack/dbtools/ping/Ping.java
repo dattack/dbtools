@@ -39,6 +39,12 @@ public final class Ping {
 
     private static final Log log = LogFactory.getLog(Ping.class);
 
+    /**
+     * The <code>main</code> method.
+     * 
+     * @param args
+     *            the program arguments
+     */
     public static void main(final String[] args) {
 
         try {
@@ -59,7 +65,7 @@ public final class Ping {
     // private final ExecutorService pool;
     private final ThreadPool pool;
 
-    public Ping() {
+    private Ping() {
         pool = new ThreadPool();
     }
 

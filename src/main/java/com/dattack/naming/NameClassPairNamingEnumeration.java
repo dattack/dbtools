@@ -27,11 +27,12 @@ import javax.naming.NameClassPair;
  */
 public class NameClassPairNamingEnumeration extends AbstractNamingEnumeration<NameClassPair> {
 
-	public NameClassPairNamingEnumeration(Map<?, ?> table) {
-		super(table);
-	}
+    public NameClassPairNamingEnumeration(final Map<?, ?> table) {
+        super(table);
+    }
 
-	public NameClassPair create(Object key, Object value) {
-		return new NameClassPair(key.toString(), value.getClass().getName());
-	}
+    @Override
+    public NameClassPair create(final Object key, final Object value) {
+        return new NameClassPair(key.toString(), value.getClass().getName());
+    }
 }

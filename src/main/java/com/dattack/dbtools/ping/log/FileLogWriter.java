@@ -40,124 +40,124 @@ import com.dattack.ext.io.IOUtils;
  */
 public class FileLogWriter implements LogWriter {
 
-	private static final Log log = LogFactory.getLog(FileLogWriter.class);
+    private static final Log log = LogFactory.getLog(FileLogWriter.class);
 
-	private final CSVStringBuilder csvBuilder;
-	private final String filename;
+    private final CSVStringBuilder csvBuilder;
+    private final String filename;
 
-	public FileLogWriter(final String filename) {
-		this.filename = filename;
-		this.csvBuilder = new CSVStringBuilder(new CSVConfigurationBuilder().withSeparator("\t").build());
-	}
+    public FileLogWriter(final String filename) {
+        this.filename = filename;
+        this.csvBuilder = new CSVStringBuilder(new CSVConfigurationBuilder().withSeparator("\t").build());
+    }
 
-	public FileOutputStream getOutputStream() throws FileNotFoundException {
+    private FileOutputStream getOutputStream() throws FileNotFoundException {
 
-		final File file = new File(filename);
-		if (!file.exists()) {
-			final File parent = file.getParentFile();
-			if (parent != null && !parent.exists()) {
-				if (!parent.mkdirs()) {
-					log.warn("Unable to create directory: " + parent);
-				}
-			}
-		}
-		return new FileOutputStream(file, true);
-	}
+        final File file = new File(filename);
+        if (!file.exists()) {
+            final File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) {
+                if (!parent.mkdirs()) {
+                    log.warn("Unable to create directory: " + parent);
+                }
+            }
+        }
+        return new FileOutputStream(file, true);
+    }
 
-	public synchronized void write(final LogHeader logHeader) {
-		write(format(logHeader));
-	}
+    @Override
+    public synchronized void write(final LogHeader logHeader) {
+        write(format(logHeader));
+    }
 
-	@Override
-	public void write(final LogEntry logEntry) {
-		write(format(logEntry));
-	}
+    @Override
+    public void write(final LogEntry logEntry) {
+        write(format(logEntry));
+    }
 
-	private void write(final String message) {
+    private void write(final String message) {
 
-		FileOutputStream out = null;
-		try {
-			out = getOutputStream();
-			out.write(message.getBytes());
-		} catch (final IOException e) {
-			log.warn(e.getMessage());
-		} finally {
-			IOUtils.closeQuietly(out);
-		}
-	}
+        FileOutputStream out = null;
+        try {
+            out = getOutputStream();
+            out.write(message.getBytes());
+        } catch (final IOException e) {
+            log.warn(e.getMessage());
+        } finally {
+            IOUtils.closeQuietly(out);
+        }
+    }
 
-	private String format(final LogHeader header) {
+    private String format(final LogHeader header) {
 
-		String data = null;
-		synchronized (csvBuilder) {
+        String data = null;
+        synchronized (csvBuilder) {
 
-			csvBuilder.comment();
+            csvBuilder.comment();
 
-			List<String> keys = new ArrayList<String>(header.getProperties().keySet());
-			Collections.sort(keys);
+            List<String> keys = new ArrayList<String>(header.getProperties().keySet());
+            Collections.sort(keys);
 
-			for (final String key : keys) {
-				csvBuilder.comment( //
-						new StringBuilder() //
-								.append(escapeHeaderLine(ObjectUtils.toString(key))) //
-								.append(": ") //
-								.append(escapeHeaderLine(ObjectUtils.toString(header.getProperties().get(key)))) //
-								.toString() //
-						);
-			}
+            for (final String key : keys) {
+                csvBuilder.comment(new StringBuilder() //
+                        .append(escapeHeaderLine(ObjectUtils.toString(key))) //
+                        .append(": ") //
+                        .append(escapeHeaderLine(ObjectUtils.toString(header.getProperties().get(key)))) //
+                        .toString() //
+                        );
+            }
 
-			csvBuilder.comment("SQL Sentences:");
-			for (SQLSentence sentence : header.getPingJobConfiguration().getQueryList()) {
-				csvBuilder.comment(new StringBuilder().append("  ").append(sentence.getLabel()).append(": ")
-						.append(escapeHeaderLine(sentence.getSql())).toString());
-			}
+            csvBuilder.comment("SQL Sentences:");
+            for (SQLSentence sentence : header.getPingJobConfiguration().getQueryList()) {
+                csvBuilder.comment(new StringBuilder().append("  ").append(sentence.getLabel()).append(": ")
+                        .append(escapeHeaderLine(sentence.getSql())).toString());
+            }
 
-			csvBuilder.comment() //
-					.append("date") //
-					.append("task-name") //
-					.append("thread-name") //
-					.append("iteration") //
-					.append("sql-label") //
-					.append("rows") //
-					.append("connection-time") //
-					.append("first-row-time") //
-					.append("total-time") //
-					.append("message").eol();
+            csvBuilder.comment() //
+                    .append("date") //
+                    .append("task-name") //
+                    .append("thread-name") //
+                    .append("iteration") //
+                    .append("sql-label") //
+                    .append("rows") //
+                    .append("connection-time") //
+                    .append("first-row-time") //
+                    .append("total-time") //
+                    .append("message").eol();
 
-			data = csvBuilder.toString();
-			csvBuilder.clear();
-		}
-		return data;
-	}
+            data = csvBuilder.toString();
+            csvBuilder.clear();
+        }
+        return data;
+    }
 
-	private String escapeHeaderLine(String message) {
-		return message.replaceAll("\n", " ");
-	}
+    private String escapeHeaderLine(final String message) {
+        return message.replaceAll("\n", " ");
+    }
 
-	private String format(final LogEntry entry) {
+    private String format(final LogEntry entry) {
 
-		String data = null;
-		synchronized (csvBuilder) {
-			csvBuilder.append(new Date(entry.getStartTime())) //
-					.append(StringUtils.trimToEmpty(entry.getTaskName())) //
-					.append(StringUtils.trimToEmpty(entry.getThreadName())) //
-					.append(entry.getIteration()) //
-					.append(StringUtils.trimToEmpty(entry.getSqlLabel())) //
-					.append(entry.getRows()) //
-					.append(entry.getConnectionTime()) //
-					.append(entry.getFirstRowTime()) //
-					.append(entry.getExecutionTime());
+        String data = null;
+        synchronized (csvBuilder) {
+            csvBuilder.append(new Date(entry.getStartTime())) //
+                    .append(StringUtils.trimToEmpty(entry.getTaskName())) //
+                    .append(StringUtils.trimToEmpty(entry.getThreadName())) //
+                    .append(entry.getIteration()) //
+                    .append(StringUtils.trimToEmpty(entry.getSqlLabel())) //
+                    .append(entry.getRows()) //
+                    .append(entry.getConnectionTime()) //
+                    .append(entry.getFirstRowTime()) //
+                    .append(entry.getExecutionTime());
 
-			if (entry.getException() != null) {
-				csvBuilder.append(normalize(entry.getException().getMessage()));
-			}
-			data = csvBuilder.eol().toString();
-			csvBuilder.clear();
-		}
-		return data;
-	}
-	
-	private String normalize(final String text) {
-	    return text.replace("\n", " ");
-	}
+            if (entry.getException() != null) {
+                csvBuilder.append(normalize(entry.getException().getMessage()));
+            }
+            data = csvBuilder.eol().toString();
+            csvBuilder.clear();
+        }
+        return data;
+    }
+
+    private String normalize(final String text) {
+        return text.replace("\n", " ");
+    }
 }

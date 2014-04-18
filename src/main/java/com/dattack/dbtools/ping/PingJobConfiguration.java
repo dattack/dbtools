@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.EnvironmentConfiguration;
-import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.commons.lang.StringUtils;
 
 import com.dattack.dbtools.Builder;
@@ -32,8 +30,11 @@ import com.dattack.ext.misc.ConfigurationUtil;
  * @author cvarela
  * @since 0.1
  */
-public class PingJobConfiguration implements Serializable {
+public final class PingJobConfiguration implements Serializable {
 
+    /**
+     * The <code>Builder</code> pattern implementation of <code>PingJobConfiguration</code>.
+     */
     public static class PingConfigurationBuilder implements Builder<PingJobConfiguration> {
 
         private static final String LABEL_PREFIX = "Label-";
@@ -50,7 +51,7 @@ public class PingJobConfiguration implements Serializable {
         private int executions;
 
         // SQL query list
-        private List<SQLSentence> queryList;
+        private final List<SQLSentence> queryList;
 
         // the number of threads to run
         private int threads;
@@ -60,8 +61,8 @@ public class PingJobConfiguration implements Serializable {
 
         private String logFile;
 
-        private CompositeConfiguration configuration;
-        private BaseConfiguration baseConfiguration;
+        private final CompositeConfiguration configuration;
+        private final BaseConfiguration baseConfiguration;
 
         public PingConfigurationBuilder() {
 
@@ -82,27 +83,63 @@ public class PingJobConfiguration implements Serializable {
             return new PingJobConfiguration(this);
         }
 
-        public PingConfigurationBuilder withDatasource(String value) {
+        /**
+         * Sets the JNDI name of the datasource to use.
+         * 
+         * @param value
+         *            the JNDI name
+         * @return self instance
+         */
+        public PingConfigurationBuilder withDatasource(final String value) {
             this.datasource = value;
             return this;
         }
 
-        public PingConfigurationBuilder withExecutions(int value) {
+        /**
+         * Sets the number of executions to loop. If the value is zero or negative then executes with no limit. By
+         * default, the value is 0 (no limit).
+         * 
+         * @param value
+         *            the number of executions
+         * @return self instance
+         */
+        public PingConfigurationBuilder withExecutions(final int value) {
             this.executions = value;
             return this;
         }
 
-        public PingConfigurationBuilder withName(String value) {
+        /**
+         * Sets the task's name.
+         * 
+         * @param value
+         *            the task's name
+         * @return self instance
+         */
+        public PingConfigurationBuilder withName(final String value) {
             this.baseConfiguration.setProperty(TASK_NAME_CONFIGURATION_VAR, value);
             this.name = value;
             return this;
         }
 
+        /**
+         * Sets the log file pathname.
+         * 
+         * @param value
+         *            the log file pathname.
+         * @return self instance
+         */
         public PingConfigurationBuilder withLogFile(final String value) {
             this.logFile = value;
             return this;
         }
 
+        /**
+         * Adds a new ping-query.
+         * 
+         * @param sentence
+         *            the SQL query
+         * @return self instance
+         */
         public PingConfigurationBuilder withQuery(final SQLSentence sentence) {
             if (StringUtils.isBlank(sentence.getLabel())) {
                 this.queryList.add(new SQLSentence(computeLabel(sentence), sentence.getSql()));
@@ -116,14 +153,29 @@ public class PingJobConfiguration implements Serializable {
             return LABEL_PREFIX + sentence.getSql().hashCode();
         }
 
-        public PingConfigurationBuilder withThreads(int value) {
+        /**
+         * Sets the number of threads to use.
+         * 
+         * @param value
+         *            the number of threads
+         * @return self instance
+         */
+        public PingConfigurationBuilder withThreads(final int value) {
             if (value >= DEFAULT_THREADS) {
                 this.threads = value;
             }
             return this;
         }
 
-        public PingConfigurationBuilder withTimeBetweenExecutions(long value) {
+        /**
+         * Sets the time that the current thread must sleep before execute a new ping-query (in milliseconds). If the
+         * time is zero or negative, then the current thread loop without sleep.
+         * 
+         * @param value
+         *            the time to sleep
+         * @return self instance
+         */
+        public PingConfigurationBuilder withTimeBetweenExecutions(final long value) {
             if (value >= 0) {
                 this.timeBetweenExecutions = value;
             }
@@ -133,13 +185,13 @@ public class PingJobConfiguration implements Serializable {
 
     private static final long serialVersionUID = -8595562721719896797L;
 
-    private String datasource;
-    private int executions;
-    private String name;
-    private List<SQLSentence> queryList;
-    private int threads;
-    private long timeBetweenExecutions;
-    private String logFile;
+    private final String datasource;
+    private final int executions;
+    private final String name;
+    private final List<SQLSentence> queryList;
+    private final int threads;
+    private final long timeBetweenExecutions;
+    private final String logFile;
 
     private PingJobConfiguration(final PingConfigurationBuilder builder) {
         this.datasource = builder.datasource;

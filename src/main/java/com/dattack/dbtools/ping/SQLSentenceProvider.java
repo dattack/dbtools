@@ -23,8 +23,8 @@ package com.dattack.dbtools.ping;
  */
 public interface SQLSentenceProvider {
 
-	/**
-	 * @return the SQL-query to be executed
-	 */
-	SQLSentence nextSQL();
+    /**
+     * @return the SQL-query to be executed
+     */
+    SQLSentence nextSQL();
 }

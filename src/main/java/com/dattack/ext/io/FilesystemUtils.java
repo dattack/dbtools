@@ -34,52 +34,109 @@ import java.text.MessageFormat;
  */
 public final class FilesystemUtils {
 
-	private FilesystemUtils() {
-		// static class
-	}
+    private FilesystemUtils() {
+        // static class
+    }
 
-	public static File locate(final String path) {
+    /**
+     * Finds the file with the given name.
+     * 
+     * @param path
+     *            the file name
+     * @return the <code>File</code>
+     */
+    public static File locate(final String path) {
 
-		final URL url = FilesystemUtils.class.getClassLoader().getResource(path);
-		if (url != null) {
-			try {
-				final URI uri = new URI(url.toExternalForm());
-				return new File(uri);
-			} catch (final URISyntaxException e) {
-				// URI syntax error? we have a valid URL 
-			}
-		}
-		return new File(path);
-	}
+        final URL url = FilesystemUtils.class.getClassLoader().getResource(path);
+        if (url != null) {
+            try {
+                final URI uri = new URI(url.toExternalForm());
+                return new File(uri);
+            } catch (final URISyntaxException e) {
+                // URI syntax error? we have a valid URL
+                return new File(path);
+            }
+        }
+        return new File(path);
+    }
 
-	public static String readFileToString(final String path) throws IOException {
-		return readFileToString(path, Charset.defaultCharset());
-	}
+    /**
+     * Reads the content of a file.
+     * 
+     * @param path
+     *            the file to read
+     * @return a <code>String</code> containing the bytes read from the file
+     * @throws IOException
+     *             if an I/O error occurs reading from the stream
+     */
+    public static String readFileToString(final String path) throws IOException {
+        return readFileToString(path, Charset.defaultCharset());
+    }
 
-	public static String readFileToString(final Path path) throws IOException {
-		return readFileToString(path, Charset.defaultCharset());
-	}
+    /**
+     * Reads the content of a file.
+     * 
+     * @param path
+     *            the file to read
+     * @return a <code>String</code> containing the bytes read from the file
+     * @throws IOException
+     *             if an I/O error occurs reading from the stream
+     */
+    public static String readFileToString(final Path path) throws IOException {
+        return readFileToString(path, Charset.defaultCharset());
+    }
 
-	public static String readFileToString(String path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
-	}
+    /**
+     * Reads the content of a file.
+     * 
+     * @param path
+     *            the file to read
+     * @param encoding
+     *            The {@link java.nio.charset.Charset charset} to be used to decode the {@code bytes}
+     * @return a <code>String</code> containing the bytes read from the file
+     * @throws IOException
+     *             if an I/O error occurs reading from the stream
+     */
+    public static String readFileToString(final String path, final Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
 
-	public static String readFileToString(final Path path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(path);
-		return new String(encoded, encoding);
-	}
+    /**
+     * Reads the content of a file.
+     * 
+     * @param path
+     *            the file to read
+     * @param encoding
+     *            The {@link java.nio.charset.Charset charset} to be used to decode the {@code bytes}
+     * @return a <code>String</code> containing the bytes read from the file
+     * @throws IOException
+     *             if an I/O error occurs reading from the stream
+     */
+    public static String readFileToString(final Path path, final Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(path);
+        return new String(encoded, encoding);
+    }
 
-	public static void mkdirs(File directory) throws IOException {
-		if (directory.exists()) {
-			if (directory.isFile()) {
-				throw new IOException(MessageFormat.format(
-						"Unable to create directory: file {0} exists but is not a directory", directory));
-			}
-		} else {
-			if (!directory.mkdirs()) {
-				throw new IOException("Unable to create directory " + directory);
-			}
-		}
-	}
+    /**
+     * Creates the directory named by this abstract pathname, including any necessary but nonexistent parent
+     * directories.
+     * 
+     * @param directory
+     *            the directory named
+     * @throws IOException
+     *             if an I/O error occurs creating the directory hierarchy
+     */
+    public static void mkdirs(final File directory) throws IOException {
+        if (directory.exists()) {
+            if (directory.isFile()) {
+                throw new IOException(MessageFormat.format(
+                        "Unable to create directory: file {0} exists but is not a directory", directory));
+            }
+        } else {
+            if (!directory.mkdirs()) {
+                throw new IOException("Unable to create directory " + directory);
+            }
+        }
+    }
 }

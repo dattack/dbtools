@@ -23,102 +23,117 @@ import java.io.Serializable;
  */
 public class LogEntry implements Serializable {
 
-	private static final long serialVersionUID = 9149270318492709877L;
+    private static final long serialVersionUID = 9149270318492709877L;
 
-	private static final long UNKNOWN_TIME = -1;
+    private static final long UNKNOWN_TIME = -1;
 
-	private final String taskName;
-	private final String threadName;
-	private final long iteration;
-	private final String sqlLabel;
-	private long rows;
-	private boolean running;
+    private final String taskName;
+    private final String threadName;
+    private final long iteration;
+    private final String sqlLabel;
+    private long rows;
+    private boolean running;
 
-	private final long startTime;
-	private long connectionTime;
-	private long firstRowTime;
-	private long lastRowTime;
-	private Exception exception;
+    private final long startTime;
+    private long connectionTime;
+    private long firstRowTime;
+    private long lastRowTime;
+    private Exception exception;
 
-	public LogEntry(final String taskName, final String threadName, final long iteration, final String sqlLabel) {
-		this.taskName = taskName;
-		this.threadName = threadName;
-		startTime = System.currentTimeMillis();
-		this.iteration = iteration;
-		this.sqlLabel = sqlLabel;
-		running = true;
-		connectionTime = UNKNOWN_TIME;
-		firstRowTime = UNKNOWN_TIME;
-		lastRowTime = UNKNOWN_TIME;
-	}
+    public LogEntry(final String taskName, final String threadName, final long iteration, final String sqlLabel) {
+        this.taskName = taskName;
+        this.threadName = threadName;
+        startTime = System.currentTimeMillis();
+        this.iteration = iteration;
+        this.sqlLabel = sqlLabel;
+        running = true;
+        connectionTime = UNKNOWN_TIME;
+        firstRowTime = UNKNOWN_TIME;
+        lastRowTime = UNKNOWN_TIME;
+    }
 
-	public void end() {
-		if (running) {
-			running = false;
-			lastRowTime = System.currentTimeMillis();
-			if (firstRowTime == UNKNOWN_TIME) {
-				firstRowTime = lastRowTime;
-			}
-		}
-	}
+    /**
+     * Computes the total time.
+     */
+    public void end() {
+        if (running) {
+            running = false;
+            lastRowTime = System.currentTimeMillis();
+            if (firstRowTime == UNKNOWN_TIME) {
+                firstRowTime = lastRowTime;
+            }
+        }
+    }
 
-	public Exception getException() {
-		return exception;
-	}
+    public Exception getException() {
+        return exception;
+    }
 
-	public long getConnectionTime() {
-		return connectionTime - startTime;
-	}
-	
-	public long getExecutionTime() {
-		return lastRowTime - startTime;
-	}
+    public long getConnectionTime() {
+        return connectionTime - startTime;
+    }
 
-	public long getFirstRowTime() {
-		return firstRowTime - startTime;
-	}
+    public long getExecutionTime() {
+        return lastRowTime - startTime;
+    }
 
-	public String getTaskName() {
-		return taskName;
-	}
-	
-	public String getThreadName() {
-		return threadName;
-	}
+    public long getFirstRowTime() {
+        return firstRowTime - startTime;
+    }
 
-	public long getIteration() {
-		return iteration;
-	}
-	
-	public String getSqlLabel() {
-		return sqlLabel;
-	}
+    public String getTaskName() {
+        return taskName;
+    }
 
-	public long getRows() {
-		return rows;
-	}
+    public String getThreadName() {
+        return threadName;
+    }
 
-	public long getStartTime() {
-		return startTime;
-	}
+    public long getIteration() {
+        return iteration;
+    }
 
-	public synchronized void connect() {
-		if (connectionTime == UNKNOWN_TIME) {
-			connectionTime = System.currentTimeMillis();
-		}
-	}
+    public String getSqlLabel() {
+        return sqlLabel;
+    }
 
-	public void incrRows() {
-		if (running) {
-			if (firstRowTime == UNKNOWN_TIME) {
-				firstRowTime = System.currentTimeMillis();
-			}
-			rows++;
-		}
-	}
+    public long getRows() {
+        return rows;
+    }
 
-	public void setException(Exception exception) {
-		this.exception = exception;
-		end();
-	}
+    public long getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * Sets the connection time.
+     */
+    public synchronized void connect() {
+        if (connectionTime == UNKNOWN_TIME) {
+            connectionTime = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * Increments the number of rows.
+     */
+    public void incrRows() {
+        if (running) {
+            if (firstRowTime == UNKNOWN_TIME) {
+                firstRowTime = System.currentTimeMillis();
+            }
+            rows++;
+        }
+    }
+
+    /**
+     * Sets the error message.
+     * 
+     * @param exception
+     *            the exception
+     */
+    public void setException(final Exception exception) {
+        this.exception = exception;
+        end();
+    }
 }

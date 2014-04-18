@@ -18,27 +18,28 @@ package com.dattack.dbtools.ping;
 import java.util.List;
 
 /**
+ * Implements the round-robin strategy for SQL-sentence selection.
  * 
  * @author cvarela
  * @since 0.1
  */
 public class SQLSentenceRoundRobinProvider implements SQLSentenceProvider {
 
-	private final List<SQLSentence> sqlList;
-	private int index;
+    private final List<SQLSentence> sqlList;
+    private int index;
 
-	public SQLSentenceRoundRobinProvider(final List<SQLSentence> sqlList) {
-		this.sqlList = sqlList;
-		index = 0;
-	}
+    public SQLSentenceRoundRobinProvider(final List<SQLSentence> sqlList) {
+        this.sqlList = sqlList;
+        index = 0;
+    }
 
-	@Override
-	public synchronized SQLSentence nextSQL() {
+    @Override
+    public synchronized SQLSentence nextSQL() {
 
-		SQLSentence sqlSentence = sqlList.get(index++);
-		if (index >= sqlList.size()) {
-			index = 0;
-		}
-		return sqlSentence;
-	}
+        SQLSentence sqlSentence = sqlList.get(index++);
+        if (index >= sqlList.size()) {
+            index = 0;
+        }
+        return sqlSentence;
+    }
 }

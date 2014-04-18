@@ -27,12 +27,12 @@ import javax.naming.Binding;
  */
 public class BindingNamingEnumeration extends AbstractNamingEnumeration<Binding> {
 
-	public BindingNamingEnumeration(Map<?, ?> table) {
-		super(table);
-	}
+    public BindingNamingEnumeration(final Map<?, ?> table) {
+        super(table);
+    }
 
-	@Override
-	protected Binding create(Object key, Object value) {
-		return new Binding(key.toString(), value);
-	}
+    @Override
+    protected Binding create(final Object key, final Object value) {
+        return new Binding(key.toString(), value);
+    }
 }

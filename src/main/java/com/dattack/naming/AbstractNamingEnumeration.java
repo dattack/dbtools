@@ -29,60 +29,65 @@ import javax.naming.NamingException;
  */
 abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
 
-	private Map<?, ?> bindingMap = null;
-	private Iterator<?> iterator = null;
+    private Map<?, ?> bindingMap = null;
+    private Iterator<?> iterator = null;
 
-	public AbstractNamingEnumeration(final Map<?, ?> bindingMap) {
-		this.bindingMap = bindingMap;
-		iterator = this.bindingMap.keySet().iterator();
-	}
+    public AbstractNamingEnumeration(final Map<?, ?> bindingMap) {
+        this.bindingMap = bindingMap;
+        iterator = this.bindingMap.keySet().iterator();
+    }
 
-	/** {@inheritDoc  */
-	public final void close() {
-		bindingMap = null;
-		iterator = null;
-	}
+    /** {@inheritDoc} */
+    @Override
+    public final void close() {
+        bindingMap = null;
+        iterator = null;
+    }
 
-	/**
-	 * @param key
-	 *            the key from the binding map
-	 * @param value
-	 *            the binding value
-	 * @return the object associated with the values given
-	 */
-	protected abstract T create(Object key, Object value);
+    /**
+     * @param key
+     *            the key from the binding map
+     * @param value
+     *            the binding value
+     * @return the object associated with the values given
+     */
+    protected abstract T create(Object key, Object value);
 
-	/** {@inheritDoc  */
-	public final boolean hasMore() throws NamingException {
-		if (bindingMap == null) {
-			throw new NamingException();
-		}
-		return hasMoreElements();
-	}
+    /** {@inheritDoc} */
+    @Override
+    public final boolean hasMore() throws NamingException {
+        if (bindingMap == null) {
+            throw new NamingException();
+        }
+        return hasMoreElements();
+    }
 
-	/** {@inheritDoc  */
-	public final boolean hasMoreElements() {
-		if (iterator == null) {
-			return false;
-		}
-		return iterator.hasNext();
-	}
+    /** {@inheritDoc} */
+    @Override
+    public final boolean hasMoreElements() {
+        if (iterator == null) {
+            return false;
+        }
+        return iterator.hasNext();
+    }
 
-	/** {@inheritDoc  */
-	public final T next() throws NamingException {
-		if (bindingMap == null) {
-			throw new NamingException();
-		}
-		return nextElement();
-	}
+    /** {@inheritDoc} */
+    @Override
+    public final T next() throws NamingException {
+        if (bindingMap == null) {
+            throw new NamingException();
+        }
+        return nextElement();
+    }
 
-	/** {@inheritDoc  */
-	public final T nextElement() {
-		if (bindingMap == null) {
-			return null;
-		}
-		Object name = iterator.next();
+    /** {@inheritDoc} */
+    @Override
+    public final T nextElement() {
+        if (bindingMap == null) {
+            return null;
+        }
+        Object name = iterator.next();
 
-		return create(name.toString(), bindingMap.get(name));
-	}
+        return create(name.toString(), bindingMap.get(name));
+    }
 }

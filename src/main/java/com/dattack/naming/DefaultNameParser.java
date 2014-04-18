@@ -34,16 +34,17 @@ import org.apache.commons.lang.StringUtils;
  */
 class DefaultNameParser implements NameParser {
 
-	private final Properties properties;
+    private final Properties properties;
 
-	public DefaultNameParser(Context parent) throws NamingException {
-		this.properties = new Properties();
-		properties.putAll(parent.getEnvironment());
-	}
+    public DefaultNameParser(final Context parent) throws NamingException {
+        this.properties = new Properties();
+        properties.putAll(parent.getEnvironment());
+    }
 
-	/** {@inheritDoc} */
-	public Name parse(final String name) throws InvalidNameException, NamingException {
+    /** {@inheritDoc} */
+    @Override
+    public Name parse(final String name) throws InvalidNameException, NamingException {
 
-		return new CompoundName(StringUtils.trimToEmpty(name), properties);
-	}
+        return new CompoundName(StringUtils.trimToEmpty(name), properties);
+    }
 }

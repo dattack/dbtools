@@ -34,39 +34,40 @@ import com.dattack.naming.AbstractContext;
  */
 public class StandaloneContext extends AbstractContext {
 
-	public StandaloneContext(Hashtable<?, ?> env) {
-		super(env);
-	}
+    public StandaloneContext(final Hashtable<?, ?> env) {
+        super(env);
+    }
 
-	private StandaloneContext(AbstractContext that) {
-		super(that);
-	}
+    private StandaloneContext(final AbstractContext that) {
+        super(that);
+    }
 
-	/**
-	 * @see javax.naming.Context#createSubcontext(javax.naming.Name)
-	 */
-	public Context createSubcontext(Name name) throws NamingException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Context createSubcontext(final Name name) throws NamingException {
 
-		Hashtable<Name, Object> subContexts = getSubContexts();
+        Hashtable<Name, Object> subContexts = getSubContexts();
 
-		if (name.size() > 1) {
-			if (subContexts.containsKey(name.getPrefix(1))) {
-				Context subContext = (Context) subContexts.get(name.getPrefix(1));
-				return subContext.createSubcontext(name.getSuffix(1));
-			}
-			throw new NameNotFoundException(MessageFormat.format("The subcontext ''{0}'' was not found.",
-					name.getPrefix(1)));
-		}
+        if (name.size() > 1) {
+            if (subContexts.containsKey(name.getPrefix(1))) {
+                Context subContext = (Context) subContexts.get(name.getPrefix(1));
+                return subContext.createSubcontext(name.getSuffix(1));
+            }
+            throw new NameNotFoundException(MessageFormat.format("The subcontext ''{0}'' was not found.",
+                    name.getPrefix(1)));
+        }
 
-		if (lookup(name) != null) {
-			throw new NameAlreadyBoundException();
-		}
+        if (lookup(name) != null) {
+            throw new NameAlreadyBoundException();
+        }
 
-		Name contextName = getNameParser((Name) null).parse(getNameInNamespace());
-		contextName.addAll(name);
-		StandaloneContext subcontext = new StandaloneContext(this);
-		subcontext.setNameInNamespace(contextName);
-		bind(name, subcontext);
-		return subcontext;
-	}
+        Name contextName = getNameParser((Name) null).parse(getNameInNamespace());
+        contextName.addAll(name);
+        StandaloneContext subcontext = new StandaloneContext(this);
+        subcontext.setNameInNamespace(contextName);
+        bind(name, subcontext);
+        return subcontext;
+    }
 }

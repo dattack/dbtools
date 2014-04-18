@@ -23,37 +23,59 @@ import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.commons.lang.ObjectUtils;
 
 /**
+ * Provides utility methods for manage to <code>Configuration</code> instances.
+ * 
  * @author cvarela
  * @since 0.1
  */
-public class ConfigurationUtil {
+public final class ConfigurationUtil {
 
-	private ConfigurationUtil() {
-		// static class
-	}
-	
-	/**
-	 * Create a Configuration based on the environment variables and system properties.
-	 * @return
-	 */
-	public static CompositeConfiguration createEnvSystemConfiguration() {
-		CompositeConfiguration configuration = new CompositeConfiguration();
-		configuration.addConfiguration(new SystemConfiguration());
-		configuration.addConfiguration(new EnvironmentConfiguration());
-		return configuration;
-	}
+    private ConfigurationUtil() {
+        // static class
+    }
 
-	public static String interpolate(final Object value, final AbstractConfiguration configuration) {
+    /**
+     * Create a <code>Configuration</code> based on the environment variables and system properties.
+     * 
+     * @return a <code>Configuration</code> based on the environment variables and system properties
+     */
+    public static CompositeConfiguration createEnvSystemConfiguration() {
+        CompositeConfiguration configuration = new CompositeConfiguration();
+        configuration.addConfiguration(new SystemConfiguration());
+        configuration.addConfiguration(new EnvironmentConfiguration());
+        return configuration;
+    }
 
-		return interpolate(ObjectUtils.toString(value), configuration);
-	}
+    /**
+     * Interpolates the specified value.
+     * 
+     * @param value
+     *            the value to be interpolated
+     * @param configuration
+     *            the configuration object to use
+     * @return the interpolated value
+     */
+    public static String interpolate(final Object value, final AbstractConfiguration configuration) {
 
-	public static String interpolate(final String value, final AbstractConfiguration configuration) {
+        return interpolate(ObjectUtils.toString(value), configuration);
+    }
 
-		if ((value == null) || (configuration == null)) {
-			return value;
-		}
+    /**
+     * Interpolates the specified value.
+     * 
+     * @param value
+     *            the value to be interpolated
+     * @param configuration
+     *            the configuration object
+     * @return the interpolated value
+     * @see PropertyConverter#interpolate
+     */
+    public static String interpolate(final String value, final AbstractConfiguration configuration) {
 
-		return PropertyConverter.interpolate(value, configuration).toString();
-	}
+        if ((value == null) || (configuration == null)) {
+            return value;
+        }
+
+        return PropertyConverter.interpolate(value, configuration).toString();
+    }
 }

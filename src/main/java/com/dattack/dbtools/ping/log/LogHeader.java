@@ -27,31 +27,30 @@ import com.dattack.dbtools.ping.PingJobConfiguration;
  */
 public class LogHeader implements Serializable {
 
-	private static final long serialVersionUID = -1459958170880853467L;
+    private static final long serialVersionUID = -1459958170880853467L;
 
-	private final PingJobConfiguration pingJobConfiguration;
-	private final HashMap<String, String> properties;
+    private final PingJobConfiguration pingJobConfiguration;
+    private final HashMap<String, String> properties;
 
-	public LogHeader(final PingJobConfiguration pingJobConfiguration) {
-		this.pingJobConfiguration = pingJobConfiguration;
-		properties = new HashMap<String, String>();
-		populateProperties();
-	}
+    public LogHeader(final PingJobConfiguration pingJobConfiguration) {
+        this.pingJobConfiguration = pingJobConfiguration;
+        properties = new HashMap<String, String>();
+        populateProperties();
+    }
 
-	private void populateProperties() {
-		properties.put("java version", System.getProperty("java.version"));
-		properties.put("OS", 
-				System.getProperty("os.name") + " " //
-				+ System.getProperty("os.arch") + " " //
-				+ System.getProperty("os.version"));
-		properties.put("username", System.getProperty("user.name"));
-	}
+    private void populateProperties() {
+        properties.put("java version", System.getProperty("java.version"));
+        properties.put("OS", System.getProperty("os.name") + " " //
+                + System.getProperty("os.arch") + " " //
+                + System.getProperty("os.version"));
+        properties.put("username", System.getProperty("user.name"));
+    }
 
-	public PingJobConfiguration getPingJobConfiguration() {
-		return pingJobConfiguration;
-	}
+    public PingJobConfiguration getPingJobConfiguration() {
+        return pingJobConfiguration;
+    }
 
-	public Map<String, String> getProperties() {
-		return properties;
-	}
+    public Map<String, String> getProperties() {
+        return properties;
+    }
 }

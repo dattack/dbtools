@@ -29,19 +29,25 @@ import org.apache.commons.logging.LogFactory;
  */
 public final class IOUtils {
 
-	private static final Log log = LogFactory.getLog(IOUtils.class);
+    private static final Log log = LogFactory.getLog(IOUtils.class);
 
-	private IOUtils() {
-		// utility class
-	}
+    private IOUtils() {
+        // utility class
+    }
 
-	public static void closeQuietly(final OutputStream file) {
-		if (file != null) {
-			try {
-				file.close();
-			} catch (final IOException e) {
-				log.warn(e.getMessage());
-			}
-		}
-	}
+    /**
+     * Closes a OutputStream unconditionally.
+     * 
+     * @param output
+     *            the OutputStream to close, may be null
+     */
+    public static void closeQuietly(final OutputStream output) {
+        if (output != null) {
+            try {
+                output.close();
+            } catch (final IOException e) {
+                log.warn(e.getMessage());
+            }
+        }
+    }
 }

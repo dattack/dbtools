@@ -29,70 +29,71 @@ import com.dattack.dbtools.ping.PingJobConfiguration.PingConfigurationBuilder;
 
 /**
  * @author cvarela
+ * @since 0.1
  */
 final class PingJobConfigurationParser {
 
-	private static final Log log = LogFactory.getLog(PingJobConfigurationParser.class);
+    private static final Log log = LogFactory.getLog(PingJobConfigurationParser.class);
 
-	private static final String TASK_KEY = "task";
-	private static final String EXECUTIONS_KEY = "[@executions]";
-	private static final String NAME_KEY = "[@name]";
-	private static final String THREADS_KEY = "[@threads]";
-	private static final String TIME_BETWEEN_EXECUTIONS_KEY = "[@timeBetweenExecutions]";
-	private static final String DATASOURCE_KEY = "[@datasource]";
-	private static final String QUERY_KEY = "query";
-	private static final String QUERY_LABEL_KEY = "[@label]";
-	private static final String THIS_KEY = ""; // empty
-	private static final String LOG_FILE_KEY = "log-file";
+    private static final String TASK_KEY = "task";
+    private static final String EXECUTIONS_KEY = "[@executions]";
+    private static final String NAME_KEY = "[@name]";
+    private static final String THREADS_KEY = "[@threads]";
+    private static final String TIME_BETWEEN_EXECUTIONS_KEY = "[@timeBetweenExecutions]";
+    private static final String DATASOURCE_KEY = "[@datasource]";
+    private static final String QUERY_KEY = "query";
+    private static final String QUERY_LABEL_KEY = "[@label]";
+    private static final String THIS_KEY = ""; // empty
+    private static final String LOG_FILE_KEY = "log-file";
 
-	private PingJobConfigurationParser() {
-		// static class
-	}
+    private PingJobConfigurationParser() {
+        // static class
+    }
 
-	public static List<PingJobConfiguration> parse(final File file) throws ConfigurationException {
+    public static List<PingJobConfiguration> parse(final File file) throws ConfigurationException {
 
-		if (log.isDebugEnabled()) {
-			log.debug("parsing file " + file);
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("parsing file " + file);
+        }
 
-		List<PingJobConfiguration> list = new ArrayList<PingJobConfiguration>();
+        List<PingJobConfiguration> list = new ArrayList<PingJobConfiguration>();
 
-		final XMLConfiguration config = new XMLConfiguration();
-		config.setDelimiterParsingDisabled(true);
-		config.load(file);
+        final XMLConfiguration config = new XMLConfiguration();
+        config.setDelimiterParsingDisabled(true);
+        config.load(file);
 
-		final List<HierarchicalConfiguration> taskList = config.configurationsAt(TASK_KEY);
+        final List<HierarchicalConfiguration> taskList = config.configurationsAt(TASK_KEY);
 
-		for (final HierarchicalConfiguration taskElement : taskList) {
+        for (final HierarchicalConfiguration taskElement : taskList) {
 
-			PingConfigurationBuilder builder = new PingConfigurationBuilder() //
-					.withName(taskElement.getString(NAME_KEY)) //
-					.withDatasource(taskElement.getString(DATASOURCE_KEY));
-			
-			final List<HierarchicalConfiguration> queryElementList = taskElement.configurationsAt(QUERY_KEY);
-			for (final HierarchicalConfiguration queryElement: queryElementList) {
-				String label = queryElement.getString(QUERY_LABEL_KEY);
-				String sql = queryElement.getString(THIS_KEY);
-				builder.withQuery(new SQLSentence(label, sql));
-			}
+            PingConfigurationBuilder builder = new PingConfigurationBuilder() //
+                    .withName(taskElement.getString(NAME_KEY)) //
+                    .withDatasource(taskElement.getString(DATASOURCE_KEY));
 
-			if (taskElement.containsKey(EXECUTIONS_KEY)) {
-				builder.withExecutions(taskElement.getInt(EXECUTIONS_KEY));
-			}
+            final List<HierarchicalConfiguration> queryElementList = taskElement.configurationsAt(QUERY_KEY);
+            for (final HierarchicalConfiguration queryElement : queryElementList) {
+                String label = queryElement.getString(QUERY_LABEL_KEY);
+                String sql = queryElement.getString(THIS_KEY);
+                builder.withQuery(new SQLSentence(label, sql));
+            }
 
-			if (taskElement.containsKey(THREADS_KEY)) {
-				builder.withThreads(taskElement.getInt(THREADS_KEY));
-			}
+            if (taskElement.containsKey(EXECUTIONS_KEY)) {
+                builder.withExecutions(taskElement.getInt(EXECUTIONS_KEY));
+            }
 
-			if (taskElement.containsKey(TIME_BETWEEN_EXECUTIONS_KEY)) {
-				builder.withTimeBetweenExecutions(taskElement.getLong(TIME_BETWEEN_EXECUTIONS_KEY));
-			}
-			
-			builder.withLogFile(taskElement.getString(LOG_FILE_KEY));
+            if (taskElement.containsKey(THREADS_KEY)) {
+                builder.withThreads(taskElement.getInt(THREADS_KEY));
+            }
 
-			list.add(builder.build());
-		}
+            if (taskElement.containsKey(TIME_BETWEEN_EXECUTIONS_KEY)) {
+                builder.withTimeBetweenExecutions(taskElement.getLong(TIME_BETWEEN_EXECUTIONS_KEY));
+            }
 
-		return list;
-	}
+            builder.withLogFile(taskElement.getString(LOG_FILE_KEY));
+
+            list.add(builder.build());
+        }
+
+        return list;
+    }
 }

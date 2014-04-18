@@ -16,14 +16,18 @@
 package com.dattack.dbtools;
 
 /**
+ * Defines the <code>Builder</code> pattern.
+ * 
  * @author cvarela
  * @since 0.1
  * @param <T>
  */
 public interface Builder<T> {
 
-	/**
-	 * @return a new instance of the generic type.
-	 */
-	T build();
+    /**
+     * Creates a new instance of the generic type.
+     * 
+     * @return a new instance of the generic type
+     */
+    T build();
 }

@@ -21,7 +21,19 @@ package com.dattack.dbtools.ping.log;
  */
 public interface LogWriter {
 
-	void write(final LogHeader logHeader);
+    /**
+     * Writes the header to the log.
+     * 
+     * @param logHeader
+     *            the header entity
+     */
+    void write(final LogHeader logHeader);
 
-	void write(final LogEntry logEntry);
+    /**
+     * Writes a data to the log.
+     * 
+     * @param logEntry
+     *            the data entity
+     */
+    void write(final LogEntry logEntry);
 }
