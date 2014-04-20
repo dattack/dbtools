@@ -21,13 +21,16 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.ext.jdbc.DataSourceClasspathDecorator;
 import com.dattack.ext.jdbc.SimpleDataSource;
+import com.dattack.ext.misc.ConfigurationUtil;
 
 /**
  * @author cvarela
@@ -35,22 +38,23 @@ import com.dattack.ext.jdbc.SimpleDataSource;
  */
 public class DataSourceFactory implements ResourceFactory<DataSource> {
 
-    private static final Log log = LogFactory.getLog(DataSourceFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(DataSourceFactory.class);
 
     private static final String DRIVER_KEY = "driverClassName";
     private static final String URL_KEY = "url";
     private static final String USERNAME_KEY = "username";
     private static final String PASSWORD_KEY = "password";
-    // pool properties
-    private static final String INITIAL_SIZE_KEY = "initialSize";
 
     @Override
     public DataSource getObjectInstance(final Properties properties, final List<String> extraClasspath) {
 
-        final String driver = properties.getProperty(DRIVER_KEY);
-        final String url = properties.getProperty(URL_KEY);
-        final String user = properties.getProperty(USERNAME_KEY);
-        final String password = properties.getProperty(PASSWORD_KEY);
+        CompositeConfiguration configuration = ConfigurationUtil.createEnvSystemConfiguration();
+        configuration.addConfiguration(new MapConfiguration(properties));
+
+        final String driver = configuration.getString(DRIVER_KEY);
+        final String url = configuration.getString(URL_KEY);
+        final String user = configuration.getString(USERNAME_KEY);
+        final String password = configuration.getString(PASSWORD_KEY);
 
         if (driver == null) {
             throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", DRIVER_KEY));
@@ -61,17 +65,12 @@ public class DataSourceFactory implements ResourceFactory<DataSource> {
         }
 
         DataSource ds = null;
-        if (!StringUtils.isBlank(properties.getProperty(INITIAL_SIZE_KEY))) {
-            // a pool has been configured
-            try {
-                ds = BasicDataSourceFactory.createDataSource(properties);
-            } catch (Exception e) {
-                // we will use a DataSource without a connection pool
-                log.warn(e.getMessage());
-            }
-        }
-
-        if (ds == null) {
+        try {
+            Properties props = ConfigurationConverter.getProperties(configuration);
+            ds = BasicDataSourceFactory.createDataSource(props);
+        } catch (final Exception e) {
+            // we will use a DataSource without a connection pool
+            log.warn(e.getMessage());
             ds = new SimpleDataSource(driver, url, user, password);
         }
 

@@ -26,11 +26,20 @@
             <includes>
                 <include>*.jar</include>
             </includes>
+            <fileMode>440</fileMode>
         </fileSet>
-       
+        <fileSet>
+            <directory>${project.basedir}/src/main/assembly/lib/ext</directory>
+            <outputDirectory>/lib/ext</outputDirectory>
+            <includes>
+                <include>readme</include>
+            </includes>
+            <fileMode>440</fileMode>
+        </fileSet>
         <fileSet>
             <directory>src/main/config</directory>
             <outputDirectory>/etc</outputDirectory>
+            <fileMode>640</fileMode>
         </fileSet>
     </fileSets>
 </assembly>

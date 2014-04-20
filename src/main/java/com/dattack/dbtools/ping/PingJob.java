@@ -21,8 +21,8 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.ping.log.LogEntry;
 import com.dattack.dbtools.ping.log.LogWriter;
@@ -36,7 +36,7 @@ import com.dattack.ext.jdbc.JDBCUtils;
  */
 class PingJob implements Runnable {
 
-    private static final Log log = LogFactory.getLog(PingJob.class);
+    private static final Logger log = LoggerFactory.getLogger(PingJob.class);
 
     private final PingJobConfiguration configuration;
     private final DataSource dataSource;
@@ -55,11 +55,11 @@ class PingJob implements Runnable {
     @Override
     public void run() {
 
-        log.info("Running job " + configuration.getName());
+        final String threadName = Thread.currentThread().getName();
+
+        log.info("Running job '{}' at thread '{}'", configuration.getName(), threadName);
 
         long iter = 0;
-
-        final String threadName = Thread.currentThread().getName();
 
         while (testLoop(iter)) {
             iter++;
@@ -95,7 +95,8 @@ class PingJob implements Runnable {
             } catch (final Exception e) {
                 logEntry.setException(e);
                 logWriter.write(logEntry);
-                log.warn(configuration.getName() + "@" + threadName + ": " + e.getMessage(), e);
+                log.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
+                        e.getMessage());
             } finally {
                 JDBCUtils.closeQuietly(rs);
                 JDBCUtils.closeQuietly(stmt);
@@ -112,6 +113,8 @@ class PingJob implements Runnable {
                 }
             }
         }
+
+        log.info("Job finished (job-name: '{}', thread: '{}')", configuration.getName(), threadName);
     }
 
     private boolean testLoop(final long iteration) {

@@ -19,9 +19,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Basic datasource implementation.
  * 
@@ -29,8 +26,6 @@ import org.apache.commons.logging.LogFactory;
  * @since 0.1
  */
 public final class SimpleDataSource extends AbstractDataSource {
-
-    private static final Log log = LogFactory.getLog(SimpleDataSource.class);
 
     private final String username;
     private final String password;
@@ -46,7 +41,7 @@ public final class SimpleDataSource extends AbstractDataSource {
         ensureDriverLoadedNeeded = true;
     }
 
-    private synchronized void ensureDriverLoaded() {
+    private synchronized void ensureDriverLoaded() throws SQLException {
 
         if (!ensureDriverLoadedNeeded) {
             return;
@@ -56,7 +51,7 @@ public final class SimpleDataSource extends AbstractDataSource {
             Class.forName(driver).newInstance();
             ensureDriverLoadedNeeded = false;
         } catch (final Exception e) {
-            log.error(e.getMessage());
+            throw new SQLException("Unable to load the driver class: " + driver, e);
         }
     }
 

@@ -22,8 +22,8 @@ import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.ping.PingJobConfiguration.PingConfigurationBuilder;
 
@@ -33,7 +33,7 @@ import com.dattack.dbtools.ping.PingJobConfiguration.PingConfigurationBuilder;
  */
 final class PingJobConfigurationParser {
 
-    private static final Log log = LogFactory.getLog(PingJobConfigurationParser.class);
+    private static final Logger log = LoggerFactory.getLogger(PingJobConfigurationParser.class);
 
     private static final String TASK_KEY = "task";
     private static final String EXECUTIONS_KEY = "[@executions]";
@@ -52,9 +52,7 @@ final class PingJobConfigurationParser {
 
     public static List<PingJobConfiguration> parse(final File file) throws ConfigurationException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("parsing file " + file);
-        }
+        log.debug("parsing file '{}'", file);
 
         List<PingJobConfiguration> list = new ArrayList<PingJobConfiguration>();
 

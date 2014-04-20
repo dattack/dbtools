@@ -30,8 +30,8 @@ import javax.naming.spi.InitialContextFactory;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.ext.io.FilesystemUtils;
 import com.dattack.ext.misc.ConfigurationUtil;
@@ -54,7 +54,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
     private static final String RESOURCES_DIRECTORY_PROPERTY = StandaloneContextFactory.class.getName()
             + ".resources.directory";
 
-    private final Log log = LogFactory.getLog(StandaloneContextFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(StandaloneContextFactory.class);
 
     public StandaloneContextFactory() {
         super();
@@ -90,12 +90,11 @@ public final class StandaloneContextFactory implements InitialContextFactory {
 
                     List<String> extraClasspath = CollectionUtils.listAsString(configuration
                             .getList(CLASSPATH_DIRECTORY_PROPERTY));
-                    System.out.println("extraClasspath: " + extraClasspath);
 
                     File dir = FilesystemUtils.locate(ObjectUtils.toString(configDir));
 
                     if ((dir != null) && dir.exists()) {
-                        log.info("INFO - Scanning directory '" + dir + "' for JNDI resources.");
+                        log.info("Scanning directory '{}' for JNDI resources.", dir);
                         try {
                             StandaloneContext ctx = new StandaloneContext(environment);
                             final NamingLoader loader = new NamingLoader();

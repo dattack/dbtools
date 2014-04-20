@@ -32,8 +32,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.ext.io.FilesystemUtils;
 
@@ -43,7 +42,7 @@ import com.dattack.ext.io.FilesystemUtils;
  */
 public final class DataSourceClasspathDecorator extends DataSourceDecorator {
 
-    private static final Log log = LogFactory.getLog(JNDIDataSource.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(JNDIDataSource.class);
 
     private final List<String> extraClasspath;
     private volatile boolean initialized;
@@ -73,7 +72,7 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
                     log.warn(e.getMessage());
                 }
             } else {
-                log.info("Missing directory/file: '" + path + "'");
+                log.debug("Missing directory/file: '{}'", path);
             }
         }
 
@@ -106,7 +105,7 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
         final List<URL> urlList = new ArrayList<URL>();
         for (final File jar : jars) {
             try {
-                log.info("Scanning JAR: " + jar);
+                log.info("Scanning JAR: {}", jar);
                 urlList.add(jar.toURI().toURL());
             } catch (final MalformedURLException e) {
                 log.warn(e.getMessage());
@@ -121,7 +120,7 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
 
         final List<URL> urlList = new ArrayList<URL>();
         try {
-            log.info("Scanning JAR: " + jar);
+            log.info("Scanning JAR: {}", jar);
             urlList.add(jar.toURI().toURL());
             configureClasspath(urlList);
         } catch (final MalformedURLException e) {

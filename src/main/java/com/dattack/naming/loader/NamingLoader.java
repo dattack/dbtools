@@ -25,8 +25,8 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.naming.loader.factory.ResourceFactory;
 import com.dattack.naming.loader.factory.ResourceFactoryRegistry;
@@ -39,7 +39,7 @@ public final class NamingLoader {
 
     private static final String TYPE_KEY = "type";
 
-    private static final Log log = LogFactory.getLog(NamingLoader.class);
+    private static final Logger log = LoggerFactory.getLogger(NamingLoader.class);
 
     private static Object getObject(final Properties properties, final List<String> extraClasspath) {
 
@@ -50,7 +50,7 @@ public final class NamingLoader {
             return factory.getObjectInstance(properties, extraClasspath);
         }
 
-        log.warn(MessageFormat.format("Unable to get a factory for type ''{0}''", type));
+        log.warn("Unable to get a factory for type ''{0}''", type);
         return null;
     }
 
@@ -69,7 +69,7 @@ public final class NamingLoader {
             context.rebind(key, value);
         }
 
-        log.info("Context.bind: " + key + " -> " + value);
+        log.info("Binding object '{}' to JNDI name '{}'", value.getClass().getName(), key);
     }
 
     private void load(final Properties properties, final Context ctxt, final Context parentCtxt, final String ctxtName,

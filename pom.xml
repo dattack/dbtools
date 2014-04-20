@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <commons-configuration.version>1.8</commons-configuration.version>
-        <log4j.version>1.2.17</log4j.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-cli.version>1.2</commons-cli.version>
         <sqlite.version>3.7.2</sqlite.version>
@@ -23,9 +23,9 @@
             <version>${commons-configuration.version}</version>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -203,13 +203,13 @@
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>findbugs-maven-plugin</artifactId>
                             <version>2.5.3</version>
-<!--                             <configuration> -->
-<!--                                 <jvmargs>-Xmx512m</jvmargs> -->
-<!--                                 <threshold>Normal</threshold> -->
-<!--                                 <effort>Default</effort> -->
-<!--                                 <visitors>FindDeadLocalStores, -->
-<!--                                     UnreadFields</visitors> -->
-<!--                             </configuration> -->
+                            <!-- <configuration> -->
+                            <!-- <jvmargs>-Xmx512m</jvmargs> -->
+                            <!-- <threshold>Normal</threshold> -->
+                            <!-- <effort>Default</effort> -->
+                            <!-- <visitors>FindDeadLocalStores, -->
+                            <!-- UnreadFields</visitors> -->
+                            <!-- </configuration> -->
                         </plugin>
                     </reportPlugins>
                 </configuration>

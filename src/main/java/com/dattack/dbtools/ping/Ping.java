@@ -23,8 +23,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.dattack.dbtools.ping.log.FileLogWriter;
 import com.dattack.dbtools.ping.log.LogHeader;
@@ -37,8 +35,6 @@ import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
  */
 public final class Ping {
 
-    private static final Log log = LogFactory.getLog(Ping.class);
-
     /**
      * The <code>main</code> method.
      * 
@@ -50,7 +46,7 @@ public final class Ping {
         try {
 
             if (args.length < 1) {
-                log.fatal("Usage: Ping <configuration_file> [<configuration_file [...]]");
+                System.err.println("Usage: Ping <configuration_file> [<configuration_file [...]]");
                 return;
             }
 
@@ -58,7 +54,7 @@ public final class Ping {
             ping.execute(args);
 
         } catch (final Exception e) {
-            log.fatal(e.getMessage(), e);
+            System.err.println(e.getMessage());
         }
     }
 
@@ -70,8 +66,6 @@ public final class Ping {
     }
 
     private void execute(final File file) throws ConfigurationException {
-
-        log.info("file: " + file);
 
         if (file.isDirectory()) {
 

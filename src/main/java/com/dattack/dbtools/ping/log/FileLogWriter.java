@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.csv.CSVConfiguration.CSVConfigurationBuilder;
 import com.dattack.csv.CSVStringBuilder;
@@ -40,7 +40,7 @@ import com.dattack.ext.io.IOUtils;
  */
 public class FileLogWriter implements LogWriter {
 
-    private static final Log log = LogFactory.getLog(FileLogWriter.class);
+    private static final Logger log = LoggerFactory.getLogger(FileLogWriter.class);
 
     private final CSVStringBuilder csvBuilder;
     private final String filename;
@@ -57,7 +57,7 @@ public class FileLogWriter implements LogWriter {
             final File parent = file.getParentFile();
             if (parent != null && !parent.exists()) {
                 if (!parent.mkdirs()) {
-                    log.warn("Unable to create directory: " + parent);
+                    log.warn("Unable to create directory: {}", parent);
                 }
             }
         }
