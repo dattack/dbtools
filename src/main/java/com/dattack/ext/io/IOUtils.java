@@ -15,8 +15,8 @@
  */
 package com.dattack.ext.io;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +36,15 @@ public final class IOUtils {
     }
 
     /**
-     * Closes a OutputStream unconditionally.
+     * Closes a {@link Closeable} unconditionally.
      * 
-     * @param output
-     *            the OutputStream to close, may be null
+     * @param obj
+     *            the object to close, may be null
      */
-    public static void closeQuietly(final OutputStream output) {
-        if (output != null) {
+    public static void closeQuietly(final Closeable obj) {
+        if (obj != null) {
             try {
-                output.close();
+                obj.close();
             } catch (final IOException e) {
                 log.warn(e.getMessage());
             }
