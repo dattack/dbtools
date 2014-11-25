@@ -21,130 +21,175 @@ import com.dattack.dbtools.Builder;
  * @author cvarela
  * @since 0.1
  */
-public class CSVConfiguration {
+public final class CSVConfiguration {
 
-	public static class CSVConfigurationBuilder implements Builder<CSVConfiguration> {
+    /**
+     * Builder class used to build a {@link CSVConfiguration} instance.
+     */
+    public static class CSVConfigurationBuilder implements Builder<CSVConfiguration> {
 
-		/**
-		 * The default comment-line character to use.
-		 */
-		private static final char DEFAULT_COMMENT_CHAR = '#';
-		
-		/**
-		 * The end-of-line character to use.
-		 */
-		private static final String DEFAULT_EOL = System.getProperty("line.separator");
+        /**
+         * The default comment-line character to use.
+         */
+        private static final char DEFAULT_COMMENT_CHAR = '#';
 
-		/**
-		 * The default escape character to use if none is supplied.
-		 */
-		private static final char DEFAULT_ESCAPE_CHARACTER = '\\';
+        /**
+         * The end-of-line character to use.
+         */
+        private static final String DEFAULT_EOL = System.getProperty("line.separator");
 
-		/**
-		 * This is the "null" character - if a value is set to this then it is ignored.
-		 */
-		private static final String DEFAULT_NULL_VALUE = "";
+        /**
+         * The default escape character to use if none is supplied.
+         */
+        private static final char DEFAULT_ESCAPE_CHARACTER = '\\';
 
-		/**
-		 * The default quote character to use if none is supplied.
-		 */
-		private static final char DEFAULT_QUOTE_CHARACTER = '"';
-		
-		/**
-		 * The default separator to use if none is supplied.
-		 */
-		private static final String DEFAULT_SEPARATOR = ",";
+        /**
+         * This is the "null" character - if a value is set to this then it is ignored.
+         */
+        private static final String DEFAULT_NULL_VALUE = "";
 
-		private char commentChar;
-		private String eol;
-		private char escapeChar;
-		private String nullValue;
-		private char quoteChar;
-		private String separator;
+        /**
+         * The default quote character to use if none is supplied.
+         */
+        private static final char DEFAULT_QUOTE_CHARACTER = '"';
 
-		public CSVConfigurationBuilder() {
-			this.commentChar = DEFAULT_COMMENT_CHAR;
-			this.separator = DEFAULT_SEPARATOR;
-			this.nullValue = DEFAULT_NULL_VALUE;
-			this.quoteChar = DEFAULT_QUOTE_CHARACTER;
-			this.escapeChar = DEFAULT_ESCAPE_CHARACTER;
-			this.eol = DEFAULT_EOL;
-		}
-		
-		@Override
-		public CSVConfiguration build() {
-			return new CSVConfiguration(this);
-		}
+        /**
+         * The default separator to use if none is supplied.
+         */
+        private static final String DEFAULT_SEPARATOR = ",";
 
-		public CSVConfigurationBuilder withCommentChar(final char value) {
-			this.commentChar = value;
-			return this;
-		}
+        private char commentChar;
+        private String eol;
+        private char escapeChar;
+        private String nullValue;
+        private char quoteChar;
+        private String separator;
 
-		public CSVConfigurationBuilder withEOL(final String value) {
-			this.eol = value;
-			return this;
-		}
+        public CSVConfigurationBuilder() {
+            this.commentChar = DEFAULT_COMMENT_CHAR;
+            this.separator = DEFAULT_SEPARATOR;
+            this.nullValue = DEFAULT_NULL_VALUE;
+            this.quoteChar = DEFAULT_QUOTE_CHARACTER;
+            this.escapeChar = DEFAULT_ESCAPE_CHARACTER;
+            this.eol = DEFAULT_EOL;
+        }
 
-		public CSVConfigurationBuilder withEscapeChar(final char value) {
-			this.escapeChar = value;
-			return this;
-		}
+        @Override
+        public CSVConfiguration build() {
+            return new CSVConfiguration(this);
+        }
 
-		public CSVConfigurationBuilder withNullValue(final String value) {
-			this.nullValue = value;
-			return this;
-		}
-		
-		public CSVConfigurationBuilder withQuoteChar(final char value) {
-			this.quoteChar = value;
-			return this;
-		}
+        /**
+         * Sets the comment character delimiter.
+         * 
+         * @param value
+         *            the value to set
+         * @return the instance of CSVConfigurationBuilder
+         */
+        public CSVConfigurationBuilder withCommentChar(final char value) {
+            this.commentChar = value;
+            return this;
+        }
 
-		public CSVConfigurationBuilder withSeparator(final String value) {
-			this.separator = value;
-			return this;
-		}
-	}
-	
-	private char commentChar;
-	private String eol;
-	private char escapeChar;
-	private String nullValue;
-	private char quoteChar;
+        /**
+         * Sets the end-of-line mark.
+         * 
+         * @param value
+         *            the value to set
+         * @return the instance of CSVConfigurationBuilder
+         */
+        public CSVConfigurationBuilder withEOL(final String value) {
+            this.eol = value;
+            return this;
+        }
 
-	private String separator;
+        /**
+         * Sets the escape character.
+         * 
+         * @param value
+         *            the value to set
+         * @return the instance of CSVConfigurationBuilder
+         */
+        public CSVConfigurationBuilder withEscapeChar(final char value) {
+            this.escapeChar = value;
+            return this;
+        }
 
-	private CSVConfiguration(final CSVConfigurationBuilder builder) {
-		this.commentChar = builder.commentChar;
-		this.separator = builder.separator;
-		this.nullValue = builder.nullValue;
-		this.quoteChar = builder.quoteChar;
-		this.escapeChar = builder.escapeChar;
-		this.eol = builder.eol;
-	}
+        /**
+         * Sets the comment character delimiter.
+         * 
+         * @param value
+         *            the value to set
+         * @return the instance of CSVConfigurationBuilder
+         */
+        public CSVConfigurationBuilder withNullValue(final String value) {
+            this.nullValue = value;
+            return this;
+        }
 
-	public char getCommentChar() {
-		return commentChar;
-	}
+        /**
+         * Sets the quote character.
+         * 
+         * @param value
+         *            the value to set
+         * @return the instance of CSVConfigurationBuilder
+         */
+        public CSVConfigurationBuilder withQuoteChar(final char value) {
+            this.quoteChar = value;
+            return this;
+        }
 
-	public String getEOL() {
-		return eol;
-	}
+        /**
+         * Sets the separator character.
+         * 
+         * @param value
+         *            the value to set
+         * @return the instance of CSVConfigurationBuilder
+         */
+        public CSVConfigurationBuilder withSeparator(final String value) {
+            this.separator = value;
+            return this;
+        }
+    }
 
-	public char getEscapeChar() {
-		return escapeChar;
-	}
-	
-	public String getNullStr() {
-		return nullValue;
-	}
-	
-	public char getQuoteChar() {
-		return quoteChar;
-	}
+    private final char commentChar;
+    private final String eol;
+    private final char escapeChar;
+    private final String nullValue;
+    private final char quoteChar;
 
-	public String getSeparator() {
-		return separator;
-	}
+    private final String separator;
+
+    private CSVConfiguration(final CSVConfigurationBuilder builder) {
+        this.commentChar = builder.commentChar;
+        this.separator = builder.separator;
+        this.nullValue = builder.nullValue;
+        this.quoteChar = builder.quoteChar;
+        this.escapeChar = builder.escapeChar;
+        this.eol = builder.eol;
+    }
+
+    public char getCommentChar() {
+        return commentChar;
+    }
+
+    public String getEOL() {
+        return eol;
+    }
+
+    public char getEscapeChar() {
+        return escapeChar;
+    }
+
+    public String getNullStr() {
+        return nullValue;
+    }
+
+    public char getQuoteChar() {
+        return quoteChar;
+    }
+
+    public String getSeparator() {
+        return separator;
+    }
 }
