@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,8 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dattack.csv.CSVConfiguration.CSVConfigurationBuilder;
 import com.dattack.csv.CSVStringBuilder;
+import com.dattack.dbtools.ping.LogEntry;
 import com.dattack.dbtools.ping.SQLSentence;
 import com.dattack.ext.io.IOUtils;
 
@@ -38,16 +38,16 @@ import com.dattack.ext.io.IOUtils;
  * @author cvarela
  * @since 0.1
  */
-public class FileLogWriter implements LogWriter {
+public class CSVLogWriter implements LogWriter {
 
-    private static final Logger log = LoggerFactory.getLogger(FileLogWriter.class);
+    private static final Logger log = LoggerFactory.getLogger(CSVLogWriter.class);
 
     private final CSVStringBuilder csvBuilder;
     private final String filename;
 
-    public FileLogWriter(final String filename) {
+    public CSVLogWriter(final String filename) {
         this.filename = filename;
-        this.csvBuilder = new CSVStringBuilder(new CSVConfigurationBuilder().withSeparator("\t").build());
+        this.csvBuilder = new CSVStringBuilder(new CSVConfigurationFactory().create());
     }
 
     private FileOutputStream getOutputStream() throws FileNotFoundException {

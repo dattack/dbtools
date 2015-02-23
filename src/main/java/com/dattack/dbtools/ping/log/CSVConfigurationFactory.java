@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
+ * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,16 @@
  */
 package com.dattack.dbtools.ping.log;
 
-import com.dattack.dbtools.ping.LogEntry;
+import com.dattack.csv.CSVConfiguration;
+import com.dattack.csv.CSVConfiguration.CSVConfigurationBuilder;
 
 /**
  * @author cvarela
- * @since 0.1
+ *
  */
-public interface LogWriter {
+public class CSVConfigurationFactory {
 
-    /**
-     * Writes the header to the log.
-     *
-     * @param logHeader
-     *            the header entity
-     */
-    void write(final LogHeader logHeader);
-
-    /**
-     * Writes a data to the log.
-     *
-     * @param logEntry
-     *            the data entity
-     */
-    void write(final LogEntry logEntry);
+    public CSVConfiguration create() {
+        return new CSVConfigurationBuilder().withSeparator("\t").build();
+    }
 }

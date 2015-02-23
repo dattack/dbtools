@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,27 +17,22 @@ package com.dattack.dbtools.ping;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
+import java.io.IOException;
+import java.text.ParseException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import com.dattack.dbtools.ping.log.CSVLogWriter;
-import com.dattack.dbtools.ping.log.LogHeader;
-import com.dattack.dbtools.ping.log.LogWriter;
-import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
+import com.dattack.dbtools.ping.report.Reporter;
 
 /**
  * @author cvarela
  * @since 0.1
  */
-public final class Ping {
+public final class PingAnalyzer {
 
     /**
      * The <code>main</code> method.
-     * 
+     *
      * @param args
      *            the program arguments
      */
@@ -50,7 +45,7 @@ public final class Ping {
                 return;
             }
 
-            final Ping ping = new Ping();
+            final PingAnalyzer ping = new PingAnalyzer();
             ping.execute(args);
 
         } catch (final Exception e) {
@@ -58,11 +53,7 @@ public final class Ping {
         }
     }
 
-    // private final ExecutorService pool;
-    private final ThreadPool pool;
-
-    private Ping() {
-        pool = new ThreadPool();
+    private PingAnalyzer() {
     }
 
     private void execute(final File file) throws ConfigurationException {
@@ -73,7 +64,7 @@ public final class Ping {
 
                 @Override
                 public boolean accept(final File dir, final String name) {
-                    return name.toLowerCase().endsWith(".xml");
+                    return name.toLowerCase().endsWith(".log");
                 }
             };
 
@@ -83,23 +74,13 @@ public final class Ping {
 
         } else {
 
-            List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
-            for (final PingJobConfiguration pingJobConf : pingJobConfList) {
-
-                DataSource dataSource = new DataSourceBuilder().withJNDIName(pingJobConf.getDatasource()).build();
-
-                // TODO: the sentence provider must be configured
-                SQLSentenceProvider sentenceProvider = new SQLSentenceRoundRobinProvider(pingJobConf.getQueryList());
-
-                final LogWriter logWriter = new CSVLogWriter(pingJobConf.getLogFile());
-
-                LogHeader logHeader = new LogHeader(pingJobConf);
-                logWriter.write(logHeader);
-
-                for (int i = 0; i < pingJobConf.getThreads(); i++) {
-                    pool.submit(new PingJob(pingJobConf, dataSource, sentenceProvider, logWriter),
-                            pingJobConf.getName() + "@Thread-" + i);
-                }
+            Reporter reporter = new Reporter();
+            try {
+                reporter.execute(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -108,22 +89,6 @@ public final class Ping {
 
         for (final String filename : args) {
             execute(new File(filename));
-        }
-    }
-
-    private class ThreadPool {
-
-        private final List<Thread> threadList;
-
-        public ThreadPool() {
-            this.threadList = new ArrayList<Thread>();
-        }
-
-        public void submit(final Runnable task, final String threadName) {
-
-            Thread thread = new Thread(task, threadName);
-            thread.start();
-            threadList.add(thread);
         }
     }
 }

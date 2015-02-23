@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,13 +24,12 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dattack.dbtools.ping.log.LogEntry;
 import com.dattack.dbtools.ping.log.LogWriter;
 import com.dattack.ext.jdbc.JDBCUtils;
 
 /**
  * Executes a ping-job instance.
- * 
+ *
  * @author cvarela
  * @since 0.1
  */
@@ -70,31 +69,30 @@ class PingJob implements Runnable {
             // retrieve the SQL to be executed
             SQLSentence sqlSentence = sentenceProvider.nextSQL();
 
-            final LogEntry logEntry = new LogEntry(configuration.getName(), threadName, iter, sqlSentence.getLabel());
+            final LogEntryFactory logEntryFactory = new LogEntryFactory(configuration.getName(), threadName, iter,
+                    sqlSentence.getLabel());
 
             try {
 
                 connection = dataSource.getConnection();
 
                 // sets the connection time
-                logEntry.connect();
+                logEntryFactory.connect();
 
                 // execute the query
                 stmt = connection.createStatement();
                 rs = stmt.executeQuery(sqlSentence.getSql());
 
                 while (rs.next()) {
-                    logEntry.incrRows();
+                    logEntryFactory.incrRows();
                 }
 
                 // sets the total time
-                logEntry.end();
-
-                logWriter.write(logEntry);
+                logWriter.write(logEntryFactory.create());
 
             } catch (final Exception e) {
-                logEntry.setException(e);
-                logWriter.write(logEntry);
+                ;
+                logWriter.write(logEntryFactory.create(e));
                 log.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
                         e.getMessage());
             } finally {

@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.dattack.csv;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import com.dattack.dbtools.Builder;
 
@@ -58,12 +61,15 @@ public final class CSVConfiguration {
          */
         private static final String DEFAULT_SEPARATOR = ",";
 
+        private static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.S";
+
         private char commentChar;
         private String eol;
         private char escapeChar;
         private String nullValue;
         private char quoteChar;
         private String separator;
+        private SimpleDateFormat dateFormat;
 
         public CSVConfigurationBuilder() {
             this.commentChar = DEFAULT_COMMENT_CHAR;
@@ -76,12 +82,15 @@ public final class CSVConfiguration {
 
         @Override
         public CSVConfiguration build() {
+            if (dateFormat == null) {
+                dateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+            }
             return new CSVConfiguration(this);
         }
 
         /**
          * Sets the comment character delimiter.
-         * 
+         *
          * @param value
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
@@ -93,7 +102,7 @@ public final class CSVConfiguration {
 
         /**
          * Sets the end-of-line mark.
-         * 
+         *
          * @param value
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
@@ -105,7 +114,7 @@ public final class CSVConfiguration {
 
         /**
          * Sets the escape character.
-         * 
+         *
          * @param value
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
@@ -117,7 +126,7 @@ public final class CSVConfiguration {
 
         /**
          * Sets the comment character delimiter.
-         * 
+         *
          * @param value
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
@@ -129,7 +138,7 @@ public final class CSVConfiguration {
 
         /**
          * Sets the quote character.
-         * 
+         *
          * @param value
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
@@ -141,7 +150,7 @@ public final class CSVConfiguration {
 
         /**
          * Sets the separator character.
-         * 
+         *
          * @param value
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
@@ -157,6 +166,7 @@ public final class CSVConfiguration {
     private final char escapeChar;
     private final String nullValue;
     private final char quoteChar;
+    private final DateFormat dateFormat;
 
     private final String separator;
 
@@ -167,6 +177,7 @@ public final class CSVConfiguration {
         this.quoteChar = builder.quoteChar;
         this.escapeChar = builder.escapeChar;
         this.eol = builder.eol;
+        this.dateFormat = builder.dateFormat;
     }
 
     public char getCommentChar() {
@@ -191,5 +202,9 @@ public final class CSVConfiguration {
 
     public String getSeparator() {
         return separator;
+    }
+
+    public DateFormat getDateFormat() {
+        return dateFormat;
     }
 }

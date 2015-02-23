@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,6 @@
  */
 package com.dattack.csv;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -23,7 +22,7 @@ import org.apache.commons.lang.ObjectUtils;
 /**
  * A utility class for creating CSV data from scratch. This class is not thread-safe and with no guarantee of
  * synchronization. The methods in this class can be chained to add multiple rows/columns to the object.
- * 
+ *
  * @author cvarela
  * @since 0.1
  */
@@ -34,7 +33,6 @@ public class CSVStringBuilder {
     private boolean comment;
 
     private final CSVConfiguration configuration;
-    private final SimpleDateFormat df;
     private boolean emptyLine;
     private final StringBuilder sb;
 
@@ -50,7 +48,6 @@ public class CSVStringBuilder {
         this.sb = new StringBuilder(capacity);
         this.emptyLine = true;
         this.comment = false;
-        this.df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.S");
     }
 
     /**
@@ -62,7 +59,7 @@ public class CSVStringBuilder {
         if (value == null) {
             appendValue(configuration.getNullStr());
         } else {
-            appendValue(df.format(value));
+            appendValue(configuration.getDateFormat().format(value));
         }
         return this;
     }
@@ -142,7 +139,7 @@ public class CSVStringBuilder {
     }
 
     /**
-     * 
+     *
      * @return the instance of CSVStringBuilder
      */
     public CSVStringBuilder clear() {
@@ -154,7 +151,7 @@ public class CSVStringBuilder {
 
     /**
      * Starts a new comment block.
-     * 
+     *
      * @return the instance of CSVStringBuilder
      */
     public CSVStringBuilder comment() {
@@ -192,7 +189,7 @@ public class CSVStringBuilder {
 
     /**
      * Appends the end-of-line mark.
-     * 
+     *
      * @return the instance of CSVStringBuilder
      */
     public CSVStringBuilder eol() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
+ * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dattack.dbtools.ping.log;
+package com.dattack.dbtools.ping.report;
 
-import com.dattack.dbtools.ping.LogEntry;
+import java.text.SimpleDateFormat;
 
 /**
  * @author cvarela
- * @since 0.1
+ *
  */
-public interface LogWriter {
+public class Context {
 
-    /**
-     * Writes the header to the log.
-     *
-     * @param logHeader
-     *            the header entity
-     */
-    void write(final LogHeader logHeader);
+    private final SimpleDateFormat dateFormat;
 
-    /**
-     * Writes a data to the log.
-     *
-     * @param logEntry
-     *            the data entity
-     */
-    void write(final LogEntry logEntry);
+    public Context() {
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    }
+
+    public SimpleDateFormat getDateFormat() {
+        return dateFormat;
+    }
 }
