@@ -40,27 +40,34 @@ public class CSVLogReader implements LogReader {
     }
 
     @Override
-    public synchronized LogEntry next() throws IOException, ParseException {
+    public synchronized LogEntry next() throws IOException {
 
-        CSVObject rawObject = reader.next();
+        while (true) {
+            CSVObject rawObject = reader.next();
 
-        if (rawObject == null) {
-            return null;
+            if (rawObject == null) {
+                return null;
+            }
+
+            int index = 0;
+
+            try {
+
+                return new LogEntryBuilder() //
+                        .withEventTime(configuration.getDateFormat().parse(rawObject.get(index++)).getTime()) //
+                        .withTaskName(rawObject.get(index++)) //
+                        .withThreadName(rawObject.get(index++)) //
+                        .withIteration(Long.valueOf(rawObject.get(index++))) //
+                        .withSqlLabel(rawObject.get(index++)) //
+                        .withRows(Long.valueOf(rawObject.get(index++))) //
+                        .withConnectionTime(Long.valueOf(rawObject.get(index++))) //
+                        .withFirstRowTime(Long.valueOf(rawObject.get(index++))) //
+                        .withTotalTime(Long.valueOf(rawObject.get(index++))) //
+                        .build();
+            } catch (final ParseException e) {
+                continue;
+            }
         }
-
-        int index = 0;
-
-        return new LogEntryBuilder() //
-                .withEventTime(configuration.getDateFormat().parse(rawObject.get(index++)).getTime()) //
-                .withTaskName(rawObject.get(index++)) //
-                .withThreadName(rawObject.get(index++)) //
-                .withIteration(Long.valueOf(rawObject.get(index++))) //
-                .withSqlLabel(rawObject.get(index++)) //
-                .withRows(Long.valueOf(rawObject.get(index++))) //
-                .withConnectionTime(Long.valueOf(rawObject.get(index++))) //
-                .withFirstRowTime(Long.valueOf(rawObject.get(index++))) //
-                .withTotalTime(Long.valueOf(rawObject.get(index++))) //
-                .build();
     }
 
     @Override
