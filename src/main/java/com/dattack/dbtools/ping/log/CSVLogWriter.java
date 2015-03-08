@@ -99,9 +99,9 @@ public class CSVLogWriter implements LogWriter {
 
             for (final String key : keys) {
                 csvBuilder.comment(new StringBuilder() //
-                        .append(escapeHeaderLine(ObjectUtils.toString(key))) //
+                        .append(normalize(ObjectUtils.toString(key))) //
                         .append(": ") //
-                        .append(escapeHeaderLine(ObjectUtils.toString(header.getProperties().get(key)))) //
+                        .append(normalize(ObjectUtils.toString(header.getProperties().get(key)))) //
                         .toString() //
                         );
             }
@@ -109,7 +109,7 @@ public class CSVLogWriter implements LogWriter {
             csvBuilder.comment("SQL Sentences:");
             for (SQLSentence sentence : header.getPingJobConfiguration().getQueryList()) {
                 csvBuilder.comment(new StringBuilder().append("  ").append(sentence.getLabel()).append(": ")
-                        .append(escapeHeaderLine(sentence.getSql())).toString());
+                        .append(normalize(sentence.getSql())).toString());
             }
 
             csvBuilder.comment() //
@@ -128,10 +128,6 @@ public class CSVLogWriter implements LogWriter {
             csvBuilder.clear();
         }
         return data;
-    }
-
-    private String escapeHeaderLine(final String message) {
-        return message.replaceAll("\n", " ");
     }
 
     private String format(final LogEntry entry) {
@@ -158,6 +154,6 @@ public class CSVLogWriter implements LogWriter {
     }
 
     private String normalize(final String text) {
-        return text.replace("\n", " ");
+        return text.replaceAll("\n", " ");
     }
 }
