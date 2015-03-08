@@ -20,15 +20,30 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.ParseException;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.configuration.ConfigurationException;
 
+import com.dattack.dbtools.ping.report.ReportContext;
+import com.dattack.dbtools.ping.report.MetricName;
 import com.dattack.dbtools.ping.report.Reporter;
+import com.dattack.ext.util.TimeUtils;
 
 /**
  * @author cvarela
  * @since 0.1
  */
 public final class PingAnalyzer {
+
+    private static final String START_DATE_OPTION = "start_date";
+    private static final String END_DATE_OPTION = "end_date";
+    private static final String SPAN_OPTION = "time_span";
+    private static final String METRIC_OPTION = "metric";
+    private static final String DATA_FILE_OPTION = "file";
+    private static final String MAX_VALUE_OPTION = "max";
+    private static final String MIN_VALUE_OPTION = "min";
 
     /**
      * The <code>main</code> method.
@@ -40,23 +55,59 @@ public final class PingAnalyzer {
 
         try {
 
-            if (args.length < 1) {
-                System.err.println("Usage: Ping <configuration_file> [<configuration_file [...]]");
-                return;
+            // create Options object
+            Options options = new Options();
+
+            // add t option
+            options.addOption(START_DATE_OPTION, true, "the date for an analysis run to begin");
+            options.addOption(END_DATE_OPTION, true, "the date for an analysis run to finish");
+            options.addOption(SPAN_OPTION, true, "the period of time between points");
+            options.addOption(DATA_FILE_OPTION, true, "the data file to analyze");
+            options.addOption(METRIC_OPTION, true, "the metric to analyze");
+            options.addOption(MAX_VALUE_OPTION, true, "the maximum value to use");
+            options.addOption(MIN_VALUE_OPTION, true, "the minimum value to use");
+
+            CommandLineParser parser = new PosixParser();
+            CommandLine cmd = parser.parse(options, args);
+
+            ReportContext context = new ReportContext();
+            context.setStartDate(TimeUtils.parseDate(cmd.getOptionValue(START_DATE_OPTION)));
+            context.setEndDate(TimeUtils.parseDate(cmd.getOptionValue(END_DATE_OPTION)));
+            context.setTimeSpan(TimeUtils.parseTimeSpanMillis(cmd.getOptionValue(SPAN_OPTION)));
+            context.setMaxValue(parseLong(cmd.getOptionValue(MAX_VALUE_OPTION)));
+            context.setMinValue(parseLong(cmd.getOptionValue(MIN_VALUE_OPTION)));
+            if (cmd.hasOption(METRIC_OPTION)) {
+                for (String metricName : cmd.getOptionValues(METRIC_OPTION)) {
+                    context.addMetricNameFilter(MetricName.parse(metricName));
+                }
             }
 
             final PingAnalyzer ping = new PingAnalyzer();
-            ping.execute(args);
+            for (String file : cmd.getOptionValues(DATA_FILE_OPTION)) {
+                ping.execute(new File(file), context);
+            }
 
         } catch (final Exception e) {
             System.err.println(e.getMessage());
         }
     }
 
+    private static Long parseLong(final String txt) {
+
+        try {
+            if (txt != null) {
+                return Long.valueOf(txt);
+            }
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+        return null;
+    }
+
     private PingAnalyzer() {
     }
 
-    private void execute(final File file) throws ConfigurationException {
+    private void execute(final File file, final ReportContext context) throws ConfigurationException {
 
         if (file.isDirectory()) {
 
@@ -69,26 +120,19 @@ public final class PingAnalyzer {
             };
 
             for (final File child : file.listFiles(filter)) {
-                execute(child);
+                execute(child, context);
             }
 
         } else {
 
-            Reporter reporter = new Reporter();
             try {
-                reporter.execute(file);
+                Reporter reporter = new Reporter();
+                reporter.execute(file, context);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void execute(final String[] args) throws ConfigurationException {
-
-        for (final String filename : args) {
-            execute(new File(filename));
         }
     }
 }

@@ -27,24 +27,18 @@ import com.dattack.dbtools.ping.log.CSVLogReader;
 
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
 public class Reporter {
 
-    private final Context context;
-
-    public Reporter() {
-        this.context = new Context();
-    }
-
-    public void execute(final File dataFile) throws IOException, ParseException {
+    public void execute(final File dataFile, final ReportContext context) throws IOException, ParseException {
 
         CSVLogReader logReader = new CSVLogReader(dataFile);
 
         // Javascript file
         String jsFilename = dataFile.getName() + ".js";
         PrintWriter jsWriter = new PrintWriter(new File(dataFile.getParent(), jsFilename), "UTF-8");
-        createJS(jsWriter, logReader);
+        createJS(context, jsWriter, logReader);
         jsWriter.close();
 
         // HTML file
@@ -56,7 +50,8 @@ public class Reporter {
         logReader.close();
     }
 
-    private void createJS(final PrintWriter writer, final CSVLogReader logReader) throws IOException, ParseException {
+    private void createJS(final ReportContext context, final PrintWriter writer, final CSVLogReader logReader)
+            throws IOException, ParseException {
 
         ReportStats stats = new ReportStats(context);
 
@@ -64,8 +59,19 @@ public class Reporter {
 
         int items = 0;
 
-        long startDate = -1L;
-        long endDate = -1L;
+        long startDate = Long.MAX_VALUE;
+        long endDate = Long.MIN_VALUE;
+
+        long reportStartDateFilter = -1;
+        long reportEndDateFilter = Long.MAX_VALUE;
+
+        if (context.getStartDate() != null) {
+            reportStartDateFilter = context.getStartDate().getTime();
+        }
+
+        if (context.getEndDate() != null) {
+            reportEndDateFilter = context.getEndDate().getTime();
+        }
 
         while (true) {
             LogEntry item = logReader.next();
@@ -73,18 +79,19 @@ public class Reporter {
                 break;
             }
 
-            if (startDate < 0 || item.getStartTime() < startDate) {
-                startDate = item.getStartTime();
+            // apply time filters
+            if (item.getStartTime() < reportStartDateFilter || item.getStartTime() > reportEndDateFilter) {
+                continue;
             }
 
-            if (item.getStartTime() > endDate) {
-                endDate = item.getStartTime();
-            }
+            startDate = Math.min(startDate, item.getStartTime());
+            endDate = Math.max(endDate, item.getStartTime());
 
             final List<EntryStats> entryStatsList = stats.add(item);
 
             for (EntryStats entryStats : entryStatsList) {
-                String line = String.format("{x: '%s', y: %d, group: %d}", entryStats.getX(), entryStats.getY(),
+                String line = String.format("{x: '%s', y: %d, group: %d}",
+                        context.getDateFormat().format(new Date(entryStats.getX())), entryStats.getY(),
                         entryStats.getGroup());
                 if (items > 0) {
                     writer.print(",");

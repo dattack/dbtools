@@ -21,17 +21,17 @@ package com.dattack.dbtools.ping.report;
  */
 public class EntryStats {
 
-    private final String x;
+    private final long x;
     private final long y;
     private final int group;
 
-    public EntryStats(final String x, final long y, final int group) {
+    public EntryStats(final long x, final long y, final int group) {
         this.x = x;
         this.y = y;
         this.group = group;
     }
 
-    public String getX() {
+    public long getX() {
         return x;
     }
 

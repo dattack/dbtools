@@ -16,7 +16,6 @@
 package com.dattack.dbtools.ping.report;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,37 +28,60 @@ import com.dattack.dbtools.ping.LogEntry;
  */
 class ReportStats {
 
-    private static final String CONNECTION_TIME_KEY = "Connection time";
-    private static final String FIRST_ROW_TIME_KEY = "First row time";
-    private static final String EXECUTION_TIME_KEY = "Execution time";
+    private final Map<MetricName, EntryGroup> groupMap;
+    private final HashMap<Integer, EntryStats> entryStatsMap;
+    private final ReportContext context;
 
-    private final Map<String, EntryGroup> groupMap;
-    private final Context context;
-
-    public ReportStats(final Context context) {
+    public ReportStats(final ReportContext context) {
         this.context = context;
-        this.groupMap = new HashMap<String, EntryGroup>();
+        this.groupMap = new HashMap<MetricName, EntryGroup>();
+        this.entryStatsMap = new HashMap<Integer, EntryStats>();
     }
 
     List<EntryStats> add(final LogEntry logEntry) {
 
+        long eventTime = normalizeEventTime(logEntry.getStartTime());
+
         List<EntryStats> list = new ArrayList<EntryStats>();
 
-        String x = context.getDateFormat().format(new Date(logEntry.getStartTime()));
-
         // connection time
-        list.add(new EntryStats(x, logEntry.getConnectionTime(), getGroup(
-                getKey(logEntry.getTaskName(), logEntry.getSqlLabel(), CONNECTION_TIME_KEY)).getId()));
+        addEntryStats(list, new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(),
+                MetricName.CONNECTION_TIME_KEY), eventTime, logEntry.getConnectionTime());
 
         // first row
-        list.add(new EntryStats(x, logEntry.getFirstRowTime(), getGroup(
-                getKey(logEntry.getTaskName(), logEntry.getSqlLabel(), FIRST_ROW_TIME_KEY)).getId()));
+        addEntryStats(list, new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(),
+                MetricName.FIRST_ROW_TIME_KEY), eventTime, logEntry.getFirstRowTime());
 
         // execution time
-        list.add(new EntryStats(x, logEntry.getExecutionTime(), getGroup(
-                getKey(logEntry.getTaskName(), logEntry.getSqlLabel(), EXECUTION_TIME_KEY)).getId()));
+        addEntryStats(list, new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(),
+                MetricName.EXECUTION_TIME_KEY), eventTime, logEntry.getExecutionTime());
 
         return list;
+    }
+
+    private long normalizeEventTime(final long eventTime) {
+        if (context.getTimeSpan() != null && context.getTimeSpan() > 0) {
+            return (eventTime / context.getTimeSpan()) * context.getTimeSpan();
+        }
+        return eventTime;
+    }
+
+    private EntryStats process(final EntryStats entryStats) {
+
+        EntryStats previousEntryStats = entryStatsMap.get(entryStats.getGroup());
+        if (previousEntryStats == null) {
+            // it's a new metric
+            entryStatsMap.put(entryStats.getGroup(), entryStats);
+        } else if (previousEntryStats.getX() < entryStats.getX()) {
+            // it's a new X value so returns the previous one
+            entryStatsMap.put(entryStats.getGroup(), entryStats);
+            return previousEntryStats;
+
+        } else if (previousEntryStats.getX() == entryStats.getX() && previousEntryStats.getY() < entryStats.getY()) {
+            // update with MAX value
+            entryStatsMap.put(entryStats.getGroup(), entryStats);
+        }
+        return null;
     }
 
     List<EntryGroup> getEntryGroups() {
@@ -69,7 +91,7 @@ class ReportStats {
         return list;
     }
 
-    private EntryGroup getGroup(final String key) {
+    private EntryGroup getGroup(final MetricName key) {
         EntryGroup group = groupMap.get(key);
         if (group == null) {
             group = new EntryGroup(groupMap.size(), key);
@@ -78,11 +100,25 @@ class ReportStats {
         return group;
     }
 
-    private String getKey(final String taskName, final String sqlLabel, final String metricName) {
-        return String.format("%s (%s - %s)", metricName, normalize(taskName), normalize(sqlLabel));
+    private void addEntryStats(final List<EntryStats> list, final MetricName metricName, final long x, final long y) {
+
+        if (context.getMetricNameList().isEmpty() || context.getMetricNameList().contains(metricName)) {
+
+            EntryStats entry = process(new EntryStats(x, normalizeValue(y), getGroup(metricName).getId()));
+            if (entry != null) {
+                list.add(entry);
+            }
+        }
     }
 
-    private String normalize(final String text) {
-        return text.replaceAll("\"", "");
+    private long normalizeValue(final long value) {
+
+        long normalizedValue = value;
+        if (context.getMinValue() != null && normalizedValue < context.getMinValue()) {
+            normalizedValue = context.getMinValue();
+        } else if (context.getMaxValue() != null && normalizedValue > context.getMaxValue()) {
+            normalizedValue = context.getMaxValue();
+        }
+        return normalizedValue;
     }
 }

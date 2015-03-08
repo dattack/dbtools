@@ -22,9 +22,9 @@ package com.dattack.dbtools.ping.report;
 public class EntryGroup {
 
     private final int id;
-    private final String name;
+    private final MetricName name;
 
-    public EntryGroup(final int id, final String name) {
+    public EntryGroup(final int id, final MetricName name) {
         this.id = id;
         this.name = name;
     }
@@ -33,7 +33,7 @@ public class EntryGroup {
         return id;
     }
 
-    public String getName() {
+    public MetricName getName() {
         return name;
     }
 }
