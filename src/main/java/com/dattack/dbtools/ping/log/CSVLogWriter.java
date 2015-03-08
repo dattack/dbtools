@@ -138,7 +138,7 @@ public class CSVLogWriter implements LogWriter {
 
         String data = null;
         synchronized (csvBuilder) {
-            csvBuilder.append(new Date(entry.getStartTime())) //
+            csvBuilder.append(new Date(entry.getEventTime())) //
                     .append(StringUtils.trimToEmpty(entry.getTaskName())) //
                     .append(StringUtils.trimToEmpty(entry.getThreadName())) //
                     .append(entry.getIteration()) //
@@ -146,7 +146,7 @@ public class CSVLogWriter implements LogWriter {
                     .append(entry.getRows()) //
                     .append(entry.getConnectionTime()) //
                     .append(entry.getFirstRowTime()) //
-                    .append(entry.getExecutionTime());
+                    .append(entry.getTotalTime());
 
             if (entry.getException() != null) {
                 csvBuilder.append(normalize(entry.getException().getMessage()));

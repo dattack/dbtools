@@ -40,7 +40,7 @@ class ReportStats {
 
     List<EntryStats> add(final LogEntry logEntry) {
 
-        long eventTime = normalizeEventTime(logEntry.getStartTime());
+        long eventTime = normalizeEventTime(logEntry.getEventTime());
 
         List<EntryStats> list = new ArrayList<EntryStats>();
 
@@ -54,7 +54,7 @@ class ReportStats {
 
         // execution time
         addEntryStats(list, new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(),
-                MetricName.EXECUTION_TIME_KEY), eventTime, logEntry.getExecutionTime());
+                MetricName.EXECUTION_TIME_KEY), eventTime, logEntry.getTotalTime());
 
         return list;
     }

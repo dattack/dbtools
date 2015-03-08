@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dattack.dbtools.ping.LogEntry.LogEntryBuilder;
 import com.dattack.dbtools.ping.log.LogWriter;
 import com.dattack.ext.jdbc.JDBCUtils;
 
@@ -60,6 +61,10 @@ class PingJob implements Runnable {
 
         long iter = 0;
 
+        LogEntryBuilder logEntryBuilder = new LogEntryBuilder() //
+                .withTaskName(configuration.getName()) //
+                .withThreadName(threadName);
+
         while (testLoop(iter)) {
             iter++;
             Connection connection = null;
@@ -69,30 +74,29 @@ class PingJob implements Runnable {
             // retrieve the SQL to be executed
             SQLSentence sqlSentence = sentenceProvider.nextSQL();
 
-            final LogEntryFactory logEntryFactory = new LogEntryFactory(configuration.getName(), threadName, iter,
-                    sqlSentence.getLabel());
-
             try {
+
+                logEntryBuilder.init().withSqlLabel(sqlSentence.getLabel()) //
+                        .withIteration(iter);
 
                 connection = dataSource.getConnection();
 
                 // sets the connection time
-                logEntryFactory.connect();
+                logEntryBuilder.connect();
 
                 // execute the query
                 stmt = connection.createStatement();
                 rs = stmt.executeQuery(sqlSentence.getSql());
 
                 while (rs.next()) {
-                    logEntryFactory.incrRows();
+                    logEntryBuilder.incrRows();
                 }
 
                 // sets the total time
-                logWriter.write(logEntryFactory.create());
+                logWriter.write(logEntryBuilder.build());
 
             } catch (final Exception e) {
-                ;
-                logWriter.write(logEntryFactory.create(e));
+                logWriter.write(logEntryBuilder.withException(e).build());
                 log.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
                         e.getMessage());
             } finally {

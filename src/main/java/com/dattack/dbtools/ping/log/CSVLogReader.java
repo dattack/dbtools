@@ -23,6 +23,7 @@ import com.dattack.csv.CSVConfiguration;
 import com.dattack.csv.CSVObject;
 import com.dattack.csv.CSVReader;
 import com.dattack.dbtools.ping.LogEntry;
+import com.dattack.dbtools.ping.LogEntry.LogEntryBuilder;
 
 /**
  * @author cvarela
@@ -48,20 +49,18 @@ public class CSVLogReader implements LogReader {
         }
 
         int index = 0;
-        long startTime = configuration.getDateFormat().parse(rawObject.get(index++)).getTime();
-        String taskName = rawObject.get(index++);
-        String threadName = rawObject.get(index++);
-        long iteration = Long.valueOf(rawObject.get(index++));
-        String sqlLabel = rawObject.get(index++);
 
-        LogEntry logEntry = new LogEntry(taskName, threadName, iteration, sqlLabel);
-        logEntry.setStartTime(startTime);
-        logEntry.setRows(Long.valueOf(rawObject.get(index++)));
-        logEntry.setConnectionTime(Long.valueOf(rawObject.get(index++)));
-        logEntry.setFirstRowTime(Long.valueOf(rawObject.get(index++)));
-        logEntry.setExecutionTime(Long.valueOf(rawObject.get(index++)));
-
-        return logEntry;
+        return new LogEntryBuilder() //
+                .withEventTime(configuration.getDateFormat().parse(rawObject.get(index++)).getTime()) //
+                .withTaskName(rawObject.get(index++)) //
+                .withThreadName(rawObject.get(index++)) //
+                .withIteration(Long.valueOf(rawObject.get(index++))) //
+                .withSqlLabel(rawObject.get(index++)) //
+                .withRows(Long.valueOf(rawObject.get(index++))) //
+                .withConnectionTime(Long.valueOf(rawObject.get(index++))) //
+                .withFirstRowTime(Long.valueOf(rawObject.get(index++))) //
+                .withTotalTime(Long.valueOf(rawObject.get(index++))) //
+                .build();
     }
 
     @Override

@@ -80,12 +80,12 @@ public class Reporter {
             }
 
             // apply time filters
-            if (item.getStartTime() < reportStartDateFilter || item.getStartTime() > reportEndDateFilter) {
+            if (item.getEventTime() < reportStartDateFilter || item.getEventTime() > reportEndDateFilter) {
                 continue;
             }
 
-            startDate = Math.min(startDate, item.getStartTime());
-            endDate = Math.max(endDate, item.getStartTime());
+            startDate = Math.min(startDate, item.getEventTime());
+            endDate = Math.max(endDate, item.getEventTime());
 
             final List<EntryStats> entryStatsList = stats.add(item);
 
