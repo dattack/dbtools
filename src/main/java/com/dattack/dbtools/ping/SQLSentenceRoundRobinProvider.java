@@ -25,19 +25,22 @@ import java.util.List;
  */
 public class SQLSentenceRoundRobinProvider implements SQLSentenceProvider {
 
-    private final List<SQLSentence> sqlList;
+    private List<SQLSentence> sentenceList;
     private int index;
 
-    public SQLSentenceRoundRobinProvider(final List<SQLSentence> sqlList) {
-        this.sqlList = sqlList;
+    public SQLSentenceRoundRobinProvider() {
         index = 0;
     }
 
+    public void setSentences(final List<SQLSentence> sqlList) {
+        this.sentenceList = sqlList;
+    }
+    
     @Override
     public synchronized SQLSentence nextSQL() {
 
-        SQLSentence sqlSentence = sqlList.get(index++);
-        if (index >= sqlList.size()) {
+        SQLSentence sqlSentence = sentenceList.get(index++);
+        if (index >= sentenceList.size()) {
             index = 0;
         }
         return sqlSentence;

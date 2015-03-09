@@ -15,6 +15,8 @@
  */
 package com.dattack.dbtools.ping;
 
+import java.util.List;
+
 /**
  * Defines the interface to be implemented by the provider of the SQL-query executed from a ping job.
  * 
@@ -22,6 +24,8 @@ package com.dattack.dbtools.ping;
  * @since 0.1
  */
 public interface SQLSentenceProvider {
+
+    void setSentences(final List<SQLSentence> sqlList);
 
     /**
      * @return the SQL-query to be executed

@@ -88,8 +88,8 @@ public final class Ping {
 
                 DataSource dataSource = new DataSourceBuilder().withJNDIName(pingJobConf.getDatasource()).build();
 
-                // TODO: the sentence provider must be configured
-                SQLSentenceProvider sentenceProvider = new SQLSentenceRoundRobinProvider(pingJobConf.getQueryList());
+                SQLSentenceProvider sentenceProvider = getSentenceProvider(pingJobConf.getProviderClassName());
+                sentenceProvider.setSentences(pingJobConf.getQueryList());
 
                 final LogWriter logWriter = new CSVLogWriter(pingJobConf.getLogFile());
 
@@ -102,6 +102,23 @@ public final class Ping {
                 }
             }
         }
+    }
+
+    private SQLSentenceProvider getSentenceProvider(final String clazzname) {
+        
+        SQLSentenceProvider sentenceProvider = null;
+        if (clazzname != null) {
+            try {
+                sentenceProvider = (SQLSentenceProvider) Class.forName(clazzname).newInstance();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+
+        if (sentenceProvider == null) {
+            sentenceProvider = new SQLSentenceRoundRobinProvider();
+        }
+        return sentenceProvider;
     }
 
     private void execute(final String[] args) throws ConfigurationException {

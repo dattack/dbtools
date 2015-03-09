@@ -17,6 +17,8 @@ package com.dattack.dbtools.ping;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author cvarela
  */
@@ -24,12 +26,23 @@ public class SQLSentence implements Serializable {
 
     private static final long serialVersionUID = 6027026851333293209L;
 
+    private static final String LABEL_PREFIX = "Label-";
+
     private final String label;
     private final String sql;
+    private final float weight;
 
-    public SQLSentence(final String label, final String sql) {
-        this.label = label;
+    public SQLSentence(final String label, final String sql, final float weight) {
         this.sql = sql;
+        this.label = computeLabel(label);
+        this.weight = weight;
+    }
+
+    private String computeLabel(final String value) {
+        if (StringUtils.isBlank(value)) {
+            return LABEL_PREFIX + sql.hashCode();
+        }
+        return value;
     }
 
     public String getLabel() {
@@ -38,5 +51,9 @@ public class SQLSentence implements Serializable {
 
     public String getSql() {
         return sql;
+    }
+
+    public float getWeight() {
+        return weight;
     }
 }

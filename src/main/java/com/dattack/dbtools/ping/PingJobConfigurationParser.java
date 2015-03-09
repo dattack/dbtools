@@ -35,7 +35,9 @@ final class PingJobConfigurationParser {
 
     private static final Logger log = LoggerFactory.getLogger(PingJobConfigurationParser.class);
 
+    private static final float DEFAULT_WEIGHT_VALUE = 1F;
     private static final String TASK_KEY = "task";
+    private static final String PROVIDER_KEY = "[@provider]";
     private static final String EXECUTIONS_KEY = "[@executions]";
     private static final String NAME_KEY = "[@name]";
     private static final String THREADS_KEY = "[@threads]";
@@ -43,6 +45,7 @@ final class PingJobConfigurationParser {
     private static final String DATASOURCE_KEY = "[@datasource]";
     private static final String QUERY_KEY = "query";
     private static final String QUERY_LABEL_KEY = "[@label]";
+    private static final String QUERY_WEIGHT_KEY = "[@weight]";
     private static final String THIS_KEY = ""; // empty
     private static final String LOG_FILE_KEY = "log-file";
 
@@ -72,7 +75,12 @@ final class PingJobConfigurationParser {
             for (final HierarchicalConfiguration queryElement : queryElementList) {
                 String label = queryElement.getString(QUERY_LABEL_KEY);
                 String sql = queryElement.getString(THIS_KEY);
-                builder.withQuery(new SQLSentence(label, sql));
+                float weight = queryElement.getFloat(QUERY_WEIGHT_KEY, DEFAULT_WEIGHT_VALUE);
+                builder.withQuery(new SQLSentence(label, sql, weight));
+            }
+            
+            if (taskElement.containsKey(PROVIDER_KEY)) {
+                builder.withProviderClassName(taskElement.getString(PROVIDER_KEY));
             }
 
             if (taskElement.containsKey(EXECUTIONS_KEY)) {

@@ -26,18 +26,21 @@ import java.util.Random;
  */
 public class SQLSentenceRandomProvider implements SQLSentenceProvider {
 
-    private final List<SQLSentence> sqlList;
+    private List<SQLSentence> sentenceList;
     private final Random randomGenerator;
 
-    public SQLSentenceRandomProvider(final List<SQLSentence> sqlList) {
-        this.sqlList = sqlList;
+    public SQLSentenceRandomProvider() {
         randomGenerator = new Random();
+    }
+
+    public void setSentences(final List<SQLSentence> sqlList) {
+        this.sentenceList = sqlList;
     }
 
     @Override
     public SQLSentence nextSQL() {
 
-        int index = randomGenerator.nextInt(sqlList.size());
-        return sqlList.get(index);
+        int index = randomGenerator.nextInt(sentenceList.size());
+        return sentenceList.get(index);
     }
 }

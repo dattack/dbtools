@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.lang.StringUtils;
 
 import com.dattack.dbtools.Builder;
 import com.dattack.ext.misc.ConfigurationUtil;
@@ -37,7 +36,6 @@ public final class PingJobConfiguration implements Serializable {
      */
     public static class PingConfigurationBuilder implements Builder<PingJobConfiguration> {
 
-        private static final String LABEL_PREFIX = "Label-";
         private static final String TASK_NAME_CONFIGURATION_VAR = "task.name";
         private static final String DEFAULT_TASK_NAME = "";
         private static final int DEFAULT_EXECUTIONS = 0; // UNLIMITED
@@ -46,6 +44,7 @@ public final class PingJobConfiguration implements Serializable {
 
         private String datasource;
         private String name;
+        private String providerClassName;
 
         // the number of iterations by each thread
         private int executions;
@@ -81,6 +80,18 @@ public final class PingJobConfiguration implements Serializable {
         @Override
         public PingJobConfiguration build() {
             return new PingJobConfiguration(this);
+        }
+        
+        /**
+         * Sets the classname of the sql-sentence provider strategy to use.
+         * 
+         * @param value
+         *            the JNDI name
+         * @return self instance
+         */
+        public PingConfigurationBuilder withProviderClassName(final String value) {
+            this.providerClassName = value;
+            return this;
         }
 
         /**
@@ -141,16 +152,8 @@ public final class PingJobConfiguration implements Serializable {
          * @return self instance
          */
         public PingConfigurationBuilder withQuery(final SQLSentence sentence) {
-            if (StringUtils.isBlank(sentence.getLabel())) {
-                this.queryList.add(new SQLSentence(computeLabel(sentence), sentence.getSql()));
-            } else {
-                this.queryList.add(sentence);
-            }
+            this.queryList.add(sentence);
             return this;
-        }
-
-        private String computeLabel(final SQLSentence sentence) {
-            return LABEL_PREFIX + sentence.getSql().hashCode();
         }
 
         /**
@@ -187,6 +190,7 @@ public final class PingJobConfiguration implements Serializable {
 
     private final String datasource;
     private final int executions;
+    private final String providerClassName;
     private final String name;
     private final List<SQLSentence> queryList;
     private final int threads;
@@ -196,6 +200,7 @@ public final class PingJobConfiguration implements Serializable {
     private PingJobConfiguration(final PingConfigurationBuilder builder) {
         this.datasource = builder.datasource;
         this.executions = builder.executions;
+        this.providerClassName = builder.providerClassName;
         this.name = builder.name;
         this.queryList = builder.queryList;
         this.threads = builder.threads;
@@ -209,6 +214,10 @@ public final class PingJobConfiguration implements Serializable {
 
     public int getExecutions() {
         return executions;
+    }
+    
+    public String getProviderClassName() {
+        return providerClassName;
     }
 
     public String getName() {
