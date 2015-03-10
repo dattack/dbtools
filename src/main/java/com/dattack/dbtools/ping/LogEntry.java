@@ -48,8 +48,13 @@ public class LogEntry implements Serializable {
 
         @Override
         public LogEntry build() {
-            this.totalTime = computeRelativeTime();
+
+            if (totalTime == UNKNOWN) {
+                this.totalTime = computeRelativeTime();
+            }
+
             if (exception == null && firstRowTime == UNKNOWN) {
+                // empty resultset
                 this.firstRowTime = totalTime;
             }
             LogEntry logEntry = new LogEntry(this);
