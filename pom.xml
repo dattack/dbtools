@@ -89,6 +89,14 @@
                                 <platform>windows</platform>
                             </platforms>
                         </program>
+                        <program>
+                            <mainClass>com.dattack.dbtools.ping.PingAnalyzer</mainClass>
+                            <name>analyzer</name>
+                            <platforms>
+                                <platform>unix</platform>
+                                <platform>windows</platform>
+                            </platforms>
+                        </program>
                     </programs>
                 </configuration>
             </plugin>
