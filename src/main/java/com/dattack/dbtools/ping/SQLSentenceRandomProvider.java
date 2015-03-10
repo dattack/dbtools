@@ -40,6 +40,10 @@ public class SQLSentenceRandomProvider implements SQLSentenceProvider {
     @Override
     public SQLSentence nextSQL() {
 
+        if (sentenceList == null || sentenceList.isEmpty()) {
+            throw new IllegalArgumentException("The sentence list must not be null or empty");
+        }
+
         int index = randomGenerator.nextInt(sentenceList.size());
         return sentenceList.get(index);
     }

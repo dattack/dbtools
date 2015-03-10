@@ -35,9 +35,13 @@ public class SQLSentenceRoundRobinProvider implements SQLSentenceProvider {
     public void setSentences(final List<SQLSentence> sqlList) {
         this.sentenceList = sqlList;
     }
-    
+
     @Override
     public synchronized SQLSentence nextSQL() {
+
+        if (sentenceList == null || sentenceList.isEmpty()) {
+            throw new IllegalArgumentException("The sentence list must not be null or empty");
+        }
 
         SQLSentence sqlSentence = sentenceList.get(index++);
         if (index >= sentenceList.size()) {
