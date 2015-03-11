@@ -30,12 +30,14 @@ class ReportStats {
 
     private final Map<MetricName, EntryGroup> groupMap;
     private final HashMap<Integer, EntryStats> entryStatsMap;
+    private final HashMap<Integer, GroupStats> groupStatsMap;
     private final ReportContext context;
 
     public ReportStats(final ReportContext context) {
         this.context = context;
         this.groupMap = new HashMap<MetricName, EntryGroup>();
         this.entryStatsMap = new HashMap<Integer, EntryStats>();
+        this.groupStatsMap = new HashMap<Integer, GroupStats>();
     }
 
     List<EntryStats> add(final LogEntry logEntry) {
@@ -106,9 +108,19 @@ class ReportStats {
 
             EntryStats entry = process(new EntryStats(x, normalizeValue(y), getGroup(metricName).getId()));
             if (entry != null) {
+                GroupStats groupStats = groupStatsMap.get(entry.getGroup());
+                if (groupStats == null) {
+                    groupStats = new GroupStats(entry.getGroup());
+                    groupStatsMap.put(entry.getGroup(), groupStats);
+                }
+                groupStats.addEntry(entry);
                 list.add(entry);
             }
         }
+    }
+
+    public GroupStats getGroupStats(final int group) {
+        return groupStatsMap.get(group);
     }
 
     private long normalizeValue(final long value) {

@@ -25,7 +25,7 @@ public class MetricName {
 
     public static final String CONNECTION_TIME_KEY = "Connection time";
     public static final String FIRST_ROW_TIME_KEY = "First row time";
-    public static final String EXECUTION_TIME_KEY = "Execution time";
+    public static final String EXECUTION_TIME_KEY = "Total time";
 
     private final String taskName;
     private final String sqlLabel;

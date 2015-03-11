@@ -53,7 +53,7 @@ public class Reporter {
     private void createJS(final ReportContext context, final PrintWriter writer, final CSVLogReader logReader)
             throws IOException, ParseException {
 
-        ReportStats stats = new ReportStats(context);
+        ReportStats reportStats = new ReportStats(context);
 
         writer.println("var items = [");
 
@@ -87,7 +87,7 @@ public class Reporter {
             startDate = Math.min(startDate, item.getEventTime());
             endDate = Math.max(endDate, item.getEventTime());
 
-            final List<EntryStats> entryStatsList = stats.add(item);
+            final List<EntryStats> entryStatsList = reportStats.add(item);
 
             for (EntryStats entryStats : entryStatsList) {
                 String line = String.format("{x: '%s', y: %d, group: %d}",
@@ -104,7 +104,17 @@ public class Reporter {
         writer.println("];");
         writer.println("var groups = new vis.DataSet();");
 
-        for (EntryGroup entryGroup : stats.getEntryGroups()) {
+        for (EntryGroup entryGroup : reportStats.getEntryGroups()) {
+
+            GroupStats groupStats = reportStats.getGroupStats(entryGroup.getId());
+            if (groupStats != null) {
+                System.out.format("%n%nGroup (%d): %s%n", entryGroup.getId(), entryGroup.getName());
+                System.out.format("Elements: %d%n", groupStats.getStatistics().getN());
+                System.out.format("Min. value: %s%n", groupStats.getStatistics().getMin());
+                System.out.format("Max. value: %s%n", groupStats.getStatistics().getMax());
+                System.out.format("Mean: %s%n", groupStats.getStatistics().getMean());
+                System.out.format("Standard deviation: %s%n", groupStats.getStatistics().getStandardDeviation());
+            }
             writer.println(String.format(
                     "groups.add({id: '%d', content: '%s', options: {drawPoints: {style: 'circle'}}});",
                     entryGroup.getId(), entryGroup.getName()));
