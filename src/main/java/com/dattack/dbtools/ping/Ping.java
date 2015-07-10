@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import com.dattack.dbtools.ping.log.CSVLogWriter;
+import com.dattack.dbtools.ping.log.CSVFileLogWriter;
 import com.dattack.dbtools.ping.log.LogHeader;
 import com.dattack.dbtools.ping.log.LogWriter;
 import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
@@ -91,7 +91,7 @@ public final class Ping {
                 SQLSentenceProvider sentenceProvider = getSentenceProvider(pingJobConf.getProviderClassName());
                 sentenceProvider.setSentences(pingJobConf.getQueryList());
 
-                final LogWriter logWriter = new CSVLogWriter(pingJobConf.getLogFile());
+                final LogWriter logWriter = new CSVFileLogWriter(pingJobConf.getLogFile());
 
                 LogHeader logHeader = new LogHeader(pingJobConf);
                 logWriter.write(logHeader);

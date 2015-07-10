@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.dattack.dbtools.ping.LogEntry;
-import com.dattack.dbtools.ping.log.CSVLogReader;
+import com.dattack.dbtools.ping.log.CSVFileLogReader;
 
 /**
  * @author cvarela
@@ -33,7 +33,7 @@ public class Reporter {
 
     public void execute(final File dataFile, final ReportContext context) throws IOException, ParseException {
 
-        CSVLogReader logReader = new CSVLogReader(dataFile);
+        CSVFileLogReader logReader = new CSVFileLogReader(dataFile);
 
         // Javascript file
         String jsFilename = dataFile.getName() + ".js";
@@ -50,7 +50,7 @@ public class Reporter {
         logReader.close();
     }
 
-    private void createJS(final ReportContext context, final PrintWriter writer, final CSVLogReader logReader)
+    private void createJS(final ReportContext context, final PrintWriter writer, final CSVFileLogReader logReader)
             throws IOException, ParseException {
 
         ReportStats reportStats = new ReportStats(context);

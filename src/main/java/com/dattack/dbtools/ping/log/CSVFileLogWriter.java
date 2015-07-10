@@ -38,14 +38,14 @@ import com.dattack.ext.io.IOUtils;
  * @author cvarela
  * @since 0.1
  */
-public class CSVLogWriter implements LogWriter {
+public class CSVFileLogWriter implements LogWriter {
 
-    private static final Logger log = LoggerFactory.getLogger(CSVLogWriter.class);
+    private static final Logger log = LoggerFactory.getLogger(CSVFileLogWriter.class);
 
     private final CSVStringBuilder csvBuilder;
     private final String filename;
 
-    public CSVLogWriter(final String filename) {
+    public CSVFileLogWriter(final String filename) {
         this.filename = filename;
         this.csvBuilder = new CSVStringBuilder(new CSVConfigurationFactory().create());
     }

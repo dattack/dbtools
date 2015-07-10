@@ -27,14 +27,14 @@ import com.dattack.dbtools.ping.LogEntry.LogEntryBuilder;
 
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
-public class CSVLogReader implements LogReader {
+public class CSVFileLogReader implements LogReader {
 
     private final CSVReader reader;
     private final CSVConfiguration configuration;
 
-    public CSVLogReader(final File dataFile) {
+    public CSVFileLogReader(final File dataFile) {
         configuration = new CSVConfigurationFactory().create();
         reader = new CSVReader(configuration, dataFile);
     }
