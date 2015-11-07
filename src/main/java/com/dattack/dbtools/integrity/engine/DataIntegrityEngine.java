@@ -121,6 +121,10 @@ public class DataIntegrityEngine {
         // process the flight recorder and execute notifications
         executeNotifications(taskBean, flightRecorder);
 
+        for (final SourceResult sourceResult : sourceResultList) {
+            sourceResult.close();
+        }
+
         log.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
     }
 

@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,9 +20,11 @@ import java.util.List;
 import org.apache.commons.configuration.BaseConfiguration;
 
 import com.dattack.dbtools.integrity.beans.EventActionBeanVisitor;
+import com.dattack.dbtools.integrity.beans.EventActionExecuteSqlBean;
 import com.dattack.dbtools.integrity.beans.EventActionLogBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowWarningBean;
+import com.dattack.dbtools.integrity.beans.SourceBean;
 import com.dattack.ext.misc.ConfigurationUtil;
 
 /**
@@ -55,6 +57,36 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
     }
 
     @Override
+    public void visite(final EventActionExecuteSqlBean item) {
+
+        populateContext();
+        for (final SourceBean sourceBean : item.getSourceList()) {
+
+            SourceResult sourceResult = null;
+            try {
+                final SourceExecutor sourceExecutor = new SourceExecutor(sourceBean);
+                sourceResult = sourceExecutor.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (sourceResult != null) {
+                    sourceResult.close();
+                }
+            }
+        }
+    }
+
+    private void populateContext() {
+        for (final RowData rowData : rowDataList) {
+            for (final IdentifierValuePair item : rowData.getFieldValueList()) {
+                ExecutionContext.getInstance().getConfiguration().setProperty(
+                        String.format("%s.%s", rowData.getSourceId().getValue(), item.getKey().getValue()),
+                        item.getValue());
+            }
+        }
+    }
+
+    @Override
     public void visite(final EventActionLogBean action) {
         flightRecorder.appendLog(log(Severity.EMPTY));
     }
@@ -72,7 +104,7 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
     private void visite(final String template, final Severity severity, final boolean maxEventsReached) {
 
         String message = interpolate(template, log(severity));
-        
+
         switch (severity) {
         case WARNING:
             flightRecorder.handleWarning(message);
@@ -99,7 +131,7 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
         StringBuilder sb = new StringBuilder();
         for (final RowData rowData : rowDataList) {
             sb.append("\n[").append(severity.getName()).append("@").append(rowData.getSourceId().getValue())
-                    .append("]");
+            .append("]");
 
             if (rowData.getFieldValueList().isEmpty()) {
                 sb.append("\tNo data available.");

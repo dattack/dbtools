@@ -33,7 +33,8 @@ public final class CheckExprResultBean implements Serializable {
 
     private static final long serialVersionUID = -859826184950423875L;
 
-    @XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_LOG, type = EventActionLogBean.class),
+    @XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_EXECUTE_SQL, type = EventActionExecuteSqlBean.class),
+        @XmlElement(name = XmlTokens.ELEMENT_LOG, type = EventActionLogBean.class),
         @XmlElement(name = XmlTokens.ELEMENT_THROW_ERROR, type = EventActionThrowErrorBean.class),
         @XmlElement(name = XmlTokens.ELEMENT_THROW_WARNING, type = EventActionThrowWarningBean.class) })
     private final List<EventActionBean> actionList;

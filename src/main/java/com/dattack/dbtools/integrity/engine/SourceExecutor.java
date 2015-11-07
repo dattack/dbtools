@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,14 +25,13 @@ import java.util.concurrent.Callable;
 import javax.sql.DataSource;
 
 import org.apache.commons.configuration.AbstractConfiguration;
-import org.apache.commons.configuration.BaseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.integrity.beans.Identifier;
 import com.dattack.dbtools.integrity.beans.SourceBean;
 import com.dattack.dbtools.integrity.beans.SqlQueryBean;
-import com.dattack.dbtools.integrity.exceptions.ConfigurationMistakeException;
+import com.dattack.ext.jdbc.JDBCUtils;
 import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
 import com.dattack.ext.misc.ConfigurationUtil;
 
@@ -95,14 +94,18 @@ final class SourceExecutor implements Callable<SourceResult> {
     @Override
     public SourceResult call() throws Exception {
 
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+
         try {
             log.info("Configuring datasource with JNDI name: '{}'", sourceBean.getJndi());
 
-            Connection connection = getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = null;
+            connection = getConnection();
+            statement = connection.createStatement();
+            resultSet = null;
 
-            final AbstractConfiguration configuration = new BaseConfiguration();
+            final AbstractConfiguration configuration = ExecutionContext.getInstance().getConfiguration();
 
             for (Iterator<SqlQueryBean> it = sourceBean.getSqlList().iterator(); it.hasNext();) {
 
@@ -116,22 +119,13 @@ final class SourceExecutor implements Callable<SourceResult> {
                 }
             }
 
-            return createSourceResult(sourceBean.getId(), resultSet);
+            return new SourceResult(sourceBean.getId(), connection, statement, resultSet);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            JDBCUtils.closeQuietly(resultSet);
+            JDBCUtils.closeQuietly(statement);
+            JDBCUtils.closeQuietly(connection);
             throw e;
         }
-    }
-
-    private SourceResult createSourceResult(final Identifier sourceId, final ResultSet resultSet) {
-
-        if (resultSet == null) {
-            throw new ConfigurationMistakeException(
-                    String.format("[Source: %s] At least one of the SQL statements executed must return a ResultSet",
-                            sourceBean.getId()));
-        }
-
-        return new SourceResult(sourceId, resultSet);
     }
 }

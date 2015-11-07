@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import com.dattack.dbtools.integrity.beans.Identifier.IdentifierBuilder;
  */
 final class RowDataFactory {
 
-    private Identifier sourceId;
+    private final Identifier sourceId;
     private final List<Identifier> keyFieldList;
 
     public RowDataFactory(final Identifier sourceId, final List<Identifier> keyFieldList) {
@@ -40,8 +40,8 @@ final class RowDataFactory {
 
         RowData rowData = new RowData(sourceId, keyFieldList);
 
-        if (sourceResult.getResultSet().next()) {
-            
+        if (sourceResult.getResultSet() != null && sourceResult.getResultSet().next()) {
+
             ResultSetMetaData metaData = sourceResult.getResultSet().getMetaData();
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 Identifier name = new IdentifierBuilder().withValue(metaData.getColumnLabel(i)).build();

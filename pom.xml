@@ -7,16 +7,55 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>dbtools</name>
+    <url>http://www.dattack.com</url>
+    <inceptionYear>2014</inceptionYear>
+    <organization>
+        <name>Dattack Team</name>
+        <url>http://www.dattack.com/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/dattack/dbtools.git</connection>
+        <developerConnection>scm:git:git+ssh://git@github.com/dattack/dbtools.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>http://github.com/dattack/dbtools</url>
+    </scm>
+    <issueManagement>
+        <system>GitHub Issue Management</system>
+        <url>https://github.com/dattack/dbtools/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/dattack/dbtools</url>
+    </ciManagement>
+    <distributionManagement>
+        <site>
+            <id>github</id>
+            <url>gitsite:git@https://github.com/dattack/dbtools.git</url>
+        </site>
+    </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <commons-configuration.version>1.8</commons-configuration.version>
-        <slf4j.version>1.7.7</slf4j.version>
+        <slf4j.version>1.7.12</slf4j.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-cli.version>1.2</commons-cli.version>
         <sqlite.version>3.7.2</sqlite.version>
         <mysql.version>5.1.30</mysql.version>
+        <commons-email.version>1.4</commons-email.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>${commons-email.version}</version>
+        </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
@@ -88,7 +127,7 @@
                     <programs>
                         <program>
                             <mainClass>com.dattack.dbtools.ping.Ping</mainClass>
-                            <name>dbping</name>
+                            <id>dbping</id>
                             <platforms>
                                 <platform>unix</platform>
                                 <platform>windows</platform>
@@ -96,7 +135,7 @@
                         </program>
                         <program>
                             <mainClass>com.dattack.dbtools.ping.PingAnalyzer</mainClass>
-                            <name>analyzer</name>
+                            <id>analyzer</id>
                             <platforms>
                                 <platform>unix</platform>
                                 <platform>windows</platform>
@@ -132,17 +171,25 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
+                    <locales>en,es</locales>
                     <reportPlugins>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
                             <version>2.7</version>
                         </plugin>
-                        <!-- <plugin> -->
-                        <!-- <groupId>org.apache.maven.plugins</groupId> -->
-                        <!-- <artifactId>maven-changelog-plugin</artifactId> -->
-                        <!-- <version>2.1</version> -->
-                        <!-- </plugin> -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-changelog-plugin</artifactId>
+                            <version>2.2</version>
+                            <!-- <dependencies> -->
+                            <!-- <dependency> -->
+                            <!-- <groupId>org.apache.maven.scm</groupId> -->
+                            <!-- <artifactId>maven-scm-provider-gitexe</artifactId> -->
+                            <!-- <version>1.9</version> -->
+                            <!-- </dependency> -->
+                            <!-- </dependencies> -->
+                        </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-javadoc-plugin</artifactId>

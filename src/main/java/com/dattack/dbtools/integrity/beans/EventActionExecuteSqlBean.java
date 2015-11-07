@@ -13,34 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dattack.dbtools.integrity.engine;
+package com.dattack.dbtools.integrity.beans;
 
-import org.apache.commons.configuration.BaseConfiguration;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
 
 /**
+ *
  * @author cvarela
  * @since 0.1
  */
-public class ExecutionContext {
+public class EventActionExecuteSqlBean implements EventActionBean {
 
-    private static final ThreadLocal<ExecutionContext> instance = new ThreadLocal<ExecutionContext>();
+    private static final long serialVersionUID = 784476564025774210L;
 
-    private final BaseConfiguration configuration;
+    @XmlElement(name = XmlTokens.ELEMENT_SOURCE, required = true)
+    private final List<SourceBean> sourceList;
 
-    private ExecutionContext() {
-        configuration = new BaseConfiguration();
+    public EventActionExecuteSqlBean() {
+        this.sourceList = new ArrayList<SourceBean>();
     }
 
-    public synchronized static ExecutionContext getInstance() {
-        ExecutionContext obj = instance.get();
-        if (obj == null) {
-            obj = new ExecutionContext();
-            instance.set(obj);
-        }
-        return obj;
+    public List<SourceBean> getSourceList() {
+        return sourceList;
     }
 
-    public BaseConfiguration getConfiguration() {
-        return configuration;
+    @Override
+    public void accept(final EventActionBeanVisitor visitor) {
+        visitor.visite(this);
     }
 }

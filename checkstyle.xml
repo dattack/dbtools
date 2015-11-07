@@ -53,13 +53,13 @@
         </module>
         <module name="NoWhitespaceBefore">
             <property name="tokens"
-                value="SEMI, POST_DEC, POST_INC, GENERIC_START, GENERIC_END" />
+                value="SEMI, POST_DEC, POST_INC" />
         </module>
         <module name="OperatorWrap" />
         <module name="ParenPad" />
         <module name="TypecastParenPad" />
         <module name="WhitespaceAfter">
-            <property name="tokens" value="COMMA, SEMI, TYPECAST, GENERIC_END" />
+            <property name="tokens" value="COMMA, SEMI, TYPECAST" />
         </module>
         <module name="WhitespaceAround">
             <property name="tokens"
