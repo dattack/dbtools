@@ -36,7 +36,7 @@ public final class SourceBean implements Serializable {
     @XmlAttribute(name = XmlTokens.ATTRIBUTE_ID, required = false)
     private Identifier id;
 
-    @XmlElement(name = XmlTokens.ELEMENT_QUERY, required = true)
+    @XmlElement(name = XmlTokens.ELEMENT_SQL, required = true)
     private final List<SqlQueryBean> sqlList;
 
     public SourceBean() {

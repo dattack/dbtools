@@ -53,11 +53,11 @@ public final class XmlTokens {
     public static final String ELEMENT_ON_WARNING = "onWarning";
     public static final String ELEMENT_PASSWORD = "password";
     public static final String ELEMENT_PORT = "port";
-    public static final String ELEMENT_QUERY = "query";
     public static final String ELEMENT_ROW_CHECK = "rowCheck";
     public static final String ELEMENT_SEND_MAIL = "sendMail";
     public static final String ELEMENT_SMTP = "smtp";
     public static final String ELEMENT_SOURCE = "source";
+    public static final String ELEMENT_SQL = "sql";
     public static final String ELEMENT_SSL_ON_CONNECT = "sslOnConnect";
     public static final String ELEMENT_START_TLS_ENABLED = "startTLSEnabled";
     public static final String ELEMENT_TASK = "task";
