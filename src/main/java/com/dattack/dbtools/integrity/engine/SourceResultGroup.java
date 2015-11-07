@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,18 +29,18 @@ import com.dattack.dbtools.integrity.exceptions.ConfigurationMistakeException;
 final class SourceResultGroup implements Iterable<SourceResult> {
 
     private final List<SourceResult> sourceResults;
-    
+
     public SourceResultGroup() {
         this.sourceResults = new ArrayList<SourceResult>();
     }
-    
+
     public void add(final SourceResult item) {
         this.sourceResults.add(item);
     }
-    
+
     public SourceResult get(final Identifier sourceName) {
-        
-        for (final SourceResult sourceResult: sourceResults) {
+
+        for (final SourceResult sourceResult : sourceResults) {
             if (sourceName.equals(sourceResult.getSourceAlias())) {
                 return sourceResult;
             }
@@ -51,5 +51,11 @@ final class SourceResultGroup implements Iterable<SourceResult> {
     @Override
     public Iterator<SourceResult> iterator() {
         return sourceResults.iterator();
+    }
+
+    public void close() {
+        for (final SourceResult sourceResult : sourceResults) {
+            sourceResult.close();
+        }
     }
 }

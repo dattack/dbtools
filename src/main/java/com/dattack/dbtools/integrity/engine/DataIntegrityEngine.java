@@ -110,10 +110,10 @@ public class DataIntegrityEngine {
         final FlightRecorder flightRecorder = new FlightRecorder(taskBean, configurationBean);
 
         // executes the source' statements and retrieves the ResultSets to check
-        SourceResultGroup sourceResultList = getSourceResultsList(taskBean.getSources());
+        SourceResultGroup sourceResultGroup = getSourceResultsList(taskBean.getSources());
 
         // execute checks
-        executeRowChecks(taskBean, sourceResultList, flightRecorder);
+        executeRowChecks(taskBean, sourceResultGroup, flightRecorder);
 
         // execute global checks
         // TODO: execute global checks
@@ -121,9 +121,7 @@ public class DataIntegrityEngine {
         // process the flight recorder and execute notifications
         executeNotifications(taskBean, flightRecorder);
 
-        for (final SourceResult sourceResult : sourceResultList) {
-            sourceResult.close();
-        }
+        sourceResultGroup.close();
 
         log.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
     }
