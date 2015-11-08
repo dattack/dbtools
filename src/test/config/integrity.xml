@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE integrity [
+  <!ENTITY configuration         SYSTEM "configuration.xml">
+  <!ENTITY notification          SYSTEM "notifications.xml">
+  <!ENTITY on_missing_template   SYSTEM "html_on_missing_template.xml">
+  <!ENTITY on_fail_template      SYSTEM "html_on_fail_template.xml">
+]>
+
+<integrity>
+
+  &configuration;
+
+  <task id="error-test" name="Gas Oil check">
+
+    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
+    <eval name="successRows" expr="0" />
+    <eval name="warningRows" expr="0" />
+    <eval name="errorRows" expr="0" />
+    <eval name="aborted" expr="false" />
+
+    <source jndi="jdbc/sqlite-db1" id="datasource1">
+      <sql scope="pre">
+        <![CDATA[
+            CREATE TABLE IF NOT EXISTS energy_data AS
+            SELECT * FROM commodities WHERE name <> 'Gold'
+        ]]>
+      </sql>
+      <sql id="minmax">
+        <![CDATA[
+            SELECT min(high_price) AS min_high_price,
+                   max(low_price) AS max_low_price
+            FROM energy_data
+            WHERE name = 'Gas Oil'
+        ]]>
+      </sql>
+      <sql>
+        <![CDATA[
+            SELECT day, name, price, open_price, high_price, low_price, volume, change
+            FROM energy_data
+            WHERE price > ${minmax.min_high_price}
+              AND price < ${minmax.max_low_price}
+              AND name = 'Gas Oil'
+            GROUP BY day, name
+        ]]>
+      </sql>
+      <!--
+      <sql scope="post">
+        <![CDATA[
+        DROP TABLE IF EXISTS energy_data
+        ]]>
+      </sql>
+      -->
+    </source>
+
+    <source jndi="jdbc/sqlite-db2" id="datasource2">
+      <sql>
+        <![CDATA[
+            SELECT day, name, price, open_price, high_price, low_price, volume, change
+            FROM commodities
+            WHERE name = 'Gas Oil'
+              AND day <> '13/07/2015'
+            GROUP BY day, name
+        ]]>
+      </sql>
+    </source>
+
+    <rowCheck constraint="sorted">
+      <join type="INNER" using="day, name" source="datasource1, datasource2">
+        <onMatch>
+          <check expr="Math.abs(datasource1.get('price') - datasource2.get('price')) &lt; 0.50 * datasource2.get('open_price')">
+            <onSuccess>
+              <executeSql>
+                <source jndi="jdbc/sqlite-db_stats">
+                  <sql>
+                  INSERT INTO dummy (metric, counter)
+                  VALUES ('${datasource1.name}', ${datasource1.volume})
+                  </sql>
+                </source>
+              </executeSql>
+              <eval name="successRows" expr="successRows + 1" />
+              <!-- <log/> -->
+            </onSuccess>
+            <onFail>
+              <eval name="warningRows" expr="warningRows + 1" />
+              <throwWarning max="10">&on_fail_template;</throwWarning>
+            </onFail>
+          </check>
+        </onMatch>
+        <onMissing source="datasource1">
+          <eval name="warningRows" expr="warningRows + 1" />
+          <throwWarning max="10">&on_missing_template;</throwWarning>
+        </onMissing>
+        <onMissing source="datasource2">
+          <throwError max="10">&on_missing_template;</throwError>
+        </onMissing>
+      </join>
+    </rowCheck>
+
+    &notification;
+
+  </task>
+
+</integrity>

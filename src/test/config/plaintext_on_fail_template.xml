@@ -1,0 +1,5 @@
+<![CDATA[
+[${status}] Unsatisfied check expression: ${check.expr}
+
+${log}
+]]>

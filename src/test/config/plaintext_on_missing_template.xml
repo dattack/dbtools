@@ -1,0 +1,5 @@
+<![CDATA[
+[${status}] Unsatisfied join condition (${join.using}): missing data on '${onMissing.source}'
+
+${log}
+]]>
