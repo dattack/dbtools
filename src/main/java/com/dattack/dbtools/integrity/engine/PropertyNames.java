@@ -32,6 +32,15 @@ public final class PropertyNames {
     /** Property 'task.name'. */
     public static final String TASK_NAME = "task.name";
 
+    /** Property 'join.using'. */
+    public static final String JOIN_USING = "join.using";
+
+    /** Property 'onMissing.source'. */
+    public static final String ON_MISSING_SOURCE = "onMissing.source";
+
+    /** Property 'status'. */
+    public static final String STATUS = "status";
+
     private PropertyNames() {
         // static class
     }

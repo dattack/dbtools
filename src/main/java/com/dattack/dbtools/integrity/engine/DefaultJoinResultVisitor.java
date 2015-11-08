@@ -96,6 +96,8 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     public void visite(final JoinResultMissingBean item) {
         if (!missingSourceList.isEmpty()) {
             if (missingSourceList.contains(item.getSourceId())) {
+                ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.ON_MISSING_SOURCE,
+                        item.getSourceId().getValue());
                 execute(item.getActionList());
             }
         }

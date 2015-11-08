@@ -19,7 +19,6 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationConverter;
 
 import com.dattack.dbtools.integrity.beans.EventActionBeanVisitor;
@@ -29,7 +28,6 @@ import com.dattack.dbtools.integrity.beans.EventActionLogBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.integrity.beans.SourceBean;
-import com.dattack.ext.misc.ConfigurationUtil;
 import com.dattack.ext.script.JavaScriptEngine;
 
 /**
@@ -40,21 +38,6 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
 
     private final List<RowData> rowDataList;
     private final FlightRecorder flightRecorder;
-
-    private enum Severity {
-
-        EMPTY(""), WARNING("Warning"), ERROR("Error");
-
-        private String name;
-
-        Severity(final String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
 
     public DefaultEventActionVisitor(final List<RowData> rowDataList, final FlightRecorder flightRecorder) {
         this.rowDataList = rowDataList;
@@ -105,60 +88,16 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
 
     @Override
     public void visite(final EventActionLogBean action) {
-        flightRecorder.appendLog(log(Severity.EMPTY));
+        flightRecorder.handleLog(action, rowDataList);
     }
 
     @Override
     public void visite(final EventActionThrowErrorBean action) {
-        visite(action.getTemplate(), Severity.ERROR, action.isMaxEventsReached());
+        flightRecorder.handleError(action, rowDataList);
     }
 
     @Override
     public void visite(final EventActionThrowWarningBean action) {
-        visite(action.getTemplate(), Severity.WARNING, action.isMaxEventsReached());
-    }
-
-    private void visite(final String template, final Severity severity, final boolean maxEventsReached) {
-
-        String message = interpolate(template, log(severity));
-
-        switch (severity) {
-        case WARNING:
-            flightRecorder.handleWarning(message);
-            break;
-        case ERROR:
-            flightRecorder.handleError(message);
-            break;
-        default:
-            break;
-        }
-
-        if (maxEventsReached) {
-            throw new RuntimeException(String.format("%s: %s", severity, message));
-        }
-    }
-
-    private String interpolate(final String message, final String log) {
-        CompositeConfiguration configuration = new CompositeConfiguration(
-                ExecutionContext.getInstance().getConfiguration());
-        configuration.setProperty(PropertyNames.LOG, log);
-        return ConfigurationUtil.interpolate(message, configuration);
-    }
-
-    private String log(final Severity severity) {
-        StringBuilder sb = new StringBuilder();
-        for (final RowData rowData : rowDataList) {
-            sb.append("\n[").append(severity.getName()).append("@").append(rowData.getSourceId().getValue())
-            .append("]");
-
-            if (rowData.getFieldValueList().isEmpty()) {
-                sb.append("\tNo data available.");
-                continue;
-            }
-            for (final IdentifierValuePair item : rowData.getFieldValueList()) {
-                sb.append("\t").append(item.getKey().getValue()).append("=").append(item.getValue());
-            }
-        }
-        return sb.toString();
+        flightRecorder.handleWarning(action, rowDataList);
     }
 }

@@ -24,9 +24,8 @@ import javax.mail.internet.InternetAddress;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
+import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,13 +79,14 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         configuration.addConfiguration(ExecutionContext.getInstance().getConfiguration());
         configuration.setDelimiterParsingDisabled(true);
         configuration.setProperty(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
-        configuration.setProperty(PropertyNames.LOG, flightRecorder.getLog());
+        configuration.setProperty(PropertyNames.LOG, flightRecorder.getReport().toString());
 
         for (ConfigurationMailingListBean item : config.getMailingLists()) {
             configuration.setProperty(item.getName(), item.getAddressList());
         }
 
-        Email email = new SimpleEmail();
+        HtmlEmail email = new HtmlEmail();
+        email.setHtmlMsg(ConfigurationUtil.interpolate(action.getMessage(), configuration));
         email.setHostName(config.getHostname());
         email.setSmtpPort(config.getPort());
         email.setAuthenticator(new DefaultAuthenticator(config.getUsername(), config.getPassword()));

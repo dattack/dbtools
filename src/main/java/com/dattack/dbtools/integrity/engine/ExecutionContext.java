@@ -29,6 +29,7 @@ public class ExecutionContext {
 
     private ExecutionContext() {
         configuration = new BaseConfiguration();
+        configuration.setDelimiterParsingDisabled(true);
     }
 
     public synchronized static ExecutionContext getInstance() {

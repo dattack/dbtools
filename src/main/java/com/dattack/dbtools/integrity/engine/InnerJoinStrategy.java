@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,9 +42,29 @@ public class InnerJoinStrategy implements JoinStrategy {
         this.joinBean = joinBean;
     }
 
+    private void setExecutionProperties() {
+
+        StringBuilder joinUsingBuilder = new StringBuilder();
+        joinUsingBuilder.append("USING[");
+        for (int i = 0; i < joinBean.getUsing().size(); i++) {
+            Identifier identifier = joinBean.getUsing().get(i);
+            if (i > 0) {
+                joinUsingBuilder.append(", ");
+            }
+            joinUsingBuilder.append(identifier.getValue());
+        }
+        joinUsingBuilder.append("]");
+
+        ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.JOIN_USING,
+                joinUsingBuilder.toString());
+    }
+
+    @Override
     public void execute(final FlightRecorder flightRecorder) {
 
         try {
+
+            setExecutionProperties();
 
             RowDataMap rowDataMap = createRowDataMap();
 
@@ -83,12 +103,12 @@ public class InnerJoinStrategy implements JoinStrategy {
                 executeJoinResult(missingSourceList, currentRowDataList, flightRecorder);
 
             } while (minKey != null);
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
     private void executeJoinResult(final List<Identifier> missingSourceList, final List<RowData> rowDataList,
             final FlightRecorder flightRecorder) {
 

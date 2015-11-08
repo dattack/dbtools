@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +15,15 @@
  */
 package com.dattack.dbtools.integrity.engine;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.dattack.dbtools.integrity.beans.ConfigurationBean;
+import com.dattack.dbtools.integrity.beans.EventActionLogBean;
+import com.dattack.dbtools.integrity.beans.EventActionThrowErrorBean;
+import com.dattack.dbtools.integrity.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.integrity.beans.TaskBean;
+import com.dattack.dbtools.integrity.engine.report.HtmlReport;
+import com.dattack.dbtools.integrity.engine.report.Report;
 
 /**
  * @author cvarela
@@ -29,57 +33,53 @@ public final class FlightRecorder {
 
     private final TaskBean taskBean;
     private final ConfigurationBean configurationBean;
-    private final StringBuilder log;
-    private final List<String> errorList;
-    private final List<String> warningList;
+    private int errorCounter;
+    private int warningCounter;
+    private final Report report;
 
     public FlightRecorder(final TaskBean taskBean, final ConfigurationBean configurationBean) {
         this.taskBean = taskBean;
         this.configurationBean = configurationBean;
-        this.log = new StringBuilder();
-        this.errorList = new ArrayList<String>();
-        this.warningList = new ArrayList<String>();
+        this.errorCounter = 0;
+        this.warningCounter = 0;
+        this.report = new HtmlReport();
     }
 
     public TaskBean getTaskBean() {
         return taskBean;
     }
-    
+
     public ConfigurationBean getConfigurationBean() {
         return configurationBean;
     }
 
-    public void appendLog(final String message) {
-        this.log.append(message).append("\n");
-    }
-
     public boolean hasErrors() {
-        return !errorList.isEmpty();
+        return errorCounter > 0;
     }
 
     public boolean hasWarnings() {
-        return !warningList.isEmpty();
+        return warningCounter > 0;
     }
 
-    public void handleError(final String message) {
-        this.errorList.add(message);
-        appendLog(message);
+    /**
+     * @return the report
+     */
+    public Report getReport() {
+        return report;
     }
 
-    public void handleWarning(final String message) {
-        this.warningList.add(message);
-        appendLog(message);
+    public void handleLog(final EventActionLogBean action, final List<RowData> rowDataList) {
+
+        report.handleLog(action, rowDataList);
     }
 
-    public String getLog() {
-        return log.toString();
+    public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList) {
+        errorCounter++;
+        report.handleError(action, rowDataList);
     }
 
-    public List<String> getErrorList() {
-        return errorList;
-    }
-
-    public List<String> getWarningList() {
-        return warningList;
+    public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList) {
+        warningCounter++;
+        report.handleWarning(action, rowDataList);
     }
 }
