@@ -24,12 +24,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import javax.script.ScriptException;
 import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.integrity.beans.ConfigurationBean;
+import com.dattack.dbtools.integrity.beans.EventActionEvalJSBean;
 import com.dattack.dbtools.integrity.beans.Identifier;
 import com.dattack.dbtools.integrity.beans.Identifier.IdentifierBuilder;
 import com.dattack.dbtools.integrity.beans.IntegrityBean;
@@ -43,6 +45,7 @@ import com.dattack.dbtools.integrity.beans.SourceBean;
 import com.dattack.dbtools.integrity.beans.TaskBean;
 import com.dattack.dbtools.integrity.exceptions.IdentifierNotFoundException;
 import com.dattack.ext.concurrent.ThreadFactoryBuilder;
+import com.dattack.ext.script.JavaScriptEngine;
 
 /**
  * @author cvarela
@@ -109,6 +112,8 @@ public class DataIntegrityEngine {
         // start the flight recorder
         final FlightRecorder flightRecorder = new FlightRecorder(taskBean, configurationBean);
 
+        executeJSEvals(taskBean);
+
         // executes the source' statements and retrieves the ResultSets to check
         SourceResultGroup sourceResultGroup = getSourceResultsList(taskBean.getSources());
 
@@ -124,6 +129,18 @@ public class DataIntegrityEngine {
         sourceResultGroup.close();
 
         log.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
+    }
+
+    private void executeJSEvals(final TaskBean taskBean) {
+        for (EventActionEvalJSBean item : taskBean.getEvalList()) {
+            try {
+                Object value = JavaScriptEngine.eval(item.getExpression());
+                ExecutionContext.getInstance().getConfiguration().setProperty(item.getName(), value);
+            } catch (ScriptException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     private void executeNotification(final NotificationEventBean bean, final FlightRecorder flightRecorder) {

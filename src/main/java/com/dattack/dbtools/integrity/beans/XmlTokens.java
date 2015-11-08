@@ -37,6 +37,7 @@ public final class XmlTokens {
 
     public static final String ELEMENT_CHECK = "check";
     public static final String ELEMENT_CONFIGURATION = "configuration";
+    public static final String ELEMENT_EVAL = "eval";
     public static final String ELEMENT_EXECUTE_SQL = "executeSql";
     public static final String ELEMENT_FROM = "from";
     public static final String ELEMENT_HOSTNAME = "hostname";

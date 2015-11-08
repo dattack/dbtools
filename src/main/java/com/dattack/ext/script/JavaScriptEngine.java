@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,9 +22,11 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.commons.lang.ObjectUtils;
+
 /**
  * Utility class to execute JavaScript code from Java.
- * 
+ *
  * @author cvarela
  * @since 0.1
  */
@@ -38,7 +40,7 @@ public final class JavaScriptEngine {
 
     /**
      * Executes the specified JavaScript.
-     * 
+     *
      * @param script
      *            the JavaScript source to be evaluated
      * @return the value returned from the execution of the script
@@ -52,7 +54,7 @@ public final class JavaScriptEngine {
 
     /**
      * Executes the specified JavaScript.
-     * 
+     *
      * @param script
      *            the JavaScript source to be evaluated
      * @param params
@@ -60,13 +62,13 @@ public final class JavaScriptEngine {
      * @return the value returned from the execution of the script
      * @throws ScriptException
      */
-    public static Object eval(final String script, final Map<String, Object> params) throws ScriptException {
+    public static Object eval(final String script, final Map<Object, Object> params) throws ScriptException {
 
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName(JAVA_SCRIPT_ENGINE_NAME);
         if (params != null) {
-            for (Entry<String, Object> entry : params.entrySet()) {
-                engine.put(entry.getKey(), entry.getValue());
+            for (Entry<Object, Object> entry : params.entrySet()) {
+                engine.put(ObjectUtils.toString(entry.getKey()), entry.getValue());
             }
         }
 
@@ -75,7 +77,7 @@ public final class JavaScriptEngine {
 
     /**
      * Executes the specified JavaScript.
-     * 
+     *
      * @param script
      *            the JavaScript source to be evaluated
      * @return the value returned from the execution of the script
@@ -88,7 +90,7 @@ public final class JavaScriptEngine {
 
     /**
      * Executes the specified JavaScript.
-     * 
+     *
      * @param script
      *            the JavaScript source to be evaluated
      * @param params
@@ -97,7 +99,7 @@ public final class JavaScriptEngine {
      * @throws ScriptException
      *             if an error occurrs
      */
-    public static Number evalNumber(final String script, final Map<String, Object> params) throws ScriptException {
+    public static Number evalNumber(final String script, final Map<Object, Object> params) throws ScriptException {
 
         Object obj = eval(script, params);
         if (obj == null) {
@@ -114,7 +116,7 @@ public final class JavaScriptEngine {
 
     /**
      * Executes the specified JavaScript.
-     * 
+     *
      * @param script
      *            the JavaScript source to be evaluated
      * @return the value returned from the execution of the script
@@ -127,7 +129,7 @@ public final class JavaScriptEngine {
 
     /**
      * Executes the specified JavaScript.
-     * 
+     *
      * @param script
      *            the JavaScript source to be evaluated
      * @param params
@@ -136,7 +138,7 @@ public final class JavaScriptEngine {
      * @throws ScriptException
      *             if an error occurrs
      */
-    public static Boolean evalBoolean(final String script, final Map<String, Object> params) throws ScriptException {
+    public static Boolean evalBoolean(final String script, final Map<Object, Object> params) throws ScriptException {
 
         Object obj = eval(script, params);
         if (obj == null) {

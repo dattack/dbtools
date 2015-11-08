@@ -17,15 +17,20 @@ package com.dattack.dbtools.integrity.engine;
 
 import java.util.List;
 
-import org.apache.commons.configuration.BaseConfiguration;
+import javax.script.ScriptException;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationConverter;
 
 import com.dattack.dbtools.integrity.beans.EventActionBeanVisitor;
+import com.dattack.dbtools.integrity.beans.EventActionEvalJSBean;
 import com.dattack.dbtools.integrity.beans.EventActionExecuteSqlBean;
 import com.dattack.dbtools.integrity.beans.EventActionLogBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.integrity.beans.SourceBean;
 import com.dattack.ext.misc.ConfigurationUtil;
+import com.dattack.ext.script.JavaScriptEngine;
 
 /**
  * @author cvarela
@@ -57,6 +62,19 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
     }
 
     @Override
+    public void visite(final EventActionEvalJSBean item) {
+
+        try {
+            Object value = JavaScriptEngine.eval(item.getExpression(),
+                    ConfigurationConverter.getMap(ExecutionContext.getInstance().getConfiguration()));
+            ExecutionContext.getInstance().getConfiguration().setProperty(item.getName(), value);
+        } catch (ScriptException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void visite(final EventActionExecuteSqlBean item) {
 
         populateContext();
@@ -79,9 +97,8 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
     private void populateContext() {
         for (final RowData rowData : rowDataList) {
             for (final IdentifierValuePair item : rowData.getFieldValueList()) {
-                ExecutionContext.getInstance().getConfiguration().setProperty(
-                        String.format("%s.%s", rowData.getSourceId().getValue(), item.getKey().getValue()),
-                        item.getValue());
+                ExecutionContext.getInstance().getConfiguration()
+                .setProperty(rowData.getSourceId().append(item.getKey()).getValue(), item.getValue());
             }
         }
     }
@@ -122,7 +139,8 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
     }
 
     private String interpolate(final String message, final String log) {
-        BaseConfiguration configuration = new BaseConfiguration();
+        CompositeConfiguration configuration = new CompositeConfiguration(
+                ExecutionContext.getInstance().getConfiguration());
         configuration.setProperty(PropertyNames.LOG, log);
         return ConfigurationUtil.interpolate(message, configuration);
     }

@@ -27,6 +27,12 @@ public interface EventActionBeanVisitor {
      * @param item
      *            the element to visite
      */
+    void visite(final EventActionEvalJSBean item);
+
+    /**
+     * @param item
+     *            the element to visite
+     */
     void visite(final EventActionExecuteSqlBean item);
 
     /**

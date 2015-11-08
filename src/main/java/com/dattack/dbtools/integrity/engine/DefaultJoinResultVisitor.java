@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,22 +66,24 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         }
     }
 
-    private Map<String, Object> createParametersMap() {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+    private Map<Object, Object> createParametersMap() {
+        HashMap<Object, Object> params = new HashMap<Object, Object>();
         for (RowData rowData : rowDataList) {
+
+            HashMap<String, Object> sourceParams = new HashMap<String, Object>();
+            params.put(rowData.getSourceId().getValue(), sourceParams);
+
             for (IdentifierValuePair item : rowData.getFieldValueList()) {
-                params.put(computeVariableName(rowData.getSourceId(), item.getKey()), item.getValue());
+                sourceParams.put(item.getKey().getValue(), item.getValue());
             }
         }
         return params;
     }
 
-    private String computeVariableName(final Identifier sourceId, final Identifier fieldName) {
-        return String.format("%s_%s", sourceId.getValue(), fieldName.getValue());
-    }
+    private void execute(final CheckExprBean checkExprBean) throws ScriptException {
 
-    private void execute(CheckExprBean checkExprBean) throws ScriptException {
-
+        ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.CHECK_EXPR,
+                checkExprBean.getExpression());
         Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(), createParametersMap());
         if (bool == null || !bool) {
             execute(checkExprBean.getOnFail());

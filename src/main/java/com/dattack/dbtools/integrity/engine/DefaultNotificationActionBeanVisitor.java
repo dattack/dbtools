@@ -21,7 +21,7 @@ import java.util.List;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
@@ -76,13 +76,14 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
             return;
         }
 
-        BaseConfiguration baseConfiguration = new BaseConfiguration();
-        baseConfiguration.setDelimiterParsingDisabled(true);
-        baseConfiguration.setProperty(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
-        baseConfiguration.setProperty(PropertyNames.LOG, flightRecorder.getLog());
+        CompositeConfiguration configuration = new CompositeConfiguration();
+        configuration.addConfiguration(ExecutionContext.getInstance().getConfiguration());
+        configuration.setDelimiterParsingDisabled(true);
+        configuration.setProperty(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
+        configuration.setProperty(PropertyNames.LOG, flightRecorder.getLog());
 
         for (ConfigurationMailingListBean item : config.getMailingLists()) {
-            baseConfiguration.setProperty(item.getName(), item.getAddressList());
+            configuration.setProperty(item.getName(), item.getAddressList());
         }
 
         Email email = new SimpleEmail();
@@ -92,14 +93,14 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         email.setSSLOnConnect(config.isSslOnConnect());
         email.setStartTLSEnabled(config.isStartTLSEnabled());
         email.setFrom(config.getFrom());
-        email.setTo(getInternetAddresses(action.getToAddressesList(), baseConfiguration));
-        email.setSubject(ConfigurationUtil.interpolate(action.getSubject(), baseConfiguration));
-        email.setMsg(ConfigurationUtil.interpolate(action.getMessage(), baseConfiguration));
+        email.setTo(getInternetAddresses(action.getToAddressesList(), configuration));
+        email.setSubject(ConfigurationUtil.interpolate(action.getSubject(), configuration));
+        email.setMsg(ConfigurationUtil.interpolate(action.getMessage(), configuration));
         email.send();
     }
 
     private List<InternetAddress> getInternetAddresses(final List<String> addressesAsText,
-            final BaseConfiguration baseConfiguration) throws AddressException {
+            final CompositeConfiguration baseConfiguration) throws AddressException {
 
         List<InternetAddress> list = new ArrayList<InternetAddress>();
         for (String to : addressesAsText) {

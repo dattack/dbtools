@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 /**
  * Defines a data integrity task that can be executed independently of any other. The task is uniquely identified from
  * their task ID.
- * 
+ *
  * @author cvarela
  * @since 0.1
  */
@@ -40,10 +40,13 @@ public final class TaskBean implements Serializable {
     private String name;
 
     @XmlElement(name = XmlTokens.ELEMENT_SOURCE, required = true)
-    private List<SourceBean> sourceList;
+    private final List<SourceBean> sourceList;
 
     @XmlElement(name = XmlTokens.ELEMENT_ROW_CHECK, required = true)
-    private List<RowCheckBean> rowCheckList;
+    private final List<RowCheckBean> rowCheckList;
+
+    @XmlElement(name = XmlTokens.ELEMENT_EVAL, required = false)
+    private List<EventActionEvalJSBean> evalList;
 
     @XmlElement(name = XmlTokens.ELEMENT_NOTIFICATION)
     private NotificationBean notification;
@@ -65,10 +68,14 @@ public final class TaskBean implements Serializable {
         return sourceList;
     }
 
+    public List<EventActionEvalJSBean> getEvalList() {
+        return evalList;
+    }
+
     public List<RowCheckBean> getRowChecks() {
         return rowCheckList;
     }
-    
+
     public NotificationBean getNotification() {
         return notification;
     }

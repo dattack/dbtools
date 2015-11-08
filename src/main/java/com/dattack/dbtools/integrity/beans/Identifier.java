@@ -37,7 +37,11 @@ public final class Identifier implements Serializable {
         }
 
         public IdentifierBuilder withValue(final String text) {
-            this.value = text;
+            if (value == null) {
+                this.value = text;
+            } else {
+                this.value = String.format("%s.%s", this.value, text);
+            }
             return this;
         }
     }
@@ -78,6 +82,14 @@ public final class Identifier implements Serializable {
 
     public String getValue() {
         return value;
+    }
+
+    public Identifier append(final String other) {
+        return new IdentifierBuilder().withValue(getValue()).withValue(other).build();
+    }
+
+    public Identifier append(final Identifier other) {
+        return new IdentifierBuilder().withValue(getValue()).withValue(other.getValue()).build();
     }
 
     @Override

@@ -67,15 +67,11 @@ final class SourceExecutor implements Callable<SourceResult> {
                 for (int columnIndex = 1; columnIndex <= rs.getMetaData().getColumnCount(); columnIndex++) {
                     String columnName = rs.getMetaData().getColumnLabel(columnIndex);
                     Object value = rs.getObject(columnIndex);
-                    String key = createKey(queryAlias, columnName);
+                    String key = queryAlias.append(columnName).getValue();
                     configuration.setProperty(key, value);
                 }
             }
         }
-    }
-
-    private String createKey(final Identifier queryAlias, final String columnName) {
-        return String.format("%s.%s", queryAlias.getValue(), columnName);
     }
 
     private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {
