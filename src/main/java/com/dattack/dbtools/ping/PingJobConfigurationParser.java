@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,6 +42,7 @@ final class PingJobConfigurationParser {
     private static final String NAME_KEY = "[@name]";
     private static final String THREADS_KEY = "[@threads]";
     private static final String TIME_BETWEEN_EXECUTIONS_KEY = "[@timeBetweenExecutions]";
+    private static final String MAX_ROWS_TO_DUMP_KEY = "[@maxRowsToDump]";
     private static final String DATASOURCE_KEY = "[@datasource]";
     private static final String QUERY_KEY = "query";
     private static final String QUERY_LABEL_KEY = "[@label]";
@@ -78,7 +79,7 @@ final class PingJobConfigurationParser {
                 float weight = queryElement.getFloat(QUERY_WEIGHT_KEY, DEFAULT_WEIGHT_VALUE);
                 builder.withQuery(new SQLSentence(label, sql, weight));
             }
-            
+
             if (taskElement.containsKey(PROVIDER_KEY)) {
                 builder.withProviderClassName(taskElement.getString(PROVIDER_KEY));
             }
@@ -93,6 +94,10 @@ final class PingJobConfigurationParser {
 
             if (taskElement.containsKey(TIME_BETWEEN_EXECUTIONS_KEY)) {
                 builder.withTimeBetweenExecutions(taskElement.getLong(TIME_BETWEEN_EXECUTIONS_KEY));
+            }
+
+            if (taskElement.containsKey(MAX_ROWS_TO_DUMP_KEY)) {
+                builder.withMaxRowsToDump(taskElement.getLong(MAX_ROWS_TO_DUMP_KEY));
             }
 
             builder.withLogFile(taskElement.getString(LOG_FILE_KEY));

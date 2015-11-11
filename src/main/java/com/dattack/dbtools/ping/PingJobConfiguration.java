@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,6 +41,7 @@ public final class PingJobConfiguration implements Serializable {
         private static final int DEFAULT_EXECUTIONS = 0; // UNLIMITED
         private static final int DEFAULT_THREADS = 1;
         private static final int DEFAULT_TIME_BETWEEN_EXECUTIONS = 0; // NOT WAIT
+        private static final long DEFAULT_MAX_ROWS_TO_DUMP = 0;
 
         private String datasource;
         private String name;
@@ -59,6 +60,7 @@ public final class PingJobConfiguration implements Serializable {
         private long timeBetweenExecutions;
 
         private String logFile;
+        private long maxRowsToDump;
 
         private final CompositeConfiguration configuration;
         private final BaseConfiguration baseConfiguration;
@@ -75,16 +77,17 @@ public final class PingJobConfiguration implements Serializable {
             withExecutions(DEFAULT_EXECUTIONS);
             withThreads(DEFAULT_THREADS);
             withTimeBetweenExecutions(DEFAULT_TIME_BETWEEN_EXECUTIONS);
+            withMaxRowsToDump(DEFAULT_MAX_ROWS_TO_DUMP);
         }
 
         @Override
         public PingJobConfiguration build() {
             return new PingJobConfiguration(this);
         }
-        
+
         /**
          * Sets the classname of the sql-sentence provider strategy to use.
-         * 
+         *
          * @param value
          *            the JNDI name
          * @return self instance
@@ -96,7 +99,7 @@ public final class PingJobConfiguration implements Serializable {
 
         /**
          * Sets the JNDI name of the datasource to use.
-         * 
+         *
          * @param value
          *            the JNDI name
          * @return self instance
@@ -109,7 +112,7 @@ public final class PingJobConfiguration implements Serializable {
         /**
          * Sets the number of executions to loop. If the value is zero or negative then executes with no limit. By
          * default, the value is 0 (no limit).
-         * 
+         *
          * @param value
          *            the number of executions
          * @return self instance
@@ -121,7 +124,7 @@ public final class PingJobConfiguration implements Serializable {
 
         /**
          * Sets the task's name.
-         * 
+         *
          * @param value
          *            the task's name
          * @return self instance
@@ -134,7 +137,7 @@ public final class PingJobConfiguration implements Serializable {
 
         /**
          * Sets the log file pathname.
-         * 
+         *
          * @param value
          *            the log file pathname.
          * @return self instance
@@ -146,7 +149,7 @@ public final class PingJobConfiguration implements Serializable {
 
         /**
          * Adds a new ping-query.
-         * 
+         *
          * @param sentence
          *            the SQL query
          * @return self instance
@@ -158,7 +161,7 @@ public final class PingJobConfiguration implements Serializable {
 
         /**
          * Sets the number of threads to use.
-         * 
+         *
          * @param value
          *            the number of threads
          * @return self instance
@@ -173,7 +176,7 @@ public final class PingJobConfiguration implements Serializable {
         /**
          * Sets the time that the current thread must sleep before execute a new ping-query (in milliseconds). If the
          * time is zero or negative, then the current thread loop without sleep.
-         * 
+         *
          * @param value
          *            the time to sleep
          * @return self instance
@@ -181,6 +184,13 @@ public final class PingJobConfiguration implements Serializable {
         public PingConfigurationBuilder withTimeBetweenExecutions(final long value) {
             if (value >= 0) {
                 this.timeBetweenExecutions = value;
+            }
+            return this;
+        }
+
+        public PingConfigurationBuilder withMaxRowsToDump(final long value) {
+            if (value >= 0) {
+                this.maxRowsToDump = value;
             }
             return this;
         }
@@ -196,6 +206,7 @@ public final class PingJobConfiguration implements Serializable {
     private final int threads;
     private final long timeBetweenExecutions;
     private final String logFile;
+    private final long maxRowsToDump;
 
     private PingJobConfiguration(final PingConfigurationBuilder builder) {
         this.datasource = builder.datasource;
@@ -206,6 +217,11 @@ public final class PingJobConfiguration implements Serializable {
         this.threads = builder.threads;
         this.timeBetweenExecutions = builder.timeBetweenExecutions;
         this.logFile = ConfigurationUtil.interpolate(builder.logFile, builder.configuration);
+        this.maxRowsToDump = builder.maxRowsToDump;
+    }
+
+    public long getMaxRowsToDump() {
+        return maxRowsToDump;
     }
 
     public String getDatasource() {
@@ -215,7 +231,7 @@ public final class PingJobConfiguration implements Serializable {
     public int getExecutions() {
         return executions;
     }
-    
+
     public String getProviderClassName() {
         return providerClassName;
     }

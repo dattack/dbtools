@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dattack.csv.CSVStringBuilder;
+import com.dattack.dbtools.ping.DataRow;
 import com.dattack.dbtools.ping.LogEntry;
 import com.dattack.dbtools.ping.SQLSentence;
 import com.dattack.ext.io.IOUtils;
@@ -103,7 +104,7 @@ public class CSVFileLogWriter implements LogWriter {
                         .append(": ") //
                         .append(normalize(ObjectUtils.toString(header.getProperties().get(key)))) //
                         .toString() //
-                        );
+                );
             }
 
             csvBuilder.comment("SQL Sentences:");
@@ -147,10 +148,24 @@ public class CSVFileLogWriter implements LogWriter {
             if (entry.getException() != null) {
                 csvBuilder.append(normalize(entry.getException().getMessage()));
             }
-            data = csvBuilder.eol().toString();
+            csvBuilder.eol();
+            addDataRowList(entry.getRowList());
+
+            data = csvBuilder.toString();
             csvBuilder.clear();
         }
         return data;
+    }
+
+    private void addDataRowList(final List<DataRow> list) {
+        for (int i = 0; i < list.size(); i++) {
+            DataRow row = list.get(i);
+            csvBuilder.comment().append(String.format(" Row %d:\t", i));
+            for (Object obj : row.getData()) {
+                csvBuilder.append(ObjectUtils.toString(obj));
+            }
+            csvBuilder.eol();
+        }
     }
 
     private String normalize(final String text) {

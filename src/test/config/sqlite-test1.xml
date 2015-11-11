@@ -1,6 +1,7 @@
 <dbping>
-	<task name="salgrade_test" threads="1" executions="1"
-		timeBetweenExecutions="100" datasource="jdbc/sqlite-db1">
+	<task name="salgrade_test" threads="1" executions="10"
+		    timeBetweenExecutions="100" datasource="jdbc/sqlite-db1"
+		    maxRowsToDump="10">
 		<query label="sql-1">SELECT *
 			FROM salgrade
 			WHERE hisal &gt; 2500
@@ -12,7 +13,8 @@
 	</task>
 
 	<task name="emp_test" threads="1" executions="10"
-		timeBetweenExecutions="10" datasource="jdbc/sqlite-db1">
+		 timeBetweenExecutions="10" datasource="jdbc/sqlite-db1"
+		 maxRowsToDump="10">
 		<query label="deptno10">SELECT * FROM emp WHERE deptno = 10</query>
 		<query label="deptno20">SELECT * FROM emp WHERE deptno = 20</query>
 		<query label="deptno30">SELECT * FROM emp WHERE deptno = 30</query>

@@ -61,7 +61,7 @@ class PingJob implements Runnable {
 
         long iter = 0;
 
-        LogEntryBuilder logEntryBuilder = new LogEntryBuilder() //
+        LogEntryBuilder logEntryBuilder = new LogEntryBuilder(configuration.getMaxRowsToDump()) //
                 .withTaskName(configuration.getName()) //
                 .withThreadName(threadName);
 
@@ -77,7 +77,7 @@ class PingJob implements Runnable {
             try {
 
                 logEntryBuilder.init().withSqlLabel(sqlSentence.getLabel()) //
-                        .withIteration(iter);
+                .withIteration(iter);
 
                 connection = dataSource.getConnection();
 
@@ -89,7 +89,7 @@ class PingJob implements Runnable {
                 rs = stmt.executeQuery(sqlSentence.getSql());
 
                 while (rs.next()) {
-                    logEntryBuilder.incrRows();
+                    logEntryBuilder.addRow(rs);
                 }
 
                 // sets the total time
