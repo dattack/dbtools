@@ -101,7 +101,7 @@ public class LogEntry implements Serializable {
             if (maxRowsToDump > rows) {
                 int columnCount = rs.getMetaData().getColumnCount();
                 DataRow dataRow = new DataRow(columnCount);
-                for (int i = 1; i < columnCount; i++) {
+                for (int i = 1; i <= columnCount; i++) {
                     dataRow.add(rs.getObject(i));
                 }
                 this.rowList.add(dataRow);
