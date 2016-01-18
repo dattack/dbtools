@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import com.dattack.dbtools.integrity.beans.ConfigurationBean;
 import com.dattack.dbtools.integrity.beans.EventActionEvalJSBean;
 import com.dattack.dbtools.integrity.beans.Identifier;
-import com.dattack.dbtools.integrity.beans.Identifier.IdentifierBuilder;
 import com.dattack.dbtools.integrity.beans.IntegrityBean;
 import com.dattack.dbtools.integrity.beans.JAXBParser;
 import com.dattack.dbtools.integrity.beans.JoinBean;
@@ -55,25 +54,6 @@ public class DataIntegrityEngine {
 
     private static final Logger log = LoggerFactory.getLogger(DataIntegrityEngine.class);
 
-    public static void main(final String[] args) {
-
-        try {
-
-            if (args.length < 2) {
-                log.error("Usage: IntegrityEngine <configuration_file_path> <task_id>");
-                return;
-            }
-            int argIndex = 0;
-            String filename = args[argIndex++];
-            Identifier taskId = new IdentifierBuilder().withValue(args[argIndex++]).build();
-
-            final DataIntegrityEngine engine = new DataIntegrityEngine();
-            engine.execute(filename, taskId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private ThreadFactory createThreadFactory() {
         return new ThreadFactoryBuilder() //
                 .withNamePrefix("source") //
@@ -86,7 +66,7 @@ public class DataIntegrityEngine {
                 }).build();
     }
 
-    private void execute(final String filename, final Identifier taskId)
+    public void execute(final String filename, final Identifier taskId)
             throws InterruptedException, ExecutionException {
 
         try {
@@ -104,7 +84,7 @@ public class DataIntegrityEngine {
         }
     }
 
-    public void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
+    private void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
             throws InterruptedException, ExecutionException {
 
         log.info("Integrity task (Task ID: {}, Task name: {}): STARTED", taskBean.getId(), taskBean.getName());
