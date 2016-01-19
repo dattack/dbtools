@@ -15,8 +15,6 @@
  */
 package com.dattack.dbtools.integrity.beans;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
@@ -24,7 +22,7 @@ import javax.xml.bind.annotation.XmlValue;
  * @author cvarela
  * @since 0.1
  */
-public final class SqlQueryBean implements Serializable {
+public final class SqlQueryBean implements SourceCommandBean {
 
     private static final long serialVersionUID = -8673720034464586206L;
 
@@ -34,6 +32,17 @@ public final class SqlQueryBean implements Serializable {
     @XmlValue
     private String sql;
     
+//    @XmlElement(name = XmlTokens.ELEMENT_SQL, required = true)
+//    private final List<SourceCommandBean> commandList;
+//
+//    public SqlQueryBean() {
+//        this.commandList = new ArrayList<SourceCommandBean>();
+//    }
+//
+//    public List<SourceCommandBean> getCommandList() {
+//        return commandList;
+//    }
+    
     public Identifier getId() {
         return id;
     }
@@ -41,4 +50,9 @@ public final class SqlQueryBean implements Serializable {
     public String getSql() {
         return sql;
     }
+
+	@Override
+	public void accept(SourceCommandBeanVisitor visitor) {
+		visitor.visite(this);
+	}
 }

@@ -79,7 +79,7 @@ public class DataIntegrityEngine {
 
             execute(taskBean, integrityBean.getConfiguration());
 
-        } catch (JAXBException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

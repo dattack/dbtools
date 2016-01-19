@@ -27,18 +27,22 @@ public final class XmlTokens {
     public static final String ATTRIBUTE_EXPR = "expr";
     public static final String ATTRIBUTE_ID = "id";
     public static final String ATTRIBUTE_JNDI = "jndi";
+    public static final String ATTRIBUTE_KEY = "key";
     public static final String ATTRIBUTE_MAX = "max";
     public static final String ATTRIBUTE_NAME = "name";
+    public static final String ATTRIBUTE_REF = "ref";
     public static final String ATTRIBUTE_SOURCE = "source";
     public static final String ATTRIBUTE_SUBJECT = "subject";
     public static final String ATTRIBUTE_TO = "to";
     public static final String ATTRIBUTE_TYPE = "type";
     public static final String ATTRIBUTE_USING = "using";
+    public static final String ATTRIBUTE_VALUES = "values";
 
     public static final String ELEMENT_CHECK = "check";
     public static final String ELEMENT_CONFIGURATION = "configuration";
     public static final String ELEMENT_EVAL = "eval";
     public static final String ELEMENT_EXECUTE_SQL = "executeSql";
+    public static final String ELEMENT_FOREACH = "foreach";
     public static final String ELEMENT_FROM = "from";
     public static final String ELEMENT_HOSTNAME = "hostname";
     public static final String ELEMENT_INTEGRITY = "integrity";

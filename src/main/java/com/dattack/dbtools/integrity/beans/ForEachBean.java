@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
+ * Copyright (c) 2016, The Dattack team (http://www.dattack.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,59 @@
  */
 package com.dattack.dbtools.integrity.beans;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author cvarela
  * @since 0.1
  */
-public final class SourceBean implements Serializable {
+public class ForEachBean implements SourceCommandBean {
 
-	private static final long serialVersionUID = -4213185381768896599L;
+	private static final long serialVersionUID = 5817647970884889561L;
 
-	@XmlAttribute(name = XmlTokens.ATTRIBUTE_JNDI, required = true)
-	private String jndi;
-
-	@XmlAttribute(name = XmlTokens.ATTRIBUTE_ID, required = false)
-	private Identifier id;
+	@XmlAttribute(name = XmlTokens.ATTRIBUTE_KEY)
+	private String key;
+	
+	@XmlAttribute(name = XmlTokens.ATTRIBUTE_VALUES)
+	private String values;
+	
+	@XmlAttribute(name = XmlTokens.ATTRIBUTE_REF)
+	private String ref;
 
 	@XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_SQL, type = SqlQueryBean.class),
 			@XmlElement(name = XmlTokens.ELEMENT_FOREACH, type = ForEachBean.class) })
 	private final List<SourceCommandBean> commandList;
 
-	public SourceBean() {
+	public ForEachBean() {
 		this.commandList = new ArrayList<SourceCommandBean>();
-	}
-
-	public String getJndi() {
-		return jndi;
-	}
-
-	public Identifier getId() {
-		return id;
 	}
 
 	public List<SourceCommandBean> getCommandList() {
 		return commandList;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public List<String> getValuesList() {
+		return Arrays.asList(StringUtils.trimToEmpty(values).split(","));
+	}
+	
+	public String getRef() {
+		return ref;
+	}
+
+	@Override
+	public void accept(SourceCommandBeanVisitor visitor) {
+		visitor.visite(this);
 	}
 }

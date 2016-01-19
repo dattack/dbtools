@@ -19,18 +19,25 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.configuration.AbstractConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dattack.dbtools.integrity.beans.ForEachBean;
 import com.dattack.dbtools.integrity.beans.Identifier;
 import com.dattack.dbtools.integrity.beans.SourceBean;
+import com.dattack.dbtools.integrity.beans.SourceCommandBean;
+import com.dattack.dbtools.integrity.beans.SourceCommandBeanVisitor;
 import com.dattack.dbtools.integrity.beans.SqlQueryBean;
+import com.dattack.dbtools.integrity.beans.Identifier.IdentifierBuilder;
 import com.dattack.ext.jdbc.JDBCUtils;
 import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
 import com.dattack.ext.misc.ConfigurationUtil;
@@ -41,87 +48,184 @@ import com.dattack.ext.misc.ConfigurationUtil;
  */
 final class SourceExecutor implements Callable<SourceResult> {
 
-    private static final Logger log = LoggerFactory.getLogger(SourceExecutor.class);
+	private static final Logger log = LoggerFactory.getLogger(SourceExecutor.class);
 
-    private final SourceBean sourceBean;
+	private final SourceBean sourceBean;
 
-    SourceExecutor(final SourceBean sourceBean) {
-        this.sourceBean = sourceBean;
-    }
+	SourceExecutor(final SourceBean sourceBean) {
+		this.sourceBean = sourceBean;
+	}
 
-    private Connection getConnection() throws SQLException {
+	private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {
 
-        DataSource dataSource = new DataSourceBuilder().withJNDIName(sourceBean.getJndi()).build();
-        return dataSource.getConnection();
-    }
+		log.info("Executing SQL sentence [Thread: {}]: {}", Thread.currentThread().getName(), sql);
 
-    private void populateConfiguration(final AbstractConfiguration configuration, final Identifier queryAlias,
-            final ResultSet rs) throws SQLException {
+		boolean isResultSet = statement.execute(sql);
 
-        if (rs == null) {
-            return;
-        }
+		if (isResultSet) {
+			return statement.getResultSet();
+		}
 
-        if (rs.next()) {
-            if (queryAlias != null) {
-                for (int columnIndex = 1; columnIndex <= rs.getMetaData().getColumnCount(); columnIndex++) {
-                    String columnName = rs.getMetaData().getColumnLabel(columnIndex);
-                    Object value = rs.getObject(columnIndex);
-                    String key = queryAlias.append(columnName).getValue();
-                    configuration.setProperty(key, value);
-                }
-            }
-        }
-    }
+		return null;
+	}
 
-    private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {
+	private Connection getConnection() throws SQLException {
+		return new DataSourceBuilder().withJNDIName(sourceBean.getJndi()).build().getConnection();
+	}
 
-        log.info("Executing SQL sentence [Thread: {}]: {}", Thread.currentThread().getName(), sql);
+	@Override
+	public SourceResult call() throws Exception {
 
-        boolean isResultSet = statement.execute(sql);
+		Connection connection = getConnection();
+		DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
+		try {
+			log.info("Configuring datasource with JNDI name: '{}'", sourceBean.getJndi());
 
-        if (isResultSet) {
-            return statement.getResultSet();
-        }
+			for (Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
+				SourceCommandBean command = it.next();
+				command.accept(visitor);
+			}
 
-        return null;
-    }
+			return new SourceResult(sourceBean.getId(), connection, visitor.getLastResultSet());
+		} finally {
+		}
+	}
 
-    @Override
-    public SourceResult call() throws Exception {
+	private class DefaultSourceCommandBeanVisitor implements SourceCommandBeanVisitor {
 
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
+		private final AbstractConfiguration configuration;
+		private Connection connection;
+		private Map<Identifier, ResultSet> resultSetMap;
+		private ResultSet lastResultSet;
 
-        try {
-            log.info("Configuring datasource with JNDI name: '{}'", sourceBean.getJndi());
+		DefaultSourceCommandBeanVisitor(final Connection connection) {
+			configuration = new CompositeConfiguration(ExecutionContext.getInstance().getConfiguration());
+			this.connection = connection;
+			this.resultSetMap = new HashMap<Identifier, ResultSet>();
+		}
 
-            connection = getConnection();
-            statement = connection.createStatement();
-            resultSet = null;
+		/**
+		 * @return the lastResultSet
+		 */
+		public ResultSet getLastResultSet() {
+			return lastResultSet;
+		}
 
-            final AbstractConfiguration configuration = ExecutionContext.getInstance().getConfiguration();
+		private void populateConfigurationFromFirstRows(final Identifier identifier, final ResultSet resultSet)
+				throws SQLException {
 
-            for (Iterator<SqlQueryBean> it = sourceBean.getSqlList().iterator(); it.hasNext();) {
+			if (resultSet.isBeforeFirst() && resultSet.next()) {
+				if (identifier != null) {
+					for (int columnIndex = 1; columnIndex <= resultSet.getMetaData().getColumnCount(); columnIndex++) {
+						String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
+						Object value = resultSet.getObject(columnIndex);
+						String key = identifier.append(columnName).getValue();
+						configuration.setProperty(key, value);
+					}
+				}
+			}
+		}
 
-                final SqlQueryBean bean = it.next();
+		private void populateConfigurationFromResultSet(final Identifier identifier, final ResultSet resultSet)
+				throws SQLException {
 
-                String interpolatedSql = ConfigurationUtil.interpolate(bean.getSql(), configuration);
-                resultSet = executeStatement(statement, interpolatedSql);
+			if (resultSet.isBeforeFirst()) {
+				resultSet.next();
+			}
 
-                if (it.hasNext()) {
-                    populateConfiguration(configuration, bean.getId(), resultSet);
-                }
-            }
+			if (identifier != null) {
+				for (int columnIndex = 1; columnIndex <= resultSet.getMetaData().getColumnCount(); columnIndex++) {
+					String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
+					Object value = resultSet.getObject(columnIndex);
+					String key = identifier.append(columnName).getValue();
+					configuration.setProperty(key, value);
+				}
+			}
+		}
 
-            return new SourceResult(sourceBean.getId(), connection, statement, resultSet);
+		private void populateConfigurationFromFirstRows() throws SQLException {
 
-        } catch (Exception e) {
-            JDBCUtils.closeQuietly(resultSet);
-            JDBCUtils.closeQuietly(statement);
-            JDBCUtils.closeQuietly(connection);
-            throw e;
-        }
-    }
+			for (Entry<Identifier, ResultSet> entry : resultSetMap.entrySet()) {
+				populateConfigurationFromFirstRows(entry.getKey(), entry.getValue());
+			}
+		}
+
+		private void setLastValues(SqlQueryBean sqlQueryBean, ResultSet resultSet) {
+			this.lastResultSet = resultSet;
+			if (resultSet != null) {
+				resultSetMap.put(sqlQueryBean.getId(), resultSet);
+			}
+		}
+
+		@Override
+		public void visite(final SqlQueryBean bean) {
+
+			Statement statement = null;
+			ResultSet resultSet = null;
+
+			try {
+
+				populateConfigurationFromFirstRows();
+
+				statement = connection.createStatement();
+				String interpolatedSql = ConfigurationUtil.interpolate(bean.getSql(), configuration);
+				resultSet = executeStatement(statement, interpolatedSql);
+
+				setLastValues(bean, resultSet);
+
+			} catch (SQLException e) {
+				JDBCUtils.closeQuietly(resultSet);
+				JDBCUtils.closeQuietly(statement);
+				throw new RuntimeException(e);
+			}
+		}
+
+		@Override
+		public void visite(ForEachBean bean) {
+
+			if (StringUtils.isNotBlank(bean.getRef())) {
+				// check REF construction
+				forEachRef(bean);
+			} else {
+				forEachValue(bean);
+			}
+		}
+
+		private void forEachRef(ForEachBean bean) {
+
+			if (StringUtils.isBlank(bean.getRef())) {
+				throw new NullPointerException("Invalid foreach loop (missing 'ref' value)");
+			}
+
+			Identifier identifier = new IdentifierBuilder().withValue(bean.getRef()).build();
+			ResultSet resultSet = resultSetMap.get(identifier);
+
+			if (resultSet == null) {
+				throw new NullPointerException(String.format("Missing ResultSet named '%s'", bean.getRef()));
+			}
+
+			try {
+				do {
+					populateConfigurationFromResultSet(identifier, resultSet);
+					executeForEachLoop(bean);
+				} while (resultSet.next());
+			} catch (SQLException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+
+		private void forEachValue(ForEachBean bean) {
+
+			for (final String value : bean.getValuesList()) {
+				configuration.setProperty(bean.getKey(), value);
+				executeForEachLoop(bean);
+			}
+		}
+
+		private void executeForEachLoop(ForEachBean bean) {
+			for (final SourceCommandBean child : bean.getCommandList()) {
+				child.accept(this);
+			}
+		}
+	}
 }

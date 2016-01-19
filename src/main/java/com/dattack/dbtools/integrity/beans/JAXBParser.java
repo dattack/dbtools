@@ -16,10 +16,19 @@
 package com.dattack.dbtools.integrity.beans;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * @author cvarela
@@ -31,12 +40,22 @@ public final class JAXBParser {
         // static class
     }
 
-    public static IntegrityBean parse(final String filename) throws JAXBException {
+    public static IntegrityBean parse(final String filename) throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException {
 
         File file = new File(filename);
         JAXBContext jaxbContext = JAXBContext.newInstance(IntegrityBean.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        return (IntegrityBean) jaxbUnmarshaller.unmarshal(file);
+        
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+
+        spf.setXIncludeAware(true);
+        spf.setNamespaceAware(true);
+        spf.setValidating(true); // Not required for JAXB/XInclude
+
+        XMLReader xr = (XMLReader) spf.newSAXParser().getXMLReader();
+        SAXSource source = new SAXSource(xr, new InputSource(new FileInputStream(file)));
+        
+        return (IntegrityBean) jaxbUnmarshaller.unmarshal(source);
     }
 }

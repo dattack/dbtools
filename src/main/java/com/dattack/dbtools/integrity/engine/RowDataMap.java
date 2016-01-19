@@ -56,7 +56,7 @@ final class RowDataMap {
         JoinKey minKey = null;
         for (RowData rowData : sourceRowDataMap.values()) {
             
-            if (rowData == null) {
+            if (rowData == null || rowData.getKey() == null) {
                 continue;
             }
             
