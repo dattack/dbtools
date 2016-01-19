@@ -15,7 +15,14 @@
  */
 package com.dattack.dbtools.integrity.engine;
 
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.SystemConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author cvarela
@@ -23,25 +30,38 @@ import org.apache.commons.configuration.BaseConfiguration;
  */
 public class ExecutionContext {
 
-    private static final ThreadLocal<ExecutionContext> instance = new ThreadLocal<ExecutionContext>();
+	private static final Logger log = LoggerFactory.getLogger(ExecutionContext.class);
+	private static final String CONFIGURATION_FILE_PROPERTY = "dattack.configurationFile";
+	
+	private static final ThreadLocal<ExecutionContext> instance = new ThreadLocal<ExecutionContext>();
 
-    private final BaseConfiguration configuration;
+	private final CompositeConfiguration configuration;
 
-    private ExecutionContext() {
-        configuration = new BaseConfiguration();
-        configuration.setDelimiterParsingDisabled(true);
-    }
+	private ExecutionContext() {
+		configuration = new CompositeConfiguration(new BaseConfiguration());
+		configuration.setDelimiterParsingDisabled(true);
+		configuration.addConfiguration(new SystemConfiguration());
 
-    public synchronized static ExecutionContext getInstance() {
-        ExecutionContext obj = instance.get();
-        if (obj == null) {
-            obj = new ExecutionContext();
-            instance.set(obj);
-        }
-        return obj;
-    }
+		if (configuration.containsKey(CONFIGURATION_FILE_PROPERTY)) {
+			try {
+				configuration.addConfiguration(
+						new PropertiesConfiguration(configuration.getString(CONFIGURATION_FILE_PROPERTY)));
+			} catch (ConfigurationException e) {
+				log.warn(e.getMessage(), e);
+			}
+		}
+	}
 
-    public BaseConfiguration getConfiguration() {
-        return configuration;
-    }
+	public synchronized static ExecutionContext getInstance() {
+		ExecutionContext obj = instance.get();
+		if (obj == null) {
+			obj = new ExecutionContext();
+			instance.set(obj);
+		}
+		return obj;
+	}
+
+	public AbstractConfiguration getConfiguration() {
+		return configuration;
+	}
 }
