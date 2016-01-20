@@ -58,7 +58,7 @@ final class SourceExecutor implements Callable<SourceResult> {
 
 	private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {
 
-		log.info("Executing SQL sentence [Thread: {}]: {}", Thread.currentThread().getName(), sql);
+		log.info("Executing SQL sentence [{}@{}]: {}", Thread.currentThread().getName(), sourceBean.getId(), sql);
 
 		boolean isResultSet = statement.execute(sql);
 
@@ -69,23 +69,29 @@ final class SourceExecutor implements Callable<SourceResult> {
 		return null;
 	}
 
-	private Connection getConnection() throws SQLException {
-		return new DataSourceBuilder().withJNDIName(sourceBean.getJndi()).build().getConnection();
+	private Connection getConnection(final String jndiName) throws SQLException {
+		return new DataSourceBuilder().withJNDIName(jndiName).build().getConnection();
+	}
+	
+	private String getInterpolatedJNDIName() {
+		return ConfigurationUtil.interpolate(sourceBean.getJndi(),
+				ExecutionContext.getInstance().getConfiguration());		
 	}
 
 	@Override
 	public SourceResult call() throws Exception {
 
-		Connection connection = getConnection();
+		final String jndiName = getInterpolatedJNDIName();
+		
+		log.info("Configuring datasource with JNDI name: '{}'", jndiName);
+		Connection connection = getConnection(jndiName);
+
 		DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
 		try {
-			log.info("Configuring datasource with JNDI name: '{}'", sourceBean.getJndi());
-
 			for (Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
 				SourceCommandBean command = it.next();
 				command.accept(visitor);
 			}
-
 			return new SourceResult(sourceBean.getId(), connection, visitor.getLastResultSet());
 		} finally {
 		}
