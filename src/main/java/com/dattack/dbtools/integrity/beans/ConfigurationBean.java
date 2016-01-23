@@ -18,6 +18,7 @@ package com.dattack.dbtools.integrity.beans;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Defines the bean mapped with the {@code XmlTokens.ELEMENT_CONFIGURATION} element. Contains the global configuration
@@ -27,6 +28,7 @@ import javax.xml.bind.annotation.XmlElement;
  * @author cvarela
  * @since 0.1
  */
+@XmlRootElement(name = XmlTokens.ELEMENT_CONFIGURATION)
 public final class ConfigurationBean implements Serializable {
 
     private static final long serialVersionUID = 560955549703792964L;

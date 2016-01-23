@@ -49,9 +49,10 @@ public final class DataIntegrityClient {
             int argIndex = 0;
             String filename = args[argIndex++];
             Identifier taskId = new IdentifierBuilder().withValue(args[argIndex++]).build();
+            String configurationFilename = null;
 
             final DataIntegrityEngine engine = new DataIntegrityEngine();
-            engine.execute(filename, taskId);
+            engine.execute(filename, taskId, configurationFilename);
         } catch (Exception e) {
         	log.error(e.getMessage(), e);
         }

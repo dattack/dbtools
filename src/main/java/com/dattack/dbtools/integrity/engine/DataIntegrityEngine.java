@@ -15,6 +15,7 @@
  */
 package com.dattack.dbtools.integrity.engine;
 
+import java.io.FileNotFoundException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +27,12 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.script.ScriptException;
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.dattack.dbtools.integrity.beans.ConfigurationBean;
 import com.dattack.dbtools.integrity.beans.EventActionEvalJSBean;
@@ -52,131 +56,153 @@ import com.dattack.ext.script.JavaScriptEngine;
  */
 public class DataIntegrityEngine {
 
-    private static final Logger log = LoggerFactory.getLogger(DataIntegrityEngine.class);
+	private static final Logger log = LoggerFactory.getLogger(DataIntegrityEngine.class);
+	
+	private static final String DEFAULT_CONFIGURATION_FILENAME = "configuration.xml";
 
-    private ThreadFactory createThreadFactory() {
-        return new ThreadFactoryBuilder() //
-                .withNamePrefix("source") //
-                .withUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+	private ThreadFactory createThreadFactory() {
+		return new ThreadFactoryBuilder() //
+				.withNamePrefix("source") //
+				.withUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
-                    @Override
-                    public void uncaughtException(final Thread t, final Throwable e) {
-                        log.error("Uncaught exception throwed by thread '{}': {}", t.getName(), e.getMessage());
-                    }
-                }).build();
-    }
+					@Override
+					public void uncaughtException(final Thread t, final Throwable e) {
+						log.error("Uncaught exception throwed by thread '{}': {}", t.getName(), e.getMessage());
+					}
+				}).build();
+	}
 
-    public void execute(final String filename, final Identifier taskId)
-            throws InterruptedException, ExecutionException {
+	public void execute(final String integrityFilename, final Identifier taskId, final String configurationFilename)
+			throws InterruptedException, ExecutionException {
 
-        try {
-            IntegrityBean integrityBean = JAXBParser.parse(filename);
+		try {
+			IntegrityBean integrityBean = JAXBParser.parseIntegrityBean(integrityFilename);
 
-            TaskBean taskBean = integrityBean.getTask(taskId);
-            if (taskBean == null) {
-                throw new IdentifierNotFoundException(TaskBean.class, taskId);
-            }
+			TaskBean taskBean = integrityBean.getTask(taskId);
+			if (taskBean == null) {
+				throw new IdentifierNotFoundException(TaskBean.class, taskId);
+			}
 
-            execute(taskBean, integrityBean.getConfiguration());
+			ConfigurationBean configurationBean = getConfigurationBean(configurationFilename);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
+			execute(taskBean, configurationBean);
 
-    private void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
-            throws InterruptedException, ExecutionException {
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
 
-        log.info("Integrity task (Task ID: {}, Task name: {}): STARTED", taskBean.getId(), taskBean.getName());
+	private ConfigurationBean getConfigurationBean(final String filename)
+			throws FileNotFoundException, JAXBException, SAXException, ParserConfigurationException {
 
-        // start the flight recorder
-        final FlightRecorder flightRecorder = new FlightRecorder(taskBean, configurationBean);
+		ConfigurationBean configurationBean = null;
+		if (StringUtils.isNotBlank(filename)) {
+			try {
+			configurationBean = JAXBParser.parseConfigurationBean(filename);
+			} catch (final FileNotFoundException e) {
+				// ignore
+			}
+		}
+		
+		if (configurationBean == null) {
+			configurationBean = JAXBParser.parseConfigurationBean(DEFAULT_CONFIGURATION_FILENAME);
+		}
+		return configurationBean;
+	}
 
-        executeJSEvals(taskBean);
+	private void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
+			throws InterruptedException, ExecutionException {
 
-        // executes the source' statements and retrieves the ResultSets to check
-        SourceResultGroup sourceResultGroup = getSourceResultsList(taskBean.getSources());
+		log.info("Integrity task (Task ID: {}, Task name: {}): STARTED", taskBean.getId(), taskBean.getName());
 
-        // execute checks
-        executeRowChecks(taskBean, sourceResultGroup, flightRecorder);
+		// start the flight recorder
+		final FlightRecorder flightRecorder = new FlightRecorder(taskBean, configurationBean);
 
-        // execute global checks
-        // TODO: execute global checks
+		executeJSEvals(taskBean);
 
-        // process the flight recorder and execute notifications
-        executeNotifications(taskBean, flightRecorder);
+		// executes the source' statements and retrieves the ResultSets to check
+		SourceResultGroup sourceResultGroup = getSourceResultsList(taskBean.getSources());
 
-        sourceResultGroup.close();
+		// execute checks
+		executeRowChecks(taskBean, sourceResultGroup, flightRecorder);
 
-        log.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
-    }
+		// execute global checks
+		// TODO: execute global checks
 
-    private void executeJSEvals(final TaskBean taskBean) {
-        for (EventActionEvalJSBean item : taskBean.getEvalList()) {
-            try {
-                Object value = JavaScriptEngine.eval(item.getExpression());
-                ExecutionContext.getInstance().getConfiguration().setProperty(item.getName(), value);
-            } catch (ScriptException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
+		// process the flight recorder and execute notifications
+		executeNotifications(taskBean, flightRecorder);
 
-    private void executeNotification(final NotificationEventBean bean, final FlightRecorder flightRecorder) {
+		sourceResultGroup.close();
 
-        NotificationActionBeanVisitor visitor = new DefaultNotificationActionBeanVisitor(flightRecorder);
-        for (final NotificationActionBean action : bean.getActionList()) {
-            action.accept(visitor);
-        }
-    }
+		log.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
+	}
 
-    private void executeNotifications(final TaskBean taskBean, final FlightRecorder flightRecorder) {
+	private void executeJSEvals(final TaskBean taskBean) {
+		for (EventActionEvalJSBean item : taskBean.getEvalList()) {
+			try {
+				Object value = JavaScriptEngine.eval(item.getExpression());
+				ExecutionContext.getInstance().getConfiguration().setProperty(item.getName(), value);
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 
-        if (flightRecorder.hasErrors() && taskBean.getNotification().getOnError() != null) {
-            executeNotification(taskBean.getNotification().getOnError(), flightRecorder);
+	private void executeNotification(final NotificationEventBean bean, final FlightRecorder flightRecorder) {
 
-        } else if (flightRecorder.hasWarnings() && taskBean.getNotification().getOnWarning() != null) {
-            executeNotification(taskBean.getNotification().getOnWarning(), flightRecorder);
+		NotificationActionBeanVisitor visitor = new DefaultNotificationActionBeanVisitor(flightRecorder);
+		for (final NotificationActionBean action : bean.getActionList()) {
+			action.accept(visitor);
+		}
+	}
 
-        } else if (taskBean.getNotification().getOnSuccess() != null) {
-            executeNotification(taskBean.getNotification().getOnSuccess(), flightRecorder);
-        }
-    }
+	private void executeNotifications(final TaskBean taskBean, final FlightRecorder flightRecorder) {
 
-    private void executeRowChecks(final TaskBean taskBean, final SourceResultGroup sourceResultList,
-            final FlightRecorder flightRecorder) {
+		if (flightRecorder.hasErrors() && taskBean.getNotification().getOnError() != null) {
+			executeNotification(taskBean.getNotification().getOnError(), flightRecorder);
 
-        for (RowCheckBean rowCheck : taskBean.getRowChecks()) {
-            // TODO: clone the sourceResultList to execute more than one loop
-            if (taskBean.getRowChecks().size() > 1) {
-                throw new RuntimeException("TODO: clone the sourceResultList to execute more than one loop");
-            }
+		} else if (flightRecorder.hasWarnings() && taskBean.getNotification().getOnWarning() != null) {
+			executeNotification(taskBean.getNotification().getOnWarning(), flightRecorder);
 
-            for (JoinBean joinBean : rowCheck.getJoinList()) {
-                JoinStrategyFactory.getInstance().create(joinBean, sourceResultList).execute(flightRecorder);
-            }
-        }
-    }
+		} else if (taskBean.getNotification().getOnSuccess() != null) {
+			executeNotification(taskBean.getNotification().getOnSuccess(), flightRecorder);
+		}
+	}
 
-    private SourceResultGroup getSourceResultsList(final List<SourceBean> sourceList)
-            throws InterruptedException, ExecutionException {
+	private void executeRowChecks(final TaskBean taskBean, final SourceResultGroup sourceResultList,
+			final FlightRecorder flightRecorder) {
 
-        ExecutorService executorService = Executors.newCachedThreadPool(createThreadFactory());
+		for (RowCheckBean rowCheck : taskBean.getRowChecks()) {
+			// TODO: clone the sourceResultList to execute more than one loop
+			if (taskBean.getRowChecks().size() > 1) {
+				throw new RuntimeException("TODO: clone the sourceResultList to execute more than one loop");
+			}
 
-        List<Future<SourceResult>> futureList = new ArrayList<Future<SourceResult>>();
+			for (JoinBean joinBean : rowCheck.getJoinList()) {
+				JoinStrategyFactory.getInstance().create(joinBean, sourceResultList).execute(flightRecorder);
+			}
+		}
+	}
 
-        for (final SourceBean sourceBean : sourceList) {
-            futureList.add(executorService.submit(new SourceExecutor(sourceBean)));
-        }
+	private SourceResultGroup getSourceResultsList(final List<SourceBean> sourceList)
+			throws InterruptedException, ExecutionException {
 
-        SourceResultGroup sourceResultList = new SourceResultGroup();
+		ExecutorService executorService = Executors.newCachedThreadPool(createThreadFactory());
 
-        for (Future<SourceResult> future : futureList) {
-            sourceResultList.add(future.get());
-        }
-        executorService.shutdown();
+		List<Future<SourceResult>> futureList = new ArrayList<Future<SourceResult>>();
 
-        return sourceResultList;
-    }
+		for (final SourceBean sourceBean : sourceList) {
+			futureList.add(executorService.submit(new SourceExecutor(sourceBean)));
+		}
+
+		SourceResultGroup sourceResultList = new SourceResultGroup();
+
+		for (Future<SourceResult> future : futureList) {
+			sourceResultList.add(future.get());
+		}
+		executorService.shutdown();
+
+		return sourceResultList;
+	}
 }

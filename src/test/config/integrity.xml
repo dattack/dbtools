@@ -1,16 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE integrity [
-  <!ENTITY configuration         SYSTEM "configuration.xml">
-  <!ENTITY notification          SYSTEM "notifications.xml">
-  <!ENTITY on_missing_template   SYSTEM "html_on_missing_template.xml">
-  <!ENTITY on_fail_template      SYSTEM "html_on_fail_template.xml">
-]>
+<!DOCTYPE integrity>
 
-<integrity>
+<integrity xmlns:xi="http://www.w3.org/2001/XInclude">
 
-  &configuration;
+  <task id="varenv" name="Gas Oil variables">
+    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
+    <eval name="successRows" expr="0" />
+    <eval name="warningRows" expr="0" />
+    <eval name="errorRows" expr="0" />
+    <source jndi="jdbc/sqlite-db1" id="datasource1">
+      <sql>
+        <![CDATA[
+            SELECT * FROM commodities WHERE name = '${test.name}' ORDER BY day, name
+        ]]>
+      </sql>
+    </source>
+    <source jndi="jdbc/sqlite-db2" id="datasource2">
+      <sql>
+        <![CDATA[
+            SELECT * FROM commodities WHERE name = 'Gas Oil' ORDER BY day, name
+        ]]>
+      </sql>
+    </source>
+    <rowCheck constraint="sorted">
+      <join type="INNER" using="day, name" source="datasource1, datasource2">
+        <onMatch>
+          <check expr="datasource1.get('price') == datasource2.get('price')">
+            <onSuccess>
+              <eval name="successRows" expr="successRows + 1" />
+            </onSuccess>
+            <onFail>
+              <eval name="warningRows" expr="warningRows + 1" />
+              <throwWarning max="10"/>
+            </onFail>
+          </check>
+        </onMatch>
+        <onMissing source="datasource1">
+          <eval name="warningRows" expr="warningRows + 1" />
+          <throwWarning max="10"/>
+        </onMissing>
+        <onMissing source="datasource2">
+          <throwError max="10"/>
+        </onMissing>
+      </join>
+    </rowCheck>
 
+
+
+<notification>
+  <onSuccess>
+    <sendMail to="${mailingList-success}" subject="Success ${task.name}">
+      <![CDATA[
+<span style="color: #04B404;">Congrats to all of our participants! xD</span>
+
+<pre>
+  execution ID: ${executionTimestamp}
+  successRows: ${successRows}
+</pre>
+      ]]>
+    </sendMail>
+  </onSuccess>
+
+  <onWarning>
+    <sendMail to="${mailingList-warning}" subject="Warning ${task.name}">
+      <![CDATA[
+<span style="color: #B18904;">Task ended with warnings!</span>
+
+<pre>
+  execution ID: ${executionTimestamp}
+  successRows: ${successRows}
+</pre>
+
+${log}
+      ]]>
+    </sendMail>
+  </onWarning>
+
+  <onError>
+    <sendMail to="${mailingList-error}" subject="ERROR ${task.name}">
+      <![CDATA[
+<span style="color: #FF0000;">Task ended with errors!</span>
+
+<pre>
+  execution ID: ${executionTimestamp}
+  successRows: ${successRows}
+</pre>
+
+${log}
+      ]]>
+    </sendMail>
+  </onError>
+</notification>
+
+
+
+
+  </task>
+
+<!--
   <task id="error-test" name="Gas Oil check">
 
     <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
@@ -44,13 +132,6 @@
             GROUP BY day, name
         ]]>
       </sql>
-      <!--
-      <sql scope="post">
-        <![CDATA[
-        DROP TABLE IF EXISTS energy_data
-        ]]>
-      </sql>
-      -->
     </source>
 
     <source jndi="jdbc/sqlite-db2" id="datasource2">
@@ -79,26 +160,193 @@
                 </source>
               </executeSql>
               <eval name="successRows" expr="successRows + 1" />
-              <!-- <log/> -->
             </onSuccess>
             <onFail>
               <eval name="warningRows" expr="warningRows + 1" />
-              <throwWarning max="10">&on_fail_template;</throwWarning>
+              <throwWarning max="10"><xi:include href="html_on_fail_template.xml"/></throwWarning>
             </onFail>
           </check>
         </onMatch>
         <onMissing source="datasource1">
           <eval name="warningRows" expr="warningRows + 1" />
-          <throwWarning max="10">&on_missing_template;</throwWarning>
+          <throwWarning max="10"><xi:include href="html_on_missing_template.xml"/></throwWarning>
         </onMissing>
         <onMissing source="datasource2">
-          <throwError max="10">&on_missing_template;</throwError>
+          <throwError max="10"><xi:include href="html_on_missing_template.xml"/></throwError>
         </onMissing>
       </join>
     </rowCheck>
-
-    &notification;
-
+	<xi:include href="notifications.xml" />
   </task>
 
+  <task id="test-loop" name="Test loop">
+
+    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
+    <eval name="successRows" expr="0" />
+    <eval name="warningRows" expr="0" />
+    <eval name="errorRows" expr="0" />
+    <eval name="aborted" expr="false" />
+
+    <source jndi="jdbc/sqlite-db1" id="datasource1">
+      <sql>
+        <![CDATA[
+			DROP TABLE IF EXISTS test_loop_1;
+        ]]>
+      </sql>
+      <sql>
+        <![CDATA[
+			CREATE TABLE test_loop_1 (
+				branch	TEXT,
+				value	TEXT
+			);
+        ]]>
+      </sql>
+      <foreach key="key" values="a, b, c">
+	      <sql>
+	        <![CDATA[
+				INSERT INTO test_loop_1 VALUES(trim('${key}'), 'abc')
+	        ]]>
+	      </sql>
+      </foreach>
+      <foreach ref="">
+      
+      </foreach>
+      <sql>
+        <![CDATA[
+            SELECT branch, value
+            FROM test_loop_1
+            ORDER BY branch, value
+        ]]>
+      </sql>
+    </source>
+
+    <source jndi="jdbc/sqlite-db2" id="datasource2">
+      <sql>
+        <![CDATA[
+            SELECT 'a' branch, 'abc' value
+            UNION ALL
+            SELECT 'B' branch, 'abc' value
+            UNION ALL
+            SELECT 'c' branch, 'abc' value
+        ]]>
+      </sql>
+    </source>
+
+    <rowCheck constraint="sorted">
+      <join type="INNER" using="branch" source="datasource1, datasource2">
+        <onMatch>
+          <check expr="datasource1.get('value') == datasource2.get('value')">
+            <onSuccess>
+              <eval name="successRows" expr="successRows + 1" />
+            </onSuccess>
+            <onFail>
+              <eval name="warningRows" expr="warningRows + 1" />
+              <throwWarning max="10"><xi:include href="html_on_fail_template.xml"/></throwWarning>
+            </onFail>
+          </check>
+        </onMatch>
+        <onMissing source="datasource1">
+          <eval name="warningRows" expr="warningRows + 1" />
+          <throwWarning max="10"><xi:include href="html_on_missing_template.xml"/></throwWarning>
+        </onMissing>
+        <onMissing source="datasource2">
+          <throwError max="10"><xi:include href="html_on_missing_template.xml"/></throwError>
+        </onMissing>
+      </join>
+    </rowCheck>
+    <xi:include href="notifications.xml" />
+  </task>
+
+  <task id="test-loop-resultset" name="Test loop ResultSet">
+
+    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
+    <eval name="successRows" expr="0" />
+    <eval name="warningRows" expr="0" />
+    <eval name="errorRows" expr="0" />
+    <eval name="aborted" expr="false" />
+
+    <source jndi="jdbc/sqlite-db1" id="datasource1">
+      <sql>
+        <![CDATA[
+			DROP TABLE IF EXISTS test_loop_resultset;
+        ]]>
+      </sql>
+      <sql>
+        <![CDATA[
+			CREATE TABLE test_loop_resultset (
+				branch	TEXT,
+				value	TEXT
+			);
+        ]]>
+      </sql>
+      <foreach key="key" values="a, b, c">
+	      <sql>
+	        <![CDATA[
+				INSERT INTO test_loop_resultset VALUES(trim('${key}'), 'abc')
+	        ]]>
+	      </sql>
+      </foreach>
+
+      <sql id="dummy">
+        <![CDATA[
+            SELECT branch, value
+            FROM test_loop_resultset
+            ORDER BY branch, value
+        ]]>
+      </sql>
+
+      <foreach ref="dummy">
+	      <sql>
+	        <![CDATA[
+				INSERT INTO test_loop_resultset VALUES('${dummy.branch}2', '${dummy.value}')
+	        ]]>
+	      </sql>
+      </foreach>
+      
+      <sql>
+        <![CDATA[
+            SELECT branch, value
+            FROM test_loop_resultset
+            ORDER BY branch, value
+        ]]>
+      </sql>
+    </source>
+
+    <source jndi="jdbc/sqlite-db2" id="datasource2">
+      <sql>
+        <![CDATA[
+            SELECT 'a' branch, 'abc' value
+            UNION ALL
+            SELECT 'B' branch, 'abc' value
+            UNION ALL
+            SELECT 'c' branch, 'abc' value
+        ]]>
+      </sql>
+    </source>
+
+    <rowCheck constraint="sorted">
+      <join type="INNER" using="branch" source="datasource1, datasource2">
+        <onMatch>
+          <check expr="datasource1.get('value') == datasource2.get('value')">
+            <onSuccess>
+              <eval name="successRows" expr="successRows + 1" />
+            </onSuccess>
+            <onFail>
+              <eval name="warningRows" expr="warningRows + 1" />
+              <throwWarning max="10"><xi:include href="html_on_fail_template.xml"/></throwWarning>
+            </onFail>
+          </check>
+        </onMatch>
+        <onMissing source="datasource1">
+          <eval name="warningRows" expr="warningRows + 1" />
+          <throwWarning max="10"><xi:include href="html_on_missing_template.xml"/></throwWarning>
+        </onMissing>
+        <onMissing source="datasource2">
+          <throwError max="10"><xi:include href="html_on_missing_template.xml"/></throwError>
+        </onMissing>
+      </join>
+    </rowCheck>
+	<xi:include href="notifications.xml" />
+  </task>
+-->
 </integrity>

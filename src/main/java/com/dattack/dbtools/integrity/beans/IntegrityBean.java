@@ -35,8 +35,8 @@ public final class IntegrityBean implements Serializable {
     @XmlElement(name = XmlTokens.ELEMENT_TASK, required = true, type = TaskBean.class)
     private final List<TaskBean> taskBeanList;
 
-    @XmlElement(name = XmlTokens.ELEMENT_CONFIGURATION, required = false, type = ConfigurationBean.class)
-    private ConfigurationBean configuration;
+//    @XmlElement(name = XmlTokens.ELEMENT_CONFIGURATION, required = false, type = ConfigurationBean.class)
+//    private ConfigurationBean configuration;
 
     public IntegrityBean() {
         this.taskBeanList = new ArrayList<TaskBean>();
@@ -52,7 +52,7 @@ public final class IntegrityBean implements Serializable {
         return null;
     }
 
-    public ConfigurationBean getConfiguration() {
-        return configuration;
-    }
+//    public ConfigurationBean getConfiguration() {
+//        return configuration;
+//    }
 }
