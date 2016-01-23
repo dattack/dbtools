@@ -57,6 +57,7 @@ public final class FilesystemUtils {
                 return new File(path);
             }
         }
+
         return new File(path);
     }
 
@@ -98,7 +99,7 @@ public final class FilesystemUtils {
      *             if an I/O error occurs reading from the stream
      */
     public static String readFileToString(final String path, final Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        byte[] encoded = Files.readAllBytes(locate(path).toPath());
         return new String(encoded, encoding);
     }
 
