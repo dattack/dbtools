@@ -22,7 +22,6 @@ import com.dattack.dbtools.integrity.beans.EventActionLogBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.integrity.beans.TaskBean;
-import com.dattack.dbtools.integrity.engine.report.HtmlReport;
 import com.dattack.dbtools.integrity.engine.report.Report;
 
 /**
@@ -42,7 +41,7 @@ public final class FlightRecorder {
         this.configurationBean = configurationBean;
         this.errorCounter = 0;
         this.warningCounter = 0;
-        this.report = new HtmlReport();
+        this.report = new Report();
     }
 
     public TaskBean getTaskBean() {

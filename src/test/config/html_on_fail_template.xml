@@ -1,5 +1,0 @@
-<![CDATA[
-<span style="font-weight: bold;">[${status}] Unsatisfied check expression: ${check.expr}</span>
-
-${log}
-]]>

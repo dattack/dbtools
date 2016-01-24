@@ -15,13 +15,19 @@
  */
 package com.dattack.dbtools.integrity.engine;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
@@ -29,11 +35,16 @@ import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dattack.dbtools.GlobalConfiguration;
+import com.dattack.dbtools.TemplateHelper;
 import com.dattack.dbtools.integrity.beans.ConfigurationMailingListBean;
 import com.dattack.dbtools.integrity.beans.ConfigurationSmtpBean;
 import com.dattack.dbtools.integrity.beans.NotificationActionBeanVisitor;
 import com.dattack.dbtools.integrity.beans.NotificationActionSendMailBean;
 import com.dattack.ext.misc.ConfigurationUtil;
+
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * @author cvarela
@@ -60,15 +71,13 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
                 sendMail(flightRecorder.getConfigurationBean().getConfigurationSmtpBean(), action);
             }
 
-        } catch (final EmailException e) {
-            log.error(e.getMessage(), e);
-        } catch (final AddressException e) {
+        } catch (final Exception e) {
             log.error(e.getMessage(), e);
         }
     }
 
     private void sendMail(final ConfigurationSmtpBean config, final NotificationActionSendMailBean action)
-            throws EmailException, AddressException {
+            throws EmailException, AddressException, ConfigurationException, TemplateException, IOException {
 
         if (config == null) {
             log.warn("Missing SMTP configuration. Please, check your configuration file.");
@@ -85,8 +94,10 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
             configuration.setProperty(item.getName(), item.getAddressList());
         }
 
+        String message = formatMessage(action);
+
         HtmlEmail email = new HtmlEmail();
-        email.setHtmlMsg(ConfigurationUtil.interpolate(action.getMessage(), configuration));
+        email.setHtmlMsg(message);
         email.setHostName(config.getHostname());
         email.setSmtpPort(config.getPort());
         email.setAuthenticator(new DefaultAuthenticator(config.getUsername(), config.getPassword()));
@@ -95,8 +106,37 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         email.setFrom(config.getFrom());
         email.setTo(getInternetAddresses(action.getToAddressesList(), configuration));
         email.setSubject(ConfigurationUtil.interpolate(action.getSubject(), configuration));
-        email.setMsg(ConfigurationUtil.interpolate(action.getMessage(), configuration));
+        email.setMsg(message);
         email.send();
+    }
+
+    private String formatMessage(final NotificationActionSendMailBean action)
+            throws TemplateException, IOException, ConfigurationException {
+        Template template = createTemplate(action);
+        Map<Object, Object> dataModel = new HashMap<Object, Object>();
+        dataModel.putAll(ConfigurationConverter.getMap(ExecutionContext.getInstance().getConfiguration()));
+        dataModel.put(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
+        dataModel.put(PropertyNames.LOG, flightRecorder.getReport().toString());
+
+        StringWriter outputWriter = new StringWriter();
+        template.process(dataModel, outputWriter);
+        return outputWriter.toString();
+    }
+
+    private Template createTemplate(final NotificationActionSendMailBean bean)
+            throws ConfigurationException, IOException {
+
+        if (StringUtils.isNotBlank(bean.getMessageTemplateText())) {
+            return TemplateHelper.createTemplate(bean.getMessageTemplateText());
+        }
+
+        if (StringUtils.isNotBlank(bean.getMessageTemplateFile())) {
+            return TemplateHelper.loadTemplate(bean.getMessageTemplateFile());
+        }
+
+        // use default template
+        return TemplateHelper
+                .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_EMAIL_KEY));
     }
 
     private List<InternetAddress> getInternetAddresses(final List<String> addressesAsText,

@@ -1,0 +1,14 @@
+<configuration>
+  <smtp>
+    <hostname>smtp.example.com</hostname>
+    <port>587</port>
+    <username>drules</username>
+    <password>changeme</password>
+    <sslOnConnect>true</sslOnConnect>
+    <startTLSEnabled>true</startTLSEnabled>
+    <from>noreply@example.com</from>
+    <mailingList name="mailingListSuccess">drules@example.com</mailingList>
+    <mailingList name="mailingListWarning">${mailingListSuccess}</mailingList>
+    <mailingList name="mailingListError">${mailingListWarning}</mailingList>
+  </smtp>
+</configuration>

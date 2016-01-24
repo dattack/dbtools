@@ -24,19 +24,19 @@ package com.dattack.dbtools.integrity.engine;
 public final class PropertyNames {
 
     /** Property 'check.expr'. */
-    public static final String CHECK_EXPR = "check.expr";
+    public static final String CHECK_EXPR = "checkExpression";
 
     /** Property 'log'. */
     public static final String LOG = "log";
 
     /** Property 'task.name'. */
-    public static final String TASK_NAME = "task.name";
+    public static final String TASK_NAME = "taskName";
 
     /** Property 'join.using'. */
-    public static final String JOIN_USING = "join.using";
+    public static final String JOIN_CONDITION = "joinCondition";
 
     /** Property 'onMissing.source'. */
-    public static final String ON_MISSING_SOURCE = "onMissing.source";
+    public static final String MISSING_SOURCE = "missingSource";
 
     /** Property 'status'. */
     public static final String STATUS = "status";

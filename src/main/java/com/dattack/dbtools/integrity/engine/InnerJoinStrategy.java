@@ -55,7 +55,7 @@ public class InnerJoinStrategy implements JoinStrategy {
         }
         joinUsingBuilder.append("]");
 
-        ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.JOIN_USING,
+        ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.JOIN_CONDITION,
                 joinUsingBuilder.toString());
     }
 

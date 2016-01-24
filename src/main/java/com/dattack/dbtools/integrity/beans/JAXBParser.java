@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +15,8 @@
  */
 package com.dattack.dbtools.integrity.beans;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -33,7 +31,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import com.dattack.ext.io.FilesystemUtils;
-import com.dattack.ext.io.IOUtils;
 
 /**
  * @author cvarela
@@ -54,6 +51,11 @@ public final class JAXBParser {
 			throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException {
 		return (ConfigurationBean) parse(filename, ConfigurationBean.class);
 	}
+
+    public static NotificationBean parseNotificationBean(final String filename)
+            throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException {
+        return (NotificationBean) parse(filename, NotificationBean.class);
+    }
 
 	private static Object parse(final String filename, final Class<?> clazz)
 			throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException {

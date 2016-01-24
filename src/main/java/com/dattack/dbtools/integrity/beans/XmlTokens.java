@@ -37,6 +37,7 @@ public final class XmlTokens {
     public static final String ATTRIBUTE_TYPE = "type";
     public static final String ATTRIBUTE_USING = "using";
     public static final String ATTRIBUTE_VALUES = "values";
+    public static final String ATTRIBUTE_TEMPLATE = "template";
 
     public static final String ELEMENT_CHECK = "check";
     public static final String ELEMENT_CONFIGURATION = "configuration";
@@ -69,7 +70,6 @@ public final class XmlTokens {
     public static final String ELEMENT_THROW_ERROR = "throwError";
     public static final String ELEMENT_THROW_WARNING = "throwWarning";
     public static final String ELEMENT_USERNAME = "username";
-
 
     public static final String VALUE_JOIN_TYPE_INNER = "inner";
     public static final String VALUE_ROW_CHECK_CONSTRAINT_SORTED = "sorted";

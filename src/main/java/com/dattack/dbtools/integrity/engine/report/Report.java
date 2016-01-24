@@ -15,27 +15,39 @@
  */
 package com.dattack.dbtools.integrity.engine.report;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 
+import com.dattack.dbtools.GlobalConfiguration;
+import com.dattack.dbtools.TemplateHelper;
 import com.dattack.dbtools.integrity.beans.EventActionLogBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.integrity.beans.EventActionThrowWarningBean;
+import com.dattack.dbtools.integrity.beans.EventActionThrowableBean;
 import com.dattack.dbtools.integrity.engine.ExecutionContext;
 import com.dattack.dbtools.integrity.engine.PropertyNames;
 import com.dattack.dbtools.integrity.engine.RowData;
 import com.dattack.ext.misc.ConfigurationUtil;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
-public abstract class Report {
+public class Report {
 
-    static final String STATUS_WARNING = "WARNING";
-    static final String STATUS_ERROR = "ERROR";
-    static final String STATUS_OK = "OK";
+    private static final String STATUS_WARNING = "WARNING";
+    private static final String STATUS_ERROR = "ERROR";
 
     private final StringBuilder buffer;
 
@@ -47,11 +59,80 @@ public abstract class Report {
         buffer.append(text);
     }
 
-    public abstract void handleLog(final EventActionLogBean action, final List<RowData> rowDataList);
+    public void handleLog(final EventActionLogBean action, final List<RowData> rowDataList) {
 
-    public abstract void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList);
+        append(log(rowDataList));
+    }
 
-    public abstract void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList);
+    public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList) {
+        handle(action, rowDataList, STATUS_ERROR);
+    }
+
+    public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList) {
+        handle(action, rowDataList, STATUS_WARNING);
+    }
+
+    private void handle(final EventActionThrowableBean action, final List<RowData> rowDataList, final String status) {
+
+        try {
+            Template template = createTemplate(action);
+            Map<Object, Object> dataModel = new HashMap<Object, Object>();
+            dataModel.putAll(ConfigurationConverter.getMap(ExecutionContext.getInstance().getConfiguration()));
+            dataModel.put(PropertyNames.STATUS, status);
+            dataModel.put("rowDataList", rowDataList);
+            dataModel.put(PropertyNames.LOG, log(rowDataList));
+
+            StringWriter outputWriter = new StringWriter();
+            template.process(dataModel, outputWriter);
+            append(outputWriter.toString());
+        } catch (IOException | TemplateException | ConfigurationException e) {
+            // TODO: launch a RuntimeException
+        }
+    }
+
+    private Template createTemplate(final EventActionThrowableBean action) throws ConfigurationException, IOException {
+
+        if (StringUtils.isNotBlank(action.getTemplateText())) {
+            return TemplateHelper.createTemplate(action.getTemplateText());
+        }
+
+        if (StringUtils.isNotBlank(action.getTemplateFile())) {
+            return TemplateHelper.loadTemplate(action.getTemplateFile());
+        }
+
+        // use default template
+        return TemplateHelper
+                .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_THROWABLE_KEY));
+    }
+
+    private String log(final List<RowData> rowDataList) {
+        return "";
+    }
+
+    // private String log(final List<RowData> rowDataList) {
+    //
+    // StringBuilder sb = new StringBuilder();
+    // sb.append("<table><tr>");
+    //
+    // for (final RowData rowData : rowDataList) {
+    // sb.append("<td><table border=1>");
+    // sb.append("<tr bgcolor=\"#0101DF\"><td colspan=2 style=\"font-weight: bold;color: #FFFFFF;\">")
+    // .append(rowData.getSourceId().getValue()).append("</td></tr>");
+    //
+    // if (rowData.getFieldValueList().isEmpty()) {
+    // sb.append("<tr><td colspan=2>No data available.</td></tr>");
+    // }
+    //
+    // for (final IdentifierValuePair item : rowData.getFieldValueList()) {
+    // sb.append("<tr><td bgcolor=\"#0101DF\" style=\"font-weight: bold;color: #FFFFFF;\">")
+    // .append(item.getKey().getValue()).append("</td><td>").append(item.getValue())
+    // .append("</td></tr>");
+    // }
+    // sb.append("</table></td>");
+    // }
+    // sb.append("</tr></table>");
+    // return sb.toString();
+    // }
 
     String interpolate(final String message, final String status, final String log) {
         CompositeConfiguration configuration = new CompositeConfiguration(

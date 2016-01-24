@@ -66,7 +66,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         }
     }
 
-    private Map<Object, Object> createParametersMap() {
+    private Map<Object, Object> createJavascriptParametersMap() {
         HashMap<Object, Object> params = new HashMap<Object, Object>();
         for (RowData rowData : rowDataList) {
 
@@ -82,9 +82,10 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
 
     private void execute(final CheckExprBean checkExprBean) throws ScriptException {
 
-        ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.CHECK_EXPR,
-                checkExprBean.getExpression());
-        Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(), createParametersMap());
+        registerCheckExpr(checkExprBean);
+
+        // eval the check expression
+        Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(), createJavascriptParametersMap());
         if (bool == null || !bool) {
             execute(checkExprBean.getOnFail());
         } else {
@@ -92,12 +93,27 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         }
     }
 
+    private void registerCheckExpr(final CheckExprBean checkExprBean) {
+        ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.CHECK_EXPR,
+                checkExprBean.getExpression());
+        registerMissingSource(null);
+    }
+
+    private void registerMissingSource(final Identifier sourceIdentifier) {
+
+        if (sourceIdentifier == null) {
+            ExecutionContext.getInstance().getConfiguration().clearProperty(PropertyNames.MISSING_SOURCE);
+        } else {
+            ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.MISSING_SOURCE,
+                    sourceIdentifier.getValue());
+        }
+    }
+
     @Override
     public void visite(final JoinResultMissingBean item) {
         if (!missingSourceList.isEmpty()) {
             if (missingSourceList.contains(item.getSourceId())) {
-                ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.ON_MISSING_SOURCE,
-                        item.getSourceId().getValue());
+                registerMissingSource(item.getSourceId());
                 execute(item.getActionList());
             }
         }

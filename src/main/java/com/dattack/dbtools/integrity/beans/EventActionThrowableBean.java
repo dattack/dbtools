@@ -31,8 +31,11 @@ public abstract class EventActionThrowableBean implements EventActionBean {
     private int currentEvents;
     private int maxEvents;
 
+    @XmlAttribute(name = XmlTokens.ATTRIBUTE_TEMPLATE)
+    private String templateFile;
+
     @XmlValue
-    private String template;
+    private String templateText;
 
     EventActionThrowableBean() {
         this.maxEvents = MAX_EVENTS_DEFAULT;
@@ -47,8 +50,12 @@ public abstract class EventActionThrowableBean implements EventActionBean {
         return maxEvents;
     }
 
-    public String getTemplate() {
-        return template;
+    public String getTemplateFile() {
+        return templateFile;
+    }
+
+    public String getTemplateText() {
+        return templateText;
     }
 
     public void incrEvents() {

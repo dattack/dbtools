@@ -45,57 +45,6 @@
         </onMissing>
       </join>
     </rowCheck>
-
-
-
-<notification>
-  <onSuccess>
-    <sendMail to="${mailingList-success}" subject="Success ${task.name}">
-      <![CDATA[
-<span style="color: #04B404;">Congrats to all of our participants! xD</span>
-
-<pre>
-  execution ID: ${executionTimestamp}
-  successRows: ${successRows}
-</pre>
-      ]]>
-    </sendMail>
-  </onSuccess>
-
-  <onWarning>
-    <sendMail to="${mailingList-warning}" subject="Warning ${task.name}">
-      <![CDATA[
-<span style="color: #B18904;">Task ended with warnings!</span>
-
-<pre>
-  execution ID: ${executionTimestamp}
-  successRows: ${successRows}
-</pre>
-
-${log}
-      ]]>
-    </sendMail>
-  </onWarning>
-
-  <onError>
-    <sendMail to="${mailingList-error}" subject="ERROR ${task.name}">
-      <![CDATA[
-<span style="color: #FF0000;">Task ended with errors!</span>
-
-<pre>
-  execution ID: ${executionTimestamp}
-  successRows: ${successRows}
-</pre>
-
-${log}
-      ]]>
-    </sendMail>
-  </onError>
-</notification>
-
-
-
-
   </task>
 
 <!--
