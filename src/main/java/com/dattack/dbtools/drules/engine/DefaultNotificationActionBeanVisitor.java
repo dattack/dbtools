@@ -26,10 +26,10 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
@@ -41,6 +41,7 @@ import com.dattack.dbtools.drules.beans.ConfigurationMailingListBean;
 import com.dattack.dbtools.drules.beans.ConfigurationSmtpBean;
 import com.dattack.dbtools.drules.beans.NotificationActionBeanVisitor;
 import com.dattack.dbtools.drules.beans.NotificationActionSendMailBean;
+import com.dattack.ext.mail.HtmlEmailBuilder;
 import com.dattack.ext.misc.ConfigurationUtil;
 
 import freemarker.template.Template;
@@ -65,11 +66,11 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
 
         try {
 
-            if (flightRecorder.getConfigurationBean() == null) {
-                log.warn("Missing configuration. Please, check your configuration file.");
-            } else {
-                sendMail(flightRecorder.getConfigurationBean().getConfigurationSmtpBean(), action);
-            }
+			if (flightRecorder.getConfigurationBean() == null) {
+				log.warn("Missing SMTP configuration. Please, check your configuration file.");
+			} else {
+				sendMail(flightRecorder.getConfigurationBean().getConfigurationSmtpBean(), action);
+			}
 
         } catch (final Exception e) {
             log.error(e.getMessage(), e);
@@ -94,34 +95,41 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
             configuration.setProperty(item.getName(), item.getAddressList());
         }
 
-        String message = formatMessage(action);
+		HtmlEmailBuilder htmlEmailBuilder = new HtmlEmailBuilder() //
+				.withHostName(ConfigurationUtil.interpolate(config.getHostname(), configuration)) //
+				.withPort(config.getPort()) //
+				.withUsername(ConfigurationUtil.interpolate(config.getUsername(), configuration)) //
+				.withPassword(ConfigurationUtil.interpolate(config.getPassword(), configuration)) //
+				.withFrom(ConfigurationUtil.interpolate(config.getFrom(), configuration)) //
+				.withSubject(ConfigurationUtil.interpolate(action.getSubject(), configuration)) //
+                .withMessage(formatMessage(action, configuration)) //
+				.withSSLOnConnect(config.isSslOnConnect()) //
+				.withStartTlsEnabled(config.isStartTLSEnabled()); //
 
-        HtmlEmail email = new HtmlEmail();
-        email.setHtmlMsg(message);
-        email.setHostName(config.getHostname());
-        email.setSmtpPort(config.getPort());
-        email.setAuthenticator(new DefaultAuthenticator(config.getUsername(), config.getPassword()));
-        email.setSSLOnConnect(config.isSslOnConnect());
-        email.setStartTLSEnabled(config.isStartTLSEnabled());
-        email.setFrom(config.getFrom());
-        email.setTo(getInternetAddresses(action.getToAddressesList(), configuration));
-        email.setSubject(ConfigurationUtil.interpolate(action.getSubject(), configuration));
-        email.setMsg(message);
-        email.send();
-    }
+        for (String to : action.getToAddressesList()) {
+            String[] addresses = StringUtils.split(ConfigurationUtil.interpolate(to, configuration), " ,");
+            for (String item : addresses) {
+                htmlEmailBuilder.withToAddress(new InternetAddress(item));
+            }
+        }
 
-    private String formatMessage(final NotificationActionSendMailBean action)
-            throws TemplateException, IOException, ConfigurationException {
-        Template template = createTemplate(action);
-        Map<Object, Object> dataModel = new HashMap<Object, Object>();
-        dataModel.putAll(ConfigurationConverter.getMap(ExecutionContext.getInstance().getConfiguration()));
-        dataModel.put(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
-        dataModel.put(PropertyNames.LOG, flightRecorder.getReport().toString());
+		HtmlEmail email = new HtmlEmail();
+		email.setTo(getInternetAddresses(action.getToAddressesList(), configuration));
+		email.send();
+	}
 
-        StringWriter outputWriter = new StringWriter();
-        template.process(dataModel, outputWriter);
-        return outputWriter.toString();
-    }
+	private String formatMessage(final NotificationActionSendMailBean action, final Configuration configuration)
+			throws TemplateException, IOException, ConfigurationException {
+
+		Template template = createTemplate(action);
+
+		Map<Object, Object> dataModel = new HashMap<Object, Object>();
+		dataModel.putAll(ConfigurationConverter.getMap(configuration));
+
+		StringWriter outputWriter = new StringWriter();
+		template.process(dataModel, outputWriter);
+		return outputWriter.toString();
+	}
 
     private Template createTemplate(final NotificationActionSendMailBean bean)
             throws ConfigurationException, IOException {

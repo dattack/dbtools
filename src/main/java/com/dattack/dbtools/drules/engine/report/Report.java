@@ -109,31 +109,6 @@ public class Report {
         return "";
     }
 
-    // private String log(final List<RowData> rowDataList) {
-    //
-    // StringBuilder sb = new StringBuilder();
-    // sb.append("<table><tr>");
-    //
-    // for (final RowData rowData : rowDataList) {
-    // sb.append("<td><table border=1>");
-    // sb.append("<tr bgcolor=\"#0101DF\"><td colspan=2 style=\"font-weight: bold;color: #FFFFFF;\">")
-    // .append(rowData.getSourceId().getValue()).append("</td></tr>");
-    //
-    // if (rowData.getFieldValueList().isEmpty()) {
-    // sb.append("<tr><td colspan=2>No data available.</td></tr>");
-    // }
-    //
-    // for (final IdentifierValuePair item : rowData.getFieldValueList()) {
-    // sb.append("<tr><td bgcolor=\"#0101DF\" style=\"font-weight: bold;color: #FFFFFF;\">")
-    // .append(item.getKey().getValue()).append("</td><td>").append(item.getValue())
-    // .append("</td></tr>");
-    // }
-    // sb.append("</table></td>");
-    // }
-    // sb.append("</tr></table>");
-    // return sb.toString();
-    // }
-
     String interpolate(final String message, final String status, final String log) {
         CompositeConfiguration configuration = new CompositeConfiguration(
                 ExecutionContext.getInstance().getConfiguration());
