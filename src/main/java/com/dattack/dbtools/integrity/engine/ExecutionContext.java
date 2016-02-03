@@ -28,11 +28,12 @@ import org.slf4j.LoggerFactory;
  * @author cvarela
  * @since 0.1
  */
-public class ExecutionContext {
+public final class ExecutionContext {
 
 	private static final Logger log = LoggerFactory.getLogger(ExecutionContext.class);
-	private static final String CONFIGURATION_FILE_PROPERTY = "dattack.configurationFile";
-	
+
+    static final String CONFIGURATION_FILE_PROPERTY = "dattack.configurationFile";
+
 	private static final ThreadLocal<ExecutionContext> instance = new ThreadLocal<ExecutionContext>();
 
 	private final CompositeConfiguration configuration;

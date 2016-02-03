@@ -77,6 +77,11 @@ public class DataIntegrityEngine {
             throws InterruptedException, ExecutionException {
 
         try {
+
+            if (StringUtils.isNotBlank(configurationFilename)) {
+                System.setProperty(ExecutionContext.CONFIGURATION_FILE_PROPERTY, configurationFilename);
+            }
+
             IntegrityBean integrityBean = JAXBParser.parseIntegrityBean(integrityFilename);
 
             TaskBean taskBean = integrityBean.getTask(taskId);
@@ -84,7 +89,7 @@ public class DataIntegrityEngine {
                 throw new IdentifierNotFoundException(TaskBean.class, taskId);
             }
 
-            ConfigurationBean configurationBean = getConfigurationBean(configurationFilename);
+            ConfigurationBean configurationBean = getConfigurationBean(null);
 
             execute(taskBean, configurationBean);
 
@@ -93,24 +98,11 @@ public class DataIntegrityEngine {
         }
     }
 
-    private ConfigurationBean getConfigurationBean(final String filename)
- throws FileNotFoundException, JAXBException,
-            SAXException, ParserConfigurationException, ConfigurationException {
+    private ConfigurationBean getConfigurationBean() throws FileNotFoundException, JAXBException, SAXException,
+            ParserConfigurationException, ConfigurationException {
 
-        ConfigurationBean configurationBean = null;
-        if (StringUtils.isNotBlank(filename)) {
-            try {
-                configurationBean = JAXBParser.parseConfigurationBean(filename);
-            } catch (final FileNotFoundException e) {
-                // ignore
-            }
-        }
-
-        if (configurationBean == null) {
-            configurationBean = JAXBParser.parseConfigurationBean(
-                    GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_CONFIGURATION_FILE_KEY));
-        }
-        return configurationBean;
+        return JAXBParser.parseConfigurationBean(
+                GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_CONFIGURATION_FILE_KEY));
     }
 
     private void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)

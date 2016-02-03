@@ -45,7 +45,7 @@
         <commons-configuration.version>1.8</commons-configuration.version>
         <slf4j.version>1.7.12</slf4j.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
-        <commons-cli.version>1.2</commons-cli.version>
+        <commons-cli.version>1.3.1</commons-cli.version>
         <sqlite.version>3.7.2</sqlite.version>
         <mysql.version>5.1.30</mysql.version>
         <commons-email.version>1.4</commons-email.version>
