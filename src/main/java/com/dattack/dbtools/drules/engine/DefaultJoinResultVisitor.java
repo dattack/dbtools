@@ -85,6 +85,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         registerCheckExpr(checkExprBean);
 
         // eval the check expression
+        log.debug(String.format("Executing javascript expression: %s", checkExprBean.getExpression()));
         Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(), createJavascriptParametersMap());
         if (bool == null || !bool) {
             execute(checkExprBean.getOnFail());
@@ -94,7 +95,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     }
 
     private void registerCheckExpr(final CheckExprBean checkExprBean) {
-        ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.CHECK_EXPR,
+        ThreadContext.getInstance().setProperty(PropertyNames.CHECK_EXPR,
                 checkExprBean.getExpression());
         registerMissingSource(null);
     }
@@ -102,9 +103,9 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     private void registerMissingSource(final Identifier sourceIdentifier) {
 
         if (sourceIdentifier == null) {
-            ExecutionContext.getInstance().getConfiguration().clearProperty(PropertyNames.MISSING_SOURCE);
+            ThreadContext.getInstance().clearProperty(PropertyNames.MISSING_SOURCE);
         } else {
-            ExecutionContext.getInstance().getConfiguration().setProperty(PropertyNames.MISSING_SOURCE,
+            ThreadContext.getInstance().setProperty(PropertyNames.MISSING_SOURCE,
                     sourceIdentifier.getValue());
         }
     }

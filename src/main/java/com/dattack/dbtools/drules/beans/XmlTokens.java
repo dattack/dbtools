@@ -41,12 +41,12 @@ public final class XmlTokens {
 
     public static final String ELEMENT_CHECK = "check";
     public static final String ELEMENT_CONFIGURATION = "configuration";
+    public static final String ELEMENT_DRULES = "drules";
     public static final String ELEMENT_EVAL = "eval";
     public static final String ELEMENT_EXECUTE_SQL = "executeSql";
     public static final String ELEMENT_FOREACH = "foreach";
     public static final String ELEMENT_FROM = "from";
     public static final String ELEMENT_HOSTNAME = "hostname";
-    public static final String ELEMENT_INTEGRITY = "integrity";
     public static final String ELEMENT_JOIN = "join";
     public static final String ELEMENT_LOG = "log";
     public static final String ELEMENT_MAILING_LISTS = "mailingList";

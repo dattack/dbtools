@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +52,11 @@ final class SourceExecutor implements Callable<SourceResult> {
 	private static final Logger log = LoggerFactory.getLogger(SourceExecutor.class);
 
 	private final SourceBean sourceBean;
+	private final Configuration initialConfiguration;
 
-	SourceExecutor(final SourceBean sourceBean) {
+	SourceExecutor(final SourceBean sourceBean, final Configuration initialConfiguration) {
 		this.sourceBean = sourceBean;
+		this.initialConfiguration = initialConfiguration;
 	}
 
 	private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {
@@ -74,12 +77,13 @@ final class SourceExecutor implements Callable<SourceResult> {
 	}
 
 	private String getInterpolatedJNDIName() {
-		return ConfigurationUtil.interpolate(sourceBean.getJndi(),
-				ExecutionContext.getInstance().getConfiguration());
+		return ThreadContext.getInstance().interpolate(sourceBean.getJndi());
 	}
 
 	@Override
 	public SourceResult call() throws Exception {
+
+		ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
 
 		final String jndiName = getInterpolatedJNDIName();
 
@@ -105,7 +109,7 @@ final class SourceExecutor implements Callable<SourceResult> {
 		private ResultSet lastResultSet;
 
 		DefaultSourceCommandBeanVisitor(final Connection connection) {
-			configuration = new CompositeConfiguration(ExecutionContext.getInstance().getConfiguration());
+			configuration = new CompositeConfiguration(ThreadContext.getInstance().getConfiguration());
 			this.connection = connection;
 			this.resultSetMap = new HashMap<Identifier, ResultSet>();
 		}

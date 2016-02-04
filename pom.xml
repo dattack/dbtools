@@ -147,7 +147,7 @@
                             </platforms>
                         </program>
                         <program>
-                            <mainClass>com.dattack.dbtools.drules.DataIntegrityClient</mainClass>
+                            <mainClass>com.dattack.dbtools.drules.DrulesClient</mainClass>
                             <id>drules</id>
                             <platforms>
                                 <platform>unix</platform>

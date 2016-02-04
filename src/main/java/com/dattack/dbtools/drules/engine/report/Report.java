@@ -32,9 +32,9 @@ import com.dattack.dbtools.drules.beans.EventActionLogBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowableBean;
-import com.dattack.dbtools.drules.engine.ExecutionContext;
 import com.dattack.dbtools.drules.engine.PropertyNames;
 import com.dattack.dbtools.drules.engine.RowData;
+import com.dattack.dbtools.drules.engine.ThreadContext;
 import com.dattack.ext.misc.ConfigurationUtil;
 
 import freemarker.template.Template;
@@ -77,7 +77,7 @@ public class Report {
         try {
             Template template = createTemplate(action);
             Map<Object, Object> dataModel = new HashMap<Object, Object>();
-            dataModel.putAll(ConfigurationConverter.getMap(ExecutionContext.getInstance().getConfiguration()));
+            dataModel.putAll(ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
             dataModel.put(PropertyNames.STATUS, status);
             dataModel.put("rowDataList", rowDataList);
             dataModel.put(PropertyNames.LOG, log(rowDataList));
@@ -111,7 +111,7 @@ public class Report {
 
     String interpolate(final String message, final String status, final String log) {
         CompositeConfiguration configuration = new CompositeConfiguration(
-                ExecutionContext.getInstance().getConfiguration());
+                ThreadContext.getInstance().getConfiguration());
         configuration.setProperty(PropertyNames.LOG, log);
         configuration.setProperty(PropertyNames.STATUS, status);
         return ConfigurationUtil.interpolate(message, configuration);

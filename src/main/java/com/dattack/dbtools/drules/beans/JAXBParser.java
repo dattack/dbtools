@@ -42,9 +42,9 @@ public final class JAXBParser {
 		// static class
 	}
 
-	public static IntegrityBean parseIntegrityBean(final String filename)
+	public static DrulesBean parseIntegrityBean(final String filename)
 			throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException {
-		return (IntegrityBean) parse(filename, IntegrityBean.class);
+		return (DrulesBean) parse(filename, DrulesBean.class);
 	}
 
 	public static ConfigurationBean parseConfigurationBean(final String filename)

@@ -17,7 +17,6 @@ package com.dattack.dbtools.drules.beans;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
@@ -31,7 +30,7 @@ public final class CheckExprBean implements Serializable {
 
     private static final long serialVersionUID = 471091198442256506L;
 
-    @XmlAttribute(name = XmlTokens.ATTRIBUTE_EXPR)
+    @XmlElement(name = XmlTokens.ATTRIBUTE_EXPR)
     private String expression;
 
     @XmlElement(name = XmlTokens.ELEMENT_ON_SUCCESS, type = CheckExprResultBean.class)

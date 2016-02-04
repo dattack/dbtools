@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author cvarela
  * @since 0.1
+ * @deprecated
  */
 public final class ExecutionContext {
 

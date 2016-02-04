@@ -20,6 +20,7 @@ import java.util.List;
 import javax.script.ScriptException;
 
 import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.commons.configuration.ConfigurationUtils;
 
 import com.dattack.dbtools.drules.beans.EventActionBeanVisitor;
 import com.dattack.dbtools.drules.beans.EventActionEvalJSBean;
@@ -36,68 +37,69 @@ import com.dattack.ext.script.JavaScriptEngine;
  */
 public class DefaultEventActionVisitor implements EventActionBeanVisitor {
 
-    private final List<RowData> rowDataList;
-    private final FlightRecorder flightRecorder;
+	private final List<RowData> rowDataList;
+	private final FlightRecorder flightRecorder;
 
-    public DefaultEventActionVisitor(final List<RowData> rowDataList, final FlightRecorder flightRecorder) {
-        this.rowDataList = rowDataList;
-        this.flightRecorder = flightRecorder;
-    }
+	public DefaultEventActionVisitor(final List<RowData> rowDataList, final FlightRecorder flightRecorder) {
+		this.rowDataList = rowDataList;
+		this.flightRecorder = flightRecorder;
+	}
 
-    @Override
-    public void visite(final EventActionEvalJSBean item) {
+	@Override
+	public void visite(final EventActionEvalJSBean item) {
 
-        try {
-            Object value = JavaScriptEngine.eval(item.getExpression(),
-                    ConfigurationConverter.getMap(ExecutionContext.getInstance().getConfiguration()));
-            ExecutionContext.getInstance().getConfiguration().setProperty(item.getName(), value);
-        } catch (ScriptException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+		try {
+			Object value = JavaScriptEngine.eval(item.getExpression(),
+					ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
+			ThreadContext.getInstance().setProperty(item.getName(), value);
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public void visite(final EventActionExecuteSqlBean item) {
+	@Override
+	public void visite(final EventActionExecuteSqlBean item) {
 
-        populateContext();
-        for (final SourceBean sourceBean : item.getSourceList()) {
+		populateContext();
+		for (final SourceBean sourceBean : item.getSourceList()) {
 
-            SourceResult sourceResult = null;
-            try {
-                final SourceExecutor sourceExecutor = new SourceExecutor(sourceBean);
-                sourceResult = sourceExecutor.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (sourceResult != null) {
-                    sourceResult.close();
-                }
-            }
-        }
-    }
+			SourceResult sourceResult = null;
+			try {
+				final SourceExecutor sourceExecutor = new SourceExecutor(sourceBean,
+						ConfigurationUtils.cloneConfiguration(ThreadContext.getInstance().getConfiguration()));
+				sourceResult = sourceExecutor.call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (sourceResult != null) {
+					sourceResult.close();
+				}
+			}
+		}
+	}
 
-    private void populateContext() {
-        for (final RowData rowData : rowDataList) {
-            for (final IdentifierValuePair item : rowData.getFieldValueList()) {
-                ExecutionContext.getInstance().getConfiguration()
-                .setProperty(rowData.getSourceId().append(item.getKey()).getValue(), item.getValue());
-            }
-        }
-    }
+	private void populateContext() {
+		for (final RowData rowData : rowDataList) {
+			for (final IdentifierValuePair item : rowData.getFieldValueList()) {
+				ThreadContext.getInstance().setProperty(rowData.getSourceId().append(item.getKey()).getValue(),
+						item.getValue());
+			}
+		}
+	}
 
-    @Override
-    public void visite(final EventActionLogBean action) {
-        flightRecorder.handleLog(action, rowDataList);
-    }
+	@Override
+	public void visite(final EventActionLogBean action) {
+		flightRecorder.handleLog(action, rowDataList);
+	}
 
-    @Override
-    public void visite(final EventActionThrowErrorBean action) {
-        flightRecorder.handleError(action, rowDataList);
-    }
+	@Override
+	public void visite(final EventActionThrowErrorBean action) {
+		flightRecorder.handleError(action, rowDataList);
+	}
 
-    @Override
-    public void visite(final EventActionThrowWarningBean action) {
-        flightRecorder.handleWarning(action, rowDataList);
-    }
+	@Override
+	public void visite(final EventActionThrowWarningBean action) {
+		flightRecorder.handleWarning(action, rowDataList);
+	}
 }

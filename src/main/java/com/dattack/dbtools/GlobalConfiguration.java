@@ -32,7 +32,7 @@ public final class GlobalConfiguration {
     /** The application's version. */
     public static final String DBTOOLS_VERSION = "0.1";
 
-    public static final String TEMPLATES_DIRECTORY_KEY = "templates.directory";
+    public static final String TEMPLATES_DIRECTORY_KEY = "dbtools.templates.directory";
 
     public static final String DRULES_TEMPLATE_THROWABLE_KEY = "drules.template.throwable";
     public static final String DRULES_TEMPLATE_EMAIL_KEY = "drules.template.email";
