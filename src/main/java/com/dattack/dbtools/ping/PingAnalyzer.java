@@ -22,12 +22,12 @@ import java.text.ParseException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.configuration.ConfigurationException;
 
-import com.dattack.dbtools.ping.report.ReportContext;
 import com.dattack.dbtools.ping.report.MetricName;
+import com.dattack.dbtools.ping.report.ReportContext;
 import com.dattack.dbtools.ping.report.Reporter;
 import com.dattack.ext.util.TimeUtils;
 
@@ -67,7 +67,7 @@ public final class PingAnalyzer {
             options.addOption(MAX_VALUE_OPTION, true, "the maximum value to use");
             options.addOption(MIN_VALUE_OPTION, true, "the minimum value to use");
 
-            CommandLineParser parser = new PosixParser();
+			CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args);
 
             ReportContext context = new ReportContext();
