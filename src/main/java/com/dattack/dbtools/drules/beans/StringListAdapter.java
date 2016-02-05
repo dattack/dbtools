@@ -17,11 +17,11 @@ package com.dattack.dbtools.drules.beans;
 
 /**
  * @author cvarela
- * @param <T>
  * @since 0.1
  */
 public final class StringListAdapter extends CustomListAdapter<String> {
 
+    @Override
     protected String create(final String text) {
         return text;
     }

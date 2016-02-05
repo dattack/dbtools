@@ -19,7 +19,6 @@ import com.dattack.dbtools.drules.beans.Identifier.IdentifierBuilder;
 
 /**
  * @author cvarela
- * @param <T>
  * @since 0.1
  */
 public final class IdentifierListAdapter extends CustomListAdapter<Identifier> {

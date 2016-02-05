@@ -38,7 +38,6 @@ import com.dattack.dbtools.drules.engine.ThreadContext;
 import com.dattack.ext.misc.ConfigurationUtil;
 
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 /**
  * @author cvarela
@@ -85,7 +84,7 @@ public class Report {
             StringWriter outputWriter = new StringWriter();
             template.process(dataModel, outputWriter);
             append(outputWriter.toString());
-        } catch (IOException | TemplateException | ConfigurationException e) {
+        } catch (Exception e) {
             // TODO: launch a RuntimeException
         }
     }

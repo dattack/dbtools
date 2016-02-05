@@ -25,14 +25,14 @@ import javax.naming.NamingException;
  * This class represents a NamingEnumeration of generic type.
  * 
  * @author cvarela
- * @param <T>
+ * @since 0.1
  */
 abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
 
     private Map<?, ?> bindingMap = null;
     private Iterator<?> iterator = null;
 
-    public AbstractNamingEnumeration(final Map<?, ?> bindingMap) {
+    AbstractNamingEnumeration(final Map<?, ?> bindingMap) {
         this.bindingMap = bindingMap;
         iterator = this.bindingMap.keySet().iterator();
     }

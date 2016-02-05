@@ -21,7 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Implements a {@link XMLAdapter} that use a comma or space to separate the elements in the list.
+ * Implements a {@link XmlAdapter} that use a comma or space to separate the elements in the list.
  *
  * @param <T>
  *            the datatype of the elements in the list.

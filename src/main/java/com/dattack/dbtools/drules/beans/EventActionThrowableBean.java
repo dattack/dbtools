@@ -58,6 +58,9 @@ public abstract class EventActionThrowableBean implements EventActionBean {
         return templateText;
     }
 
+    /**
+     * Increments the number of events handled by this action.
+     */
     public void incrEvents() {
         this.currentEvents++;
     }
@@ -67,8 +70,8 @@ public abstract class EventActionThrowableBean implements EventActionBean {
     }
 
     /**
-     *
      * @param maxEvents
+     *            the maximum number of events to handle
      */
     @XmlAttribute(name = XmlTokens.ATTRIBUTE_MAX)
     public void setMaxEvents(final int maxEvents) {

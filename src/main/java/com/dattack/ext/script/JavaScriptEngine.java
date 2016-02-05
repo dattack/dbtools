@@ -61,6 +61,7 @@ public final class JavaScriptEngine {
      *            a key/value pairs that can be used as variables into the script
      * @return the value returned from the execution of the script
      * @throws ScriptException
+     *             if error occurs in script
      */
     public static Object eval(final String script, final Map<Object, Object> params) throws ScriptException {
 
@@ -97,7 +98,7 @@ public final class JavaScriptEngine {
      *            a key/value pairs that can be used as variables into the script
      * @return the value returned from the execution of the script
      * @throws ScriptException
-     *             if an error occurrs
+     *             if error occurs in script
      */
     public static Number evalNumber(final String script, final Map<Object, Object> params) throws ScriptException {
 
@@ -121,7 +122,7 @@ public final class JavaScriptEngine {
      *            the JavaScript source to be evaluated
      * @return the value returned from the execution of the script
      * @throws ScriptException
-     *             if an error occurrs
+     *             if error occurs in script
      */
     public static Boolean evalBoolean(final String script) throws ScriptException {
         return evalBoolean(script, null);
@@ -136,7 +137,7 @@ public final class JavaScriptEngine {
      *            a key/value pairs that can be used as variables into the script
      * @return the value returned from the execution of the script
      * @throws ScriptException
-     *             if an error occurrs
+     *             if error occurs in script
      */
     public static Boolean evalBoolean(final String script, final Map<Object, Object> params) throws ScriptException {
 

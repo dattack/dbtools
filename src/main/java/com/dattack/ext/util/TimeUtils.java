@@ -44,12 +44,12 @@ public final class TimeUtils {
     private static final List<String> computeISO8601List() {
 
         final String[] patterns = { //
-        "yyyy-MM-dd'T'HH:mm", //
+                "yyyy-MM-dd'T'HH:mm", //
                 "yyyy-MM-dd'T'HH:mm:ss", //
                 "yyyy-MM-dd'T'HH:mm:ss.S", //
                 "yyyy-MM-dd HH:mm", //
                 "yyyy-MM-dd HH:mm:ss", //
-                "yyyy-MM-dd HH:mm:ss.S" };
+        "yyyy-MM-dd HH:mm:ss.S" };
 
         List<String> patternList = Arrays.asList(patterns);
         Collections.sort(patternList, new Comparator<String>() {
@@ -68,7 +68,8 @@ public final class TimeUtils {
      * has the following format: <code>(&lt;digit+&gt;&lt;letter&gt;)+</code>. The following pattern letters are
      * defined:
      * </p>
-     * <table>
+     *
+     * <table summary="">
      * <thead>
      * <tr>
      * <td>Letter</td>
