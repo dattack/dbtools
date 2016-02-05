@@ -42,6 +42,11 @@ public class CSVStringBuilder {
 
     /**
      * Constructs a CSV builder with an initial capacity specified by the <code>capacity</code> argument.
+     *
+     * @param configuration
+     *            the CSV configuration
+     * @param capacity
+     *            the initial capacity of the internal buffer
      */
     public CSVStringBuilder(final CSVConfiguration configuration, final int capacity) {
         this.configuration = configuration;
