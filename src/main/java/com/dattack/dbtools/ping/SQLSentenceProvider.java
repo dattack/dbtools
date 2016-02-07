@@ -28,7 +28,9 @@ public interface SQLSentenceProvider {
     void setSentences(final List<SQLSentence> sqlList);
 
     /**
+     * Returns the next SqlSentence to execute.
+     * 
      * @return the SQL-query to be executed
      */
-    SQLSentence nextSQL();
+    SQLSentence nextSql();
 }

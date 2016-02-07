@@ -37,7 +37,7 @@ public class SQLSentenceRoundRobinProvider implements SQLSentenceProvider {
     }
 
     @Override
-    public synchronized SQLSentence nextSQL() {
+    public synchronized SQLSentence nextSql() {
 
         if (sentenceList == null || sentenceList.isEmpty()) {
             throw new IllegalArgumentException("The sentence list must not be null or empty");

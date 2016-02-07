@@ -18,7 +18,6 @@ package com.dattack.dbtools.ping.report;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -31,27 +30,36 @@ import com.dattack.dbtools.ping.log.CSVFileLogReader;
  */
 public class Reporter {
 
-    public void execute(final File dataFile, final ReportContext context) throws IOException, ParseException {
+    /**
+     * Process all data from an input file and generates a HTML report.
+     * 
+     * @param dataFile
+     *            the input file
+     * @param context
+     *            the report context
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    public void execute(final File dataFile, final ReportContext context) throws IOException {
 
-        CSVFileLogReader logReader = new CSVFileLogReader(dataFile);
+        try (CSVFileLogReader logReader = new CSVFileLogReader(dataFile)) {
 
-        // Javascript file
-        String jsFilename = dataFile.getName() + ".js";
-        PrintWriter jsWriter = new PrintWriter(new File(dataFile.getParent(), jsFilename), "UTF-8");
-        createJS(context, jsWriter, logReader);
-        jsWriter.close();
+            // Javascript file
+            String jsFilename = dataFile.getName() + ".js";
+            try (PrintWriter jsWriter = new PrintWriter(new File(dataFile.getParent(), jsFilename), "UTF-8")) {
+                createJs(context, jsWriter, logReader);
+            }
 
-        // HTML file
-        String htmlFilename = dataFile.getName() + ".html";
-        PrintWriter htmlWriter = new PrintWriter(new File(dataFile.getParent(), htmlFilename), "UTF-8");
-        createHTML(htmlWriter, jsFilename, dataFile.getName());
-        htmlWriter.close();
-
-        logReader.close();
+            // HTML file
+            String htmlFilename = dataFile.getName() + ".html";
+            try (PrintWriter htmlWriter = new PrintWriter(new File(dataFile.getParent(), htmlFilename), "UTF-8")) {
+                createHtml(htmlWriter, jsFilename, dataFile.getName());
+            }
+        }
     }
 
-    private void createJS(final ReportContext context, final PrintWriter writer, final CSVFileLogReader logReader)
-            throws IOException, ParseException {
+    private void createJs(final ReportContext context, final PrintWriter writer, final CSVFileLogReader logReader)
+            throws IOException {
 
         ReportStats reportStats = new ReportStats(context);
 
@@ -115,9 +123,9 @@ public class Reporter {
                 System.out.format("Mean: %s%n", groupStats.getStatistics().getMean());
                 System.out.format("Standard deviation: %s%n", groupStats.getStatistics().getStandardDeviation());
             }
-            writer.println(String.format(
-                    "groups.add({id: '%d', content: '%s', options: {drawPoints: {style: 'circle'}}});",
-                    entryGroup.getId(), entryGroup.getName()));
+            writer.println(
+                    String.format("groups.add({id: '%d', content: '%s', options: {drawPoints: {style: 'circle'}}});",
+                            entryGroup.getId(), entryGroup.getName()));
 
         }
 
@@ -129,7 +137,7 @@ public class Reporter {
         writer.println("var graph2d = new vis.Graph2d(container, dataset, groups, options);");
     }
 
-    private void createHTML(final PrintWriter writer, final String jsFile, final String logFile) {
+    private void createHtml(final PrintWriter writer, final String jsFile, final String logFile) {
 
         writer.println("<!DOCTYPE HTML>");
         writer.println("<html>");
@@ -137,8 +145,10 @@ public class Reporter {
         writer.println("  <title>DBPing</title>");
         writer.println("  <meta content='text/html;charset=utf-8' http-equiv='Content-Type'>");
         writer.println("  <meta content='utf-8' http-equiv='encoding'>");
-        writer.println("  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css'>");
-        writer.println("  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css'>");
+        writer.println(
+                "  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css'>");
+        writer.println(
+                "  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css'>");
         writer.println("  <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>");
         writer.println("  <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js'></script>");
         writer.println("  <script src='http://visjs.org/dist/vis.js'></script>");

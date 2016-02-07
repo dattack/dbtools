@@ -29,21 +29,21 @@ public final class RowCheckBean implements Serializable {
 
     private static final long serialVersionUID = 5675788263421406766L;
 
-    public enum CONSTRAINT {
+    public enum Constraint {
         SORTED
     }
 
-    private final CONSTRAINT constraint;
-    
+    private final Constraint constraint;
+
     @XmlElement(name = XmlTokens.ELEMENT_JOIN)
     private final List<JoinBean> joinList;
 
     public RowCheckBean() {
-        this.constraint = CONSTRAINT.SORTED;
+        this.constraint = Constraint.SORTED;
         this.joinList = new ArrayList<JoinBean>();
     }
 
-    public CONSTRAINT getConstraint() {
+    public Constraint getConstraint() {
         return constraint;
     }
 

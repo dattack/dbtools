@@ -33,7 +33,7 @@ public final class JoinResultMissingBean implements JoinResultBean {
     @XmlAttribute(name = XmlTokens.ATTRIBUTE_SOURCE)
     private Identifier sourceId;
 
-    @XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_EVAL, type = EventActionEvalJSBean.class),
+    @XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_EVAL, type = EventActionEvalJsBean.class),
             @XmlElement(name = XmlTokens.ELEMENT_EXECUTE_SQL, type = EventActionExecuteSqlBean.class),
         @XmlElement(name = XmlTokens.ELEMENT_LOG, type = EventActionLogBean.class),
         @XmlElement(name = XmlTokens.ELEMENT_THROW_ERROR, type = EventActionThrowErrorBean.class),
@@ -54,6 +54,6 @@ public final class JoinResultMissingBean implements JoinResultBean {
 
     @Override
     public void accept(final JoinResultBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

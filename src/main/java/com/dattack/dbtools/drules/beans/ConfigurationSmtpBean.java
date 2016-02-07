@@ -45,7 +45,7 @@ public final class ConfigurationSmtpBean implements Serializable {
     private Boolean sslOnConnect;
 
     @XmlElement(name = XmlTokens.ELEMENT_START_TLS_ENABLED)
-    private Boolean startTLSEnabled;
+    private Boolean startTlsEnabled;
 
     @XmlElement(name = XmlTokens.ELEMENT_FROM)
     private String from;
@@ -73,8 +73,8 @@ public final class ConfigurationSmtpBean implements Serializable {
         return sslOnConnect;
     }
 
-    public Boolean isStartTLSEnabled() {
-        return startTLSEnabled;
+    public Boolean isStartTlsEnabled() {
+        return startTlsEnabled;
     }
 
     public String getFrom() {

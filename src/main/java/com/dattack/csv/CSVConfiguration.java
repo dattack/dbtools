@@ -29,7 +29,7 @@ public final class CSVConfiguration {
     /**
      * Builder class used to build a {@link CSVConfiguration} instance.
      */
-    public static class CSVConfigurationBuilder implements Builder<CSVConfiguration> {
+    public static class CsvConfigurationBuilder implements Builder<CSVConfiguration> {
 
         /**
          * The default comment-line character to use.
@@ -71,7 +71,7 @@ public final class CSVConfiguration {
         private String separator;
         private SimpleDateFormat dateFormat;
 
-        public CSVConfigurationBuilder() {
+        public CsvConfigurationBuilder() {
             this.commentChar = DEFAULT_COMMENT_CHAR;
             this.separator = DEFAULT_SEPARATOR;
             this.nullValue = DEFAULT_NULL_VALUE;
@@ -95,7 +95,7 @@ public final class CSVConfiguration {
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
          */
-        public CSVConfigurationBuilder withCommentChar(final char value) {
+        public CsvConfigurationBuilder withCommentChar(final char value) {
             this.commentChar = value;
             return this;
         }
@@ -107,7 +107,7 @@ public final class CSVConfiguration {
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
          */
-        public CSVConfigurationBuilder withEOL(final String value) {
+        public CsvConfigurationBuilder withEol(final String value) {
             this.eol = value;
             return this;
         }
@@ -119,7 +119,7 @@ public final class CSVConfiguration {
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
          */
-        public CSVConfigurationBuilder withEscapeChar(final char value) {
+        public CsvConfigurationBuilder withEscapeChar(final char value) {
             this.escapeChar = value;
             return this;
         }
@@ -131,7 +131,7 @@ public final class CSVConfiguration {
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
          */
-        public CSVConfigurationBuilder withNullValue(final String value) {
+        public CsvConfigurationBuilder withNullValue(final String value) {
             this.nullValue = value;
             return this;
         }
@@ -143,7 +143,7 @@ public final class CSVConfiguration {
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
          */
-        public CSVConfigurationBuilder withQuoteChar(final char value) {
+        public CsvConfigurationBuilder withQuoteChar(final char value) {
             this.quoteChar = value;
             return this;
         }
@@ -155,7 +155,7 @@ public final class CSVConfiguration {
          *            the value to set
          * @return the instance of CSVConfigurationBuilder
          */
-        public CSVConfigurationBuilder withSeparator(final String value) {
+        public CsvConfigurationBuilder withSeparator(final String value) {
             this.separator = value;
             return this;
         }
@@ -170,7 +170,7 @@ public final class CSVConfiguration {
 
     private final String separator;
 
-    private CSVConfiguration(final CSVConfigurationBuilder builder) {
+    private CSVConfiguration(final CsvConfigurationBuilder builder) {
         this.commentChar = builder.commentChar;
         this.separator = builder.separator;
         this.nullValue = builder.nullValue;
@@ -184,7 +184,7 @@ public final class CSVConfiguration {
         return commentChar;
     }
 
-    public String getEOL() {
+    public String getEol() {
         return eol;
     }
 

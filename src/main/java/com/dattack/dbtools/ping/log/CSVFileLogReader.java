@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dattack.csv.CSVConfiguration;
 import com.dattack.csv.CSVObject;
 import com.dattack.csv.CSVReader;
@@ -30,6 +33,8 @@ import com.dattack.dbtools.ping.LogEntry.LogEntryBuilder;
  * @since 0.1
  */
 public class CSVFileLogReader implements LogReader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CSVFileLogReader.class);
 
     private final CSVReader reader;
     private final CSVConfiguration configuration;
@@ -65,6 +70,7 @@ public class CSVFileLogReader implements LogReader {
                         .withTotalTime(Long.valueOf(rawObject.get(index++))) //
                         .build();
             } catch (final ParseException e) {
+                LOGGER.warn(e.getMessage());
                 continue;
             }
         }

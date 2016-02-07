@@ -24,7 +24,7 @@ import com.dattack.dbtools.drules.beans.Identifier.IdentifierBuilder;
 
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
 final class RowDataFactory {
 

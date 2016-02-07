@@ -188,6 +188,13 @@ public final class PingJobConfiguration implements Serializable {
             return this;
         }
 
+        /**
+         * Sets the maximum number of rows to log. If the value is negative, then unlimited value is used.
+         *
+         * @param value
+         *            the maximum number of rows to log
+         * @return self instance
+         */
         public PingConfigurationBuilder withMaxRowsToDump(final long value) {
             if (value >= 0) {
                 this.maxRowsToDump = value;

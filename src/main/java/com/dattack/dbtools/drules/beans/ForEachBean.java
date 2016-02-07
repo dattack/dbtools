@@ -31,43 +31,43 @@ import org.apache.commons.lang.StringUtils;
  */
 public class ForEachBean implements SourceCommandBean {
 
-	private static final long serialVersionUID = 5817647970884889561L;
+    private static final long serialVersionUID = 5817647970884889561L;
 
-	@XmlAttribute(name = XmlTokens.ATTRIBUTE_KEY)
-	private String key;
+    @XmlAttribute(name = XmlTokens.ATTRIBUTE_KEY)
+    private String key;
 
-	@XmlAttribute(name = XmlTokens.ATTRIBUTE_VALUES)
-	private String values;
+    @XmlAttribute(name = XmlTokens.ATTRIBUTE_VALUES)
+    private String values;
 
-	@XmlAttribute(name = XmlTokens.ATTRIBUTE_REF)
-	private String ref;
+    @XmlAttribute(name = XmlTokens.ATTRIBUTE_REF)
+    private String ref;
 
-	@XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_SQL, type = SqlQueryBean.class),
-			@XmlElement(name = XmlTokens.ELEMENT_FOREACH, type = ForEachBean.class) })
-	private final List<SourceCommandBean> commandList;
+    @XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_SQL, type = SqlQueryBean.class),
+            @XmlElement(name = XmlTokens.ELEMENT_FOREACH, type = ForEachBean.class) })
+    private final List<SourceCommandBean> commandList;
 
-	public ForEachBean() {
-		this.commandList = new ArrayList<SourceCommandBean>();
-	}
+    public ForEachBean() {
+        this.commandList = new ArrayList<SourceCommandBean>();
+    }
 
-	public List<SourceCommandBean> getCommandList() {
-		return commandList;
-	}
+    public List<SourceCommandBean> getCommandList() {
+        return commandList;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public List<String> getValuesList() {
-		return Arrays.asList(StringUtils.trimToEmpty(values).split(","));
-	}
+    public List<String> getValuesList() {
+        return Arrays.asList(StringUtils.trimToEmpty(values).split(","));
+    }
 
-	public String getRef() {
-		return ref;
-	}
+    public String getRef() {
+        return ref;
+    }
 
-	@Override
-	public void accept(final SourceCommandBeanVisitor visitor) {
-		visitor.visite(this);
-	}
+    @Override
+    public void accept(final SourceCommandBeanVisitor visitor) {
+        visitor.visit(this);
+    }
 }

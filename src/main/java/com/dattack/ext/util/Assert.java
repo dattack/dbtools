@@ -23,27 +23,55 @@ import org.apache.commons.lang.StringUtils;
  */
 public class Assert {
 
-	private Assert() {
-		// static class
-	}
+    private Assert() {
+        // static class
+    }
 
-	public static void isNotNull(final Object object, final String message) {
-		if (object == null) {
-			throw new IllegalArgumentException(message);
-		}
-	}
+    /**
+     * Assert that an object is not null.
+     * 
+     * @param object
+     *            the object to check
+     * @param message
+     *            the exception message to use if the assertion fails
+     */
+    public static void isNotNull(final Object object, final String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 
-	public static void isNotNull(final Object object) {
+    /**
+     * Assert that an object is not null.
+     * 
+     * @param object
+     *            the object to check
+     */
+    public static void isNotNull(final Object object) {
         isNotNull(object, "This argument must not be null");
-	}
+    }
 
-	public static void isNotBlank(final String text, final String message) {
-		if (StringUtils.isBlank(text)) {
-			throw new IllegalArgumentException(message);
-		}
-	}
+    /**
+     * Assert that a String is not a whitespace, empty or null.
+     * 
+     * @param text
+     *            the object to check
+     * @param message
+     *            the exception message to use if the assertion fails
+     */
+    public static void isNotBlank(final String text, final String message) {
+        if (StringUtils.isBlank(text)) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 
-	public static void isNotBlank(final String text) {
+    /**
+     * Assert that a String is not a whitespace, empty or null.
+     * 
+     * @param text
+     *            the object to check
+     */
+    public static void isNotBlank(final String text) {
         isNotBlank(text, "This argument must not be null, empty, or blank");
-	}
+    }
 }

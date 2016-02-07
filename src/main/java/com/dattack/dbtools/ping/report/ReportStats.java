@@ -47,16 +47,19 @@ class ReportStats {
         List<EntryStats> list = new ArrayList<EntryStats>();
 
         // connection time
-        addEntryStats(list, new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(),
-                MetricName.CONNECTION_TIME_KEY), eventTime, logEntry.getConnectionTime());
+        addEntryStats(list,
+                new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(), MetricName.CONNECTION_TIME_KEY),
+                eventTime, logEntry.getConnectionTime());
 
         // first row
-        addEntryStats(list, new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(),
-                MetricName.FIRST_ROW_TIME_KEY), eventTime, logEntry.getFirstRowTime());
+        addEntryStats(list,
+                new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(), MetricName.FIRST_ROW_TIME_KEY),
+                eventTime, logEntry.getFirstRowTime());
 
         // execution time
-        addEntryStats(list, new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(),
-                MetricName.EXECUTION_TIME_KEY), eventTime, logEntry.getTotalTime());
+        addEntryStats(list,
+                new MetricName(logEntry.getTaskName(), logEntry.getSqlLabel(), MetricName.EXECUTION_TIME_KEY),
+                eventTime, logEntry.getTotalTime());
 
         return list;
     }
@@ -102,11 +105,12 @@ class ReportStats {
         return group;
     }
 
-    private void addEntryStats(final List<EntryStats> list, final MetricName metricName, final long x, final long y) {
+    private void addEntryStats(final List<EntryStats> list, final MetricName metricName, final long valueX,
+            final long valueY) {
 
         if (context.getMetricNameList().isEmpty() || context.getMetricNameList().contains(metricName)) {
 
-            EntryStats entry = process(new EntryStats(x, normalizeValue(y), getGroup(metricName).getId()));
+            EntryStats entry = process(new EntryStats(valueX, normalizeValue(valueY), getGroup(metricName).getId()));
             if (entry != null) {
                 GroupStats groupStats = groupStatsMap.get(entry.getGroup());
                 if (groupStats == null) {

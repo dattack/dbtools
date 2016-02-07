@@ -72,7 +72,7 @@ class PingJob implements Runnable {
             ResultSet rs = null;
 
             // retrieve the SQL to be executed
-            SQLSentence sqlSentence = sentenceProvider.nextSQL();
+            SQLSentence sqlSentence = sentenceProvider.nextSql();
 
             try {
 

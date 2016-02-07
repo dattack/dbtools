@@ -25,6 +25,6 @@ public class EventActionThrowWarningBean extends EventActionThrowableBean {
 
     @Override
     public void accept(final EventActionBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

@@ -41,107 +41,109 @@ import com.dattack.ext.misc.ConfigurationUtil;
  */
 public final class DrulesClient {
 
-	private static final Logger log = LoggerFactory.getLogger(DrulesClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DrulesClient.class);
 
-	private static final String DRULES_OPTION = "d";
-	private static final String TASK_OPTION = "t";
-	private static final String PROPERTIES_OPTION = "p";
+    private static final String DRULES_OPTION = "d";
+    private static final String TASK_OPTION = "t";
+    private static final String PROPERTIES_OPTION = "p";
 
-	private static Options createOptions() {
+    private static Options createOptions() {
 
-		Options options = new Options();
+        Options options = new Options();
 
-		options.addOption(Option.builder(DRULES_OPTION) //
-				.required(true) //
-				.longOpt("drules") //
-				.hasArg(true) //
-				.argName("DRULES_FILE") //
-				.desc("the path of the file containing the DRules configuration") //
-				.build());
+        options.addOption(Option.builder(DRULES_OPTION) //
+                .required(true) //
+                .longOpt("drules") //
+                .hasArg(true) //
+                .argName("DRULES_FILE") //
+                .desc("the path of the file containing the DRules configuration") //
+                .build());
 
-		options.addOption(Option.builder(TASK_OPTION) //
-				.required(true) //
-				.longOpt("task") //
-				.hasArg(true) //
-				.argName("TASK_NAME") //
-				.desc("the name of the task being performed") //
-				.build());
+        options.addOption(Option.builder(TASK_OPTION) //
+                .required(true) //
+                .longOpt("task") //
+                .hasArg(true) //
+                .argName("TASK_NAME") //
+                .desc("the name of the task being performed") //
+                .build());
 
-		options.addOption(Option.builder(PROPERTIES_OPTION) //
-				.required(false) //
-				.longOpt("properties") //
-				.hasArg(true) //
-				.argName("PROPERTIES") //
-				.desc("the path of the file containing custom runtime properties") //
-				.build());
+        options.addOption(Option.builder(PROPERTIES_OPTION) //
+                .required(false) //
+                .longOpt("properties") //
+                .hasArg(true) //
+                .argName("PROPERTIES") //
+                .desc("the path of the file containing custom runtime properties") //
+                .build());
 
-		return options;
-	}
+        return options;
+    }
 
-	private static void execute(final String[] args) throws Exception {
+    private static void execute(final String[] args) throws Exception {
 
-		Options options = createOptions();
+        Options options = createOptions();
 
-		try {
-			CommandLineParser parser = new DefaultParser();
-			CommandLine cmd = parser.parse(options, args);
-			String filename = cmd.getOptionValue(DRULES_OPTION);
-			Identifier taskId = new IdentifierBuilder().withValue(cmd.getOptionValue(TASK_OPTION)).build();
+        try {
+            CommandLineParser parser = new DefaultParser();
+            CommandLine cmd = parser.parse(options, args);
+            String filename = cmd.getOptionValue(DRULES_OPTION);
+            Identifier taskId = new IdentifierBuilder().withValue(cmd.getOptionValue(TASK_OPTION)).build();
 
-			CompositeConfiguration cc = null;
-			if (cmd.hasOption(PROPERTIES_OPTION)) {
-				cc = loadProperties(cmd.getOptionValues(PROPERTIES_OPTION));
-			}
+            CompositeConfiguration cc = null;
+            if (cmd.hasOption(PROPERTIES_OPTION)) {
+                cc = loadProperties(cmd.getOptionValues(PROPERTIES_OPTION));
+            }
 
-			final DrulesEngine engine = new DrulesEngine();
-			engine.execute(filename, taskId, cc);
-		} catch (final ParseException e) {
-			showUsage(options);
-		}
-	}
+            final DrulesEngine engine = new DrulesEngine();
+            engine.execute(filename, taskId, cc);
+        } catch (@SuppressWarnings("unused") final ParseException e) {
+            showUsage(options);
+        }
+    }
 
-	private static CompositeConfiguration loadProperties(final String[] propertyFiles) throws ConfigurationException {
+    private static CompositeConfiguration loadProperties(final String[] propertyFiles) throws ConfigurationException {
 
-		CompositeConfiguration cc = new CompositeConfiguration();
-		cc.addConfiguration(GlobalConfiguration.getConfiguration());
+        CompositeConfiguration cc = new CompositeConfiguration();
+        cc.addConfiguration(GlobalConfiguration.getConfiguration());
 
-		if (propertyFiles != null) {
-			for (String filename : propertyFiles) {
-				if (StringUtils.isNotBlank(filename)) {
-					cc.addConfiguration(new PropertiesConfiguration(ConfigurationUtil.interpolate(filename, cc)));
-				}
-			}
-		}
-		return cc;
-	}
+        if (propertyFiles != null) {
+            for (String filename : propertyFiles) {
+                if (StringUtils.isNotBlank(filename)) {
+                    cc.addConfiguration(new PropertiesConfiguration(ConfigurationUtil.interpolate(filename, cc)));
+                }
+            }
+        }
+        return cc;
+    }
 
-	/**
-	 * @param args
-	 *            the arguments
-	 */
-	public static void main(final String[] args) {
+    /**
+     * Main() method.
+     * 
+     * @param args
+     *            the arguments
+     */
+    public static void main(final String[] args) {
 
-		try {
-			execute(args);
-			System.exit(0);
-		} catch (final Throwable e) {
-			log.error(e.getMessage(), e);
-			System.exit(-1);
-		}
-	}
+        try {
+            execute(args);
+            System.exit(0);
+        } catch (final Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            System.exit(-1);
+        }
+    }
 
-	private static void showUsage(final Options options) {
-		HelpFormatter formatter = new HelpFormatter();
-		final int descPadding = 5;
-		final int leftPadding = 4;
-		formatter.setDescPadding(descPadding);
-		formatter.setLeftPadding(leftPadding);
-		String header = "\n";
-		String footer = "\nPlease report issues at https://github.com/dattack/dbtools/issues";
-		formatter.printHelp("drules ", header, options, footer, true);
-	}
+    private static void showUsage(final Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        final int descPadding = 5;
+        final int leftPadding = 4;
+        formatter.setDescPadding(descPadding);
+        formatter.setLeftPadding(leftPadding);
+        String header = "\n";
+        String footer = "\nPlease report issues at https://github.com/dattack/dbtools/issues";
+        formatter.printHelp("drules ", header, options, footer, true);
+    }
 
-	private DrulesClient() {
-		// static class
-	}
+    private DrulesClient() {
+        // static class
+    }
 }

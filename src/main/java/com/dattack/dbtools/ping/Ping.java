@@ -23,6 +23,8 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.ping.log.CSVFileLogWriter;
 import com.dattack.dbtools.ping.log.LogHeader;
@@ -34,6 +36,24 @@ import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
  * @since 0.1
  */
 public final class Ping {
+
+    private class ThreadPool {
+
+        private final List<Thread> threadList;
+
+        public ThreadPool() {
+            this.threadList = new ArrayList<Thread>();
+        }
+
+        public void submit(final Runnable task, final String threadName) {
+
+            Thread thread = new Thread(task, threadName);
+            thread.start();
+            threadList.add(thread);
+        }
+    }
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(Ping.class);
 
     /**
      * The <code>main</code> method.
@@ -86,7 +106,7 @@ public final class Ping {
             List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
             for (final PingJobConfiguration pingJobConf : pingJobConfList) {
 
-                DataSource dataSource = new DataSourceBuilder().withJNDIName(pingJobConf.getDatasource()).build();
+                DataSource dataSource = new DataSourceBuilder().withJndiName(pingJobConf.getDatasource()).build();
 
                 SQLSentenceProvider sentenceProvider = getSentenceProvider(pingJobConf.getProviderClassName());
                 sentenceProvider.setSentences(pingJobConf.getQueryList());
@@ -104,6 +124,13 @@ public final class Ping {
         }
     }
 
+    private void execute(final String[] args) throws ConfigurationException {
+
+        for (final String filename : args) {
+            execute(new File(filename));
+        }
+    }
+
     private SQLSentenceProvider getSentenceProvider(final String clazzname) {
         
         SQLSentenceProvider sentenceProvider = null;
@@ -111,6 +138,7 @@ public final class Ping {
             try {
                 sentenceProvider = (SQLSentenceProvider) Class.forName(clazzname).newInstance();
             } catch (Exception e) {
+                LOGGER.trace(String.format("Using default SqlSentenceProvider: %s", e.getMessage()));
                 // ignore
             }
         }
@@ -119,28 +147,5 @@ public final class Ping {
             sentenceProvider = new SQLSentenceRoundRobinProvider();
         }
         return sentenceProvider;
-    }
-
-    private void execute(final String[] args) throws ConfigurationException {
-
-        for (final String filename : args) {
-            execute(new File(filename));
-        }
-    }
-
-    private class ThreadPool {
-
-        private final List<Thread> threadList;
-
-        public ThreadPool() {
-            this.threadList = new ArrayList<Thread>();
-        }
-
-        public void submit(final Runnable task, final String threadName) {
-
-            Thread thread = new Thread(task, threadName);
-            thread.start();
-            threadList.add(thread);
-        }
     }
 }

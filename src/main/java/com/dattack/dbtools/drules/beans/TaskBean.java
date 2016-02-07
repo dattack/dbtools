@@ -46,7 +46,7 @@ public final class TaskBean implements Serializable {
     private final List<RowCheckBean> rowCheckList;
 
     @XmlElement(name = XmlTokens.ELEMENT_EVAL, required = false)
-    private List<EventActionEvalJSBean> evalList;
+    private List<EventActionEvalJsBean> evalList;
 
     @XmlElement(name = XmlTokens.ELEMENT_NOTIFICATION)
     private NotificationBean notification;
@@ -68,7 +68,7 @@ public final class TaskBean implements Serializable {
         return sourceList;
     }
 
-    public List<EventActionEvalJSBean> getEvalList() {
+    public List<EventActionEvalJsBean> getEvalList() {
         return evalList;
     }
 

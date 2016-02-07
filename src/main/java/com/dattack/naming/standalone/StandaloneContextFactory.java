@@ -72,9 +72,6 @@ public final class StandaloneContextFactory implements InitialContextFactory {
         return configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Context getInitialContext(final Hashtable<?, ?> environment) throws NamingException {
 

@@ -16,15 +16,15 @@
 package com.dattack.dbtools.ping.log;
 
 import com.dattack.csv.CSVConfiguration;
-import com.dattack.csv.CSVConfiguration.CSVConfigurationBuilder;
+import com.dattack.csv.CSVConfiguration.CsvConfigurationBuilder;
 
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
 public class CSVConfigurationFactory {
 
     public CSVConfiguration create() {
-        return new CSVConfigurationBuilder().withSeparator("\t").build();
+        return new CsvConfigurationBuilder().withSeparator("\t").build();
     }
 }

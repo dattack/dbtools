@@ -41,7 +41,6 @@ class DefaultNameParser implements NameParser {
         properties.putAll(parent.getEnvironment());
     }
 
-    /** {@inheritDoc} */
     @Override
     public Name parse(final String name) throws InvalidNameException, NamingException {
 

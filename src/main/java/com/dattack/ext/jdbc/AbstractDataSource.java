@@ -34,38 +34,32 @@ public abstract class AbstractDataSource implements DataSource {
      */
     private static final int DEFAULT_TIMEOUT_VALUE = 0;
 
-    /** {@inheritDoc} */
     @Override
     public PrintWriter getLogWriter() throws SQLException {
         // null -> logging is disabled
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int getLoginTimeout() throws SQLException {
         return DEFAULT_TIMEOUT_VALUE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void setLogWriter(final PrintWriter logWriter) throws SQLException {
         // ignore
     }
 
-    /** {@inheritDoc} */
     @Override
     public void setLoginTimeout(final int timeout) throws SQLException {
         throw new UnsupportedOperationException("Not supported by BasicDataSource");
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public <T> T unwrap(final Class<T> iface) throws SQLException {
         throw new SQLException("This object is not a wrapper");

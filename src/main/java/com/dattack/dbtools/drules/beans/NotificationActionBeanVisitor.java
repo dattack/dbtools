@@ -21,5 +21,11 @@ package com.dattack.dbtools.drules.beans;
  */
 public interface NotificationActionBeanVisitor {
 
-    void visite(final NotificationActionSendMailBean action);
+    /**
+     * Visitor method.
+     * 
+     * @param action
+     *            the element to visit
+     */
+    void visit(final NotificationActionSendMailBean action);
 }

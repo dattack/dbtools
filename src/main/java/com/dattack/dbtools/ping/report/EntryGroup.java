@@ -17,7 +17,7 @@ package com.dattack.dbtools.ping.report;
 
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
 public class EntryGroup {
 

@@ -47,19 +47,26 @@ public final class GlobalConfiguration {
 
     }
 
+    /**
+     * Load the global configuration from 'dbtools.properties' file.
+     * 
+     * @return the global configuration
+     * @throws ConfigurationException
+     *             if an error occurs
+     */
     public static Configuration getConfiguration() throws ConfigurationException {
 
-        Configuration c = configuration;
-        if (c == null) {
+        Configuration conf = configuration;
+        if (conf == null) {
             synchronized (GlobalConfiguration.class) {
-                c = configuration;
-                if (c == null) {
-                    c = new PropertiesConfiguration(FilesystemUtils.locate(DBTOOLS_CONFIGURATION_FILENAME));
-                    configuration = c;
+                conf = configuration;
+                if (conf == null) {
+                    conf = new PropertiesConfiguration(FilesystemUtils.locate(DBTOOLS_CONFIGURATION_FILENAME));
+                    configuration = conf;
                 }
             }
         }
-        return c;
+        return conf;
     }
 
     public static String getProperty(final String name) throws ConfigurationException {

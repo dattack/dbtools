@@ -39,17 +39,17 @@ public final class TimeUtils {
     private static final long MILLIS_PER_DAY = 24 * MILLIS_PER_HOUR;
     private static final long MILLIS_PER_WEEK = 7 * MILLIS_PER_DAY;
 
-    private static final List<String> ISO_8601_PATTERN_LIST = computeISO8601List();
+    private static final List<String> ISO_8601_PATTERN_LIST = computeIso8601List();
 
-    private static final List<String> computeISO8601List() {
+    private static final List<String> computeIso8601List() {
 
         final String[] patterns = { //
-                "yyyy-MM-dd'T'HH:mm", //
-                "yyyy-MM-dd'T'HH:mm:ss", //
-                "yyyy-MM-dd'T'HH:mm:ss.S", //
-                "yyyy-MM-dd HH:mm", //
-                "yyyy-MM-dd HH:mm:ss", //
-        "yyyy-MM-dd HH:mm:ss.S" };
+            "yyyy-MM-dd'T'HH:mm", //
+            "yyyy-MM-dd'T'HH:mm:ss", //
+            "yyyy-MM-dd'T'HH:mm:ss.S", //
+            "yyyy-MM-dd HH:mm", //
+            "yyyy-MM-dd HH:mm:ss", //
+            "yyyy-MM-dd HH:mm:ss.S" };
 
         List<String> patternList = Arrays.asList(patterns);
         Collections.sort(patternList, new Comparator<String>() {
@@ -113,7 +113,7 @@ public final class TimeUtils {
         if (text != null) {
             try {
                 result = Long.valueOf(text);
-            } catch (NumberFormatException e) {
+            } catch (@SuppressWarnings("unused") NumberFormatException e) {
                 result = parseTimeSpanExpression(text);
             }
         }
@@ -132,11 +132,11 @@ public final class TimeUtils {
         long timeInMillis = 0;
         long value = 0;
         for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (Character.isDigit(c)) {
-                value = value * 10 + Character.digit(c, 10);
+            char charAt = text.charAt(i);
+            if (Character.isDigit(charAt)) {
+                value = value * 10 + Character.digit(charAt, 10);
             } else {
-                switch (c) {
+                switch (charAt) {
                 case 'w':
                 case 'W':
                     timeInMillis += value * MILLIS_PER_WEEK;
@@ -158,7 +158,7 @@ public final class TimeUtils {
                     timeInMillis += value * MILLIS_PER_SECOND;
                     break;
                 default:
-                    throw new IllegalArgumentException(String.format("Unknown time unit: '%s'", c));
+                    throw new IllegalArgumentException(String.format("Unknown time unit: '%s'", charAt));
                     // ignore value
                 }
                 value = 0;
@@ -197,7 +197,7 @@ public final class TimeUtils {
                     parser.applyPattern(pattern);
                     Date date = parser.parse(txt);
                     return date;
-                } catch (ParseException e) {
+                } catch (@SuppressWarnings("unused") ParseException e) {
                     // ignore exception
                 }
             }

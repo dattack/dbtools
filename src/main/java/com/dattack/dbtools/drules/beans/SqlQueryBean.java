@@ -31,18 +31,18 @@ public final class SqlQueryBean implements SourceCommandBean {
 
     @XmlValue
     private String sql;
-    
-//    @XmlElement(name = XmlTokens.ELEMENT_SQL, required = true)
-//    private final List<SourceCommandBean> commandList;
-//
-//    public SqlQueryBean() {
-//        this.commandList = new ArrayList<SourceCommandBean>();
-//    }
-//
-//    public List<SourceCommandBean> getCommandList() {
-//        return commandList;
-//    }
-    
+
+    // @XmlElement(name = XmlTokens.ELEMENT_SQL, required = true)
+    // private final List<SourceCommandBean> commandList;
+    //
+    // public SqlQueryBean() {
+    // this.commandList = new ArrayList<SourceCommandBean>();
+    // }
+    //
+    // public List<SourceCommandBean> getCommandList() {
+    // return commandList;
+    // }
+
     public Identifier getId() {
         return id;
     }
@@ -51,8 +51,8 @@ public final class SqlQueryBean implements SourceCommandBean {
         return sql;
     }
 
-	@Override
-	public void accept(SourceCommandBeanVisitor visitor) {
-		visitor.visite(this);
-	}
+    @Override
+    public void accept(SourceCommandBeanVisitor visitor) {
+        visitor.visit(this);
+    }
 }

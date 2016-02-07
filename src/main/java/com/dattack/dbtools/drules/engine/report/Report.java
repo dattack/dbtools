@@ -18,6 +18,7 @@ package com.dattack.dbtools.drules.engine.report;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +26,15 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.GlobalConfiguration;
 import com.dattack.dbtools.TemplateHelper;
-import com.dattack.dbtools.drules.beans.EventActionLogBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowableBean;
+import com.dattack.dbtools.drules.engine.IdentifierValuePair;
 import com.dattack.dbtools.drules.engine.PropertyNames;
 import com.dattack.dbtools.drules.engine.RowData;
 import com.dattack.dbtools.drules.engine.ThreadContext;
@@ -45,6 +48,8 @@ import freemarker.template.Template;
  */
 public class Report {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Report.class);
+    
     private static final String STATUS_WARNING = "WARNING";
     private static final String STATUS_ERROR = "ERROR";
 
@@ -58,7 +63,7 @@ public class Report {
         buffer.append(text);
     }
 
-    public void handleLog(final EventActionLogBean action, final List<RowData> rowDataList) {
+    public void handleLog(final List<RowData> rowDataList) {
 
         append(log(rowDataList));
     }
@@ -74,7 +79,6 @@ public class Report {
     private void handle(final EventActionThrowableBean action, final List<RowData> rowDataList, final String status) {
 
         try {
-            Template template = createTemplate(action);
             Map<Object, Object> dataModel = new HashMap<Object, Object>();
             dataModel.putAll(ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
             dataModel.put(PropertyNames.STATUS, status);
@@ -82,9 +86,11 @@ public class Report {
             dataModel.put(PropertyNames.LOG, log(rowDataList));
 
             StringWriter outputWriter = new StringWriter();
+            Template template = createTemplate(action);
             template.process(dataModel, outputWriter);
             append(outputWriter.toString());
         } catch (Exception e) {
+            LOGGER.warn(e.getMessage(), e);
             // TODO: launch a RuntimeException
         }
     }
@@ -105,7 +111,19 @@ public class Report {
     }
 
     private String log(final List<RowData> rowDataList) {
-        return "";
+        
+        StringBuilder sb = new StringBuilder();
+        for (RowData rowData: rowDataList) {
+            for (Iterator<IdentifierValuePair> it = rowData.getFieldValueList().iterator(); it.hasNext(); ) {
+                IdentifierValuePair item = it.next();
+                sb.append(item.getKey()).append(": ").append(item.getValue());
+                if (it.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     String interpolate(final String message, final String status, final String log) {

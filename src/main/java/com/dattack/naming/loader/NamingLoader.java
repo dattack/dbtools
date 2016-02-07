@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,7 +54,7 @@ public final class NamingLoader {
         return null;
     }
 
-    private void put(final Context context, final String key, final Object value) throws NamingException {
+    private static void put(final Context context, final String key, final Object value) throws NamingException {
 
         Object obj = context.lookup(key);
 
@@ -72,8 +72,8 @@ public final class NamingLoader {
         log.info("Binding object '{}' to JNDI name '{}'", value.getClass().getName(), key);
     }
 
-    private void load(final Properties properties, final Context ctxt, final Context parentCtxt, final String ctxtName,
-            final List<String> extraClasspath) throws NamingException {
+    private static void load(final Properties properties, /* final Context ctxt, */ final Context parentCtxt,
+            final String ctxtName, final List<String> extraClasspath) throws NamingException {
 
         Object value = getObject(properties, extraClasspath);
         if (value != null) {
@@ -85,8 +85,8 @@ public final class NamingLoader {
      * Scans a directory hierarchy looking for <code>*.properties</code> files. Creates a subcontext for each directory
      * in the hierarchy and binds a new resource for each <code>*.properties</code> file with a
      * <code>ResourceFactory</code> associated.
-     * 
-     * 
+     *
+     *
      * @param directory
      *            the directory to scan
      * @param ctxt
@@ -96,15 +96,16 @@ public final class NamingLoader {
      * @throws NamingException
      *             if a naming exception is encountered
      * @throws IOException
-     *             if an I/O error ocurred
+     *             if an I/O error occurs
      */
     public void loadDirectory(final File directory, final Context ctxt, final List<String> extraClasspath)
             throws NamingException, IOException {
-        loadDirectory(directory, ctxt, null, extraClasspath);
-    }
-
-    private void loadDirectory(final File directory, final Context ctxt, final Context parentCtxt, //
-            final List<String> extraClasspath) throws NamingException, IOException {
+        //
+        // loadDirectory(directory, ctxt, null, extraClasspath);
+        // }
+        //
+        // private void loadDirectory(final File directory, final Context ctxt, /*final Context parentCtxt,*/ //
+        // final List<String> extraClasspath) throws NamingException, IOException {
 
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(MessageFormat.format("''{0}'' isn't a directory", directory));
@@ -121,15 +122,15 @@ public final class NamingLoader {
 
             if (file.isDirectory()) {
                 Context tmpCtxt = ctxt.createSubcontext(name);
-                loadDirectory(file, tmpCtxt, ctxt, extraClasspath);
+                loadDirectory(file, tmpCtxt, /* ctxt, */ extraClasspath);
             } else {
                 String[] extensions = new String[] { ".properties" };
                 for (int j = 0; j < extensions.length; j++) {
                     String extension = extensions[j];
                     if (name.endsWith(extension)) {
                         name = name.substring(0, name.length() - extension.length());
-                        Context subcontext = ctxt.createSubcontext(name);
-                        load(loadFile(file), subcontext, ctxt, name, extraClasspath);
+                        /* Context subcontext = */ ctxt.createSubcontext(name);
+                        load(loadFile(file), /* subcontext, */ ctxt, name, extraClasspath);
                     }
                 }
             }
@@ -138,16 +139,10 @@ public final class NamingLoader {
 
     private Properties loadFile(final File file) throws IOException {
 
-        FileInputStream fin = null;
-        try {
-            fin = new FileInputStream(file);
+        try (FileInputStream fin = new FileInputStream(file)) {
             Properties properties = new Properties();
             properties.load(fin);
             return properties;
-        } finally {
-            if (fin != null) {
-                fin.close();
-            }
         }
     }
 }

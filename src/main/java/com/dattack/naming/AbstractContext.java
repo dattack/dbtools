@@ -83,7 +83,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object addToEnvironment(final String name, final Object object) throws NamingException {
         if (this.env == null) {
@@ -92,7 +91,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         return this.env.put(name, object);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void bind(final Name name, final Object object) throws NamingException {
 
@@ -102,12 +100,12 @@ public abstract class AbstractContext implements Cloneable, Context {
 
         if (name.isEmpty()) {
             throw new InvalidNameException("Cannot bind to an empty name");
-        } else {
-            Name prefix = name.getPrefix(1);
-            if (subContexts.containsKey(prefix)) {
-                subContexts.get(prefix).bind(name.getSuffix(1), object);
-                return;
-            }
+        }
+
+        Name prefix = name.getPrefix(1);
+        if (subContexts.containsKey(prefix)) {
+            subContexts.get(prefix).bind(name.getSuffix(1), object);
+            return;
         }
 
         if (table.containsKey(name) || subContexts.containsKey(name) || env.containsKey(name.toString())) {
@@ -122,13 +120,11 @@ public abstract class AbstractContext implements Cloneable, Context {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void bind(final String name, final Object object) throws NamingException {
         bind(nameParser.parse(name), object);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void close() throws NamingException {
         if (closing) {
@@ -177,13 +173,12 @@ public abstract class AbstractContext implements Cloneable, Context {
         this.table = null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Name composeName(final Name name, final Name prefix) throws NamingException {
 
         if (name == null || prefix == null) {
-            throw new InvalidNameException("Unable to compose name with null values (prefix: " + prefix + ", name: "
-                    + name + ")");
+            throw new InvalidNameException(
+                    "Unable to compose name with null values (prefix: " + prefix + ", name: " + name + ")");
         }
 
         Name composeName = (Name) prefix.clone();
@@ -191,23 +186,19 @@ public abstract class AbstractContext implements Cloneable, Context {
         return composeName;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String composeName(final String name, final String prefix) throws NamingException {
         return composeName(nameParser.parse(name), nameParser.parse(prefix)).toString();
     }
 
-    /** {@inheritDoc} */
     @Override
     public abstract Context createSubcontext(Name name) throws NamingException;
 
-    /** {@inheritDoc} */
     @Override
     public Context createSubcontext(final String name) throws NamingException {
         return createSubcontext(nameParser.parse(name));
     }
 
-    /** {@inheritDoc} */
     @Override
     public void destroySubcontext(final Name name) throws NamingException {
 
@@ -238,13 +229,11 @@ public abstract class AbstractContext implements Cloneable, Context {
         subContexts.remove(name);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void destroySubcontext(final String name) throws NamingException {
         destroySubcontext(nameParser.parse(name));
     }
 
-    /** {@inheritDoc} */
     @Override
     public Hashtable<?, ?> getEnvironment() throws NamingException {
         if (this.env == null) {
@@ -253,13 +242,11 @@ public abstract class AbstractContext implements Cloneable, Context {
         return (Hashtable<?, ?>) this.env.clone();
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getNameInNamespace() throws NamingException {
         return nameInNamespace.toString();
     }
 
-    /** {@inheritDoc} */
     @Override
     public NameParser getNameParser(final Name name) throws NamingException {
 
@@ -275,7 +262,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         throw new NotContextException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public NameParser getNameParser(final String name) throws NamingException {
         return getNameParser(nameParser.parse(name));
@@ -295,7 +281,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         return (table.size() == 0 && subContexts.size() == 0);
     }
 
-    /** {@inheritDoc} */
     @Override
     public NamingEnumeration<NameClassPair> list(final Name name) throws NamingException {
         if (name == null || name.isEmpty()) {
@@ -318,13 +303,11 @@ public abstract class AbstractContext implements Cloneable, Context {
         throw new NamingException("The named context '" + name + "' can't be found");
     }
 
-    /** {@inheritDoc} */
     @Override
     public NamingEnumeration<NameClassPair> list(final String name) throws NamingException {
         return list(nameParser.parse(name));
     }
 
-    /** {@inheritDoc} */
     @Override
     public NamingEnumeration<Binding> listBindings(final Name name) throws NamingException {
         if (name == null || name.isEmpty()) {
@@ -347,13 +330,11 @@ public abstract class AbstractContext implements Cloneable, Context {
         throw new NamingException("The named context '" + name + "' can't be found");
     }
 
-    /** {@inheritDoc} */
     @Override
     public NamingEnumeration<Binding> listBindings(final String name) throws NamingException {
         return listBindings(nameParser.parse(name));
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object lookup(final Name name) throws NamingException {
 
@@ -367,7 +348,7 @@ public abstract class AbstractContext implements Cloneable, Context {
                 return this.clone();
             } catch (CloneNotSupportedException e) {
                 // this shouldn't happen, since we are Cloneable
-                throw new InternalError();
+                throw new InternalError(e);
             }
         }
 
@@ -396,25 +377,21 @@ public abstract class AbstractContext implements Cloneable, Context {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object lookup(final String name) throws NamingException {
         return lookup(nameParser.parse(name));
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object lookupLink(final Name name) throws NamingException {
         return lookup(name);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object lookupLink(final String name) throws NamingException {
         return lookup(nameParser.parse(name));
     }
 
-    /** {@inheritDoc} */
     @Override
     public void rebind(final Name name, final Object object) throws NamingException {
 
@@ -424,20 +401,18 @@ public abstract class AbstractContext implements Cloneable, Context {
 
         Object targetContext = lookup(name.getPrefix(name.size() - 1));
         if (targetContext == null || !(targetContext instanceof Context)) {
-            throw new NamingException(MessageFormat.format("Cannot bind object: context does not exist ({0})",
-                    name.toString()));
+            throw new NamingException(
+                    MessageFormat.format("Cannot bind object: context does not exist ({0})", name.toString()));
         }
         unbind(name);
         bind(name, object);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void rebind(final String name, final Object object) throws NamingException {
         rebind(nameParser.parse(name), object);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object removeFromEnvironment(final String name) throws NamingException {
         if (this.env == null) {
@@ -446,7 +421,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         return this.env.remove(name);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void rename(final Name oldName, final Name newName) throws NamingException {
 
@@ -460,8 +434,8 @@ public abstract class AbstractContext implements Cloneable, Context {
         }
 
         if (lookup(newName) != null) {
-            throw new NameAlreadyBoundException(MessageFormat.format("Cannot rename object: name already bound ({0})",
-                    newName));
+            throw new NameAlreadyBoundException(
+                    MessageFormat.format("Cannot rename object: name already bound ({0})", newName));
         }
 
         unbind(oldName);
@@ -469,7 +443,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         bind(newName, oldValue);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void rename(final String oldName, final String newName) throws NamingException {
         rename(nameParser.parse(oldName), nameParser.parse(newName));
@@ -490,7 +463,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         nameInNamespace = name;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void unbind(final Name name) throws NamingException {
 
@@ -513,7 +485,6 @@ public abstract class AbstractContext implements Cloneable, Context {
         ((Context) targetContext).unbind(name.getSuffix(name.size() - 1));
     }
 
-    /** {@inheritDoc} */
     @Override
     public void unbind(final String name) throws NamingException {
         unbind(nameParser.parse(name));

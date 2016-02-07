@@ -24,32 +24,42 @@ package com.dattack.dbtools.drules.beans;
 public interface EventActionBeanVisitor {
 
     /**
+     * Visitor method.
+     * 
      * @param item
-     *            the element to visite
+     *            the element to visit
      */
-    void visite(final EventActionEvalJSBean item);
+    void visit(final EventActionEvalJsBean item);
 
     /**
+     * Visitor method.
+     * 
      * @param item
-     *            the element to visite
+     *            the element to visit
      */
-    void visite(final EventActionExecuteSqlBean item);
+    void visit(final EventActionExecuteSqlBean item);
 
     /**
+     * Visitor method.
+     * 
      * @param item
-     *            the element to visite
+     *            the element to visit
      */
-    void visite(final EventActionLogBean item);
+    void visit(final EventActionLogBean item);
 
     /**
+     * Visitor method.
+     * 
      * @param item
-     *            the element to visite
+     *            the element to visit
      */
-    void visite(final EventActionThrowErrorBean item);
+    void visit(final EventActionThrowErrorBean item);
 
     /**
+     * Visitor method.
+     * 
      * @param item
-     *            the element to visite
+     *            the element to visit
      */
-    void visite(final EventActionThrowWarningBean item);
+    void visit(final EventActionThrowWarningBean item);
 }

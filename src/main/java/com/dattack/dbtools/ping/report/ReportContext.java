@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
 public class ReportContext {
 

@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * @author cvarela
+ * @since 0.1
  */
 public class SQLSentence implements Serializable {
 

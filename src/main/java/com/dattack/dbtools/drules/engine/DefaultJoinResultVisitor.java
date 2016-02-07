@@ -52,20 +52,6 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         this.flightRecorder = flightRecorder;
     }
 
-    @Override
-    public void visite(final JoinResultMatchBean item) {
-        if (missingSourceList.isEmpty()) {
-            for (CheckExprBean checkExprBean : item.getCheckList()) {
-                try {
-                    execute(checkExprBean);
-                } catch (ScriptException e) {
-                    // TODO: throw a proper exception
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
-    }
-
     private Map<Object, Object> createJavascriptParametersMap() {
         HashMap<Object, Object> params = new HashMap<Object, Object>();
         for (RowData rowData : rowDataList) {
@@ -94,29 +80,10 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         }
     }
 
-    private void registerCheckExpr(final CheckExprBean checkExprBean) {
-        ThreadContext.getInstance().setProperty(PropertyNames.CHECK_EXPR,
-                checkExprBean.getExpression());
-        registerMissingSource(null);
-    }
+    private void execute(final CheckExprResultBean checkExprResult) {
 
-    private void registerMissingSource(final Identifier sourceIdentifier) {
-
-        if (sourceIdentifier == null) {
-            ThreadContext.getInstance().clearProperty(PropertyNames.MISSING_SOURCE);
-        } else {
-            ThreadContext.getInstance().setProperty(PropertyNames.MISSING_SOURCE,
-                    sourceIdentifier.getValue());
-        }
-    }
-
-    @Override
-    public void visite(final JoinResultMissingBean item) {
-        if (!missingSourceList.isEmpty()) {
-            if (missingSourceList.contains(item.getSourceId())) {
-                registerMissingSource(item.getSourceId());
-                execute(item.getActionList());
-            }
+        if (checkExprResult != null) {
+            execute(checkExprResult.getActionList());
         }
     }
 
@@ -128,10 +95,41 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         }
     }
 
-    private void execute(final CheckExprResultBean checkExprResult) {
+    private void registerCheckExpr(final CheckExprBean checkExprBean) {
+        ThreadContext.getInstance().setProperty(PropertyNames.CHECK_EXPR, checkExprBean.getExpression());
+        registerMissingSource(null);
+    }
 
-        if (checkExprResult != null) {
-            execute(checkExprResult.getActionList());
+    private void registerMissingSource(final Identifier sourceIdentifier) {
+
+        if (sourceIdentifier == null) {
+            ThreadContext.getInstance().clearProperty(PropertyNames.MISSING_SOURCE);
+        } else {
+            ThreadContext.getInstance().setProperty(PropertyNames.MISSING_SOURCE, sourceIdentifier.getValue());
+        }
+    }
+
+    @Override
+    public void visit(final JoinResultMatchBean item) {
+        if (missingSourceList.isEmpty()) {
+            for (CheckExprBean checkExprBean : item.getCheckList()) {
+                try {
+                    execute(checkExprBean);
+                } catch (ScriptException e) {
+                    // TODO: throw a proper exception
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void visit(final JoinResultMissingBean item) {
+        if (!missingSourceList.isEmpty()) {
+            if (missingSourceList.contains(item.getSourceId())) {
+                registerMissingSource(item.getSourceId());
+                execute(item.getActionList());
+            }
         }
     }
 }

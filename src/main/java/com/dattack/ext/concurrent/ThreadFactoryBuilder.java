@@ -42,19 +42,20 @@ public class ThreadFactoryBuilder {
         }
 
         @Override
-        public Thread newThread(final Runnable r) {
+        public Thread newThread(final Runnable target) {
 
-            Thread t = new Thread(group, r, generateThreadName(), 0);
-            t.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+            Thread thread = new Thread(group, target, generateThreadName(), 0);
+            thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             if (daemon != null) {
-                t.setDaemon(daemon);
+                thread.setDaemon(daemon);
             }
             if (priority != null) {
-                t.setPriority(priority);
+                thread.setPriority(priority);
             }
-            return t;
+            return thread;
         }
     }
+
     private static final AtomicInteger poolNumber = new AtomicInteger(1);
     private ThreadGroup group = null;
     private String namePrefix = null;
@@ -87,6 +88,13 @@ public class ThreadFactoryBuilder {
         return this;
     }
 
+    /**
+     * Sets the priority for new threads.
+     * 
+     * @param value
+     *            the new priority
+     * @return self object
+     */
     public ThreadFactoryBuilder withPriority(final int value) {
 
         Validate.isTrue(value >= Thread.MIN_PRIORITY && value <= Thread.MAX_PRIORITY, String
@@ -101,6 +109,13 @@ public class ThreadFactoryBuilder {
         return this;
     }
 
+    /**
+     * Sets the handler for uncaught exceptions.
+     * 
+     * @param value
+     *            the handler
+     * @return self object
+     */
     public ThreadFactoryBuilder withUncaughtExceptionHandler(final UncaughtExceptionHandler value) {
 
         Validate.notNull(value);

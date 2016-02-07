@@ -38,7 +38,7 @@ public class SQLSentenceRandomProvider implements SQLSentenceProvider {
     }
 
     @Override
-    public SQLSentence nextSQL() {
+    public SQLSentence nextSql() {
 
         if (sentenceList == null || sentenceList.isEmpty()) {
             throw new IllegalArgumentException("The sentence list must not be null or empty");

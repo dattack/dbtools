@@ -18,7 +18,6 @@ package com.dattack.dbtools.ping;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.text.ParseException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -67,7 +66,7 @@ public final class PingAnalyzer {
             options.addOption(MAX_VALUE_OPTION, true, "the maximum value to use");
             options.addOption(MIN_VALUE_OPTION, true, "the minimum value to use");
 
-			CommandLineParser parser = new DefaultParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args);
 
             ReportContext context = new ReportContext();
@@ -92,13 +91,14 @@ public final class PingAnalyzer {
         }
     }
 
+    /* TODO: remove this method and create a NumberUtils. */
     private static Long parseLong(final String txt) {
 
         try {
             if (txt != null) {
                 return Long.valueOf(txt);
             }
-        } catch (NumberFormatException e) {
+        } catch (@SuppressWarnings("unused") NumberFormatException e) {
             // ignore
         }
         return null;
@@ -129,8 +129,6 @@ public final class PingAnalyzer {
                 Reporter reporter = new Reporter();
                 reporter.execute(file, context);
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
                 e.printStackTrace();
             }
         }

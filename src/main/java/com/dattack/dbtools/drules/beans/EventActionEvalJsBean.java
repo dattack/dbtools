@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author cvarela
  * @since 0.1
  */
-public class EventActionEvalJSBean implements EventActionBean {
+public class EventActionEvalJsBean implements EventActionBean {
 
     private static final long serialVersionUID = -7594172165036104811L;
 
@@ -41,6 +41,6 @@ public class EventActionEvalJSBean implements EventActionBean {
 
     @Override
     public void accept(final EventActionBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

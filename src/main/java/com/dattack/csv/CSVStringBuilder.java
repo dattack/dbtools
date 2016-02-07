@@ -56,6 +56,8 @@ public class CSVStringBuilder {
     }
 
     /**
+     * Appends a new value.
+     * 
      * @param value
      *            the new value to append
      * @return the instance of CSVStringBuilder
@@ -70,6 +72,8 @@ public class CSVStringBuilder {
     }
 
     /**
+     * Appends a new value.
+     * 
      * @param value
      *            the new value to append
      * @return the instance of CSVStringBuilder
@@ -80,6 +84,8 @@ public class CSVStringBuilder {
     }
 
     /**
+     * Appends a new value.
+     * 
      * @param value
      *            the new value to append
      * @return the instance of CSVStringBuilder
@@ -90,6 +96,8 @@ public class CSVStringBuilder {
     }
 
     /**
+     * Appends a new value.
+     * 
      * @param value
      *            the new value to append
      * @return the instance of CSVStringBuilder
@@ -100,6 +108,8 @@ public class CSVStringBuilder {
     }
 
     /**
+     * Appends a new value.
+     * 
      * @param value
      *            the new value to append
      * @return the instance of CSVStringBuilder
@@ -110,6 +120,8 @@ public class CSVStringBuilder {
     }
 
     /**
+     * Appends a new value.
+     * 
      * @param value
      *            the new value to append
      * @return the instance of CSVStringBuilder
@@ -144,7 +156,8 @@ public class CSVStringBuilder {
     }
 
     /**
-     *
+     * Clear the internal buffer.
+     * 
      * @return the instance of CSVStringBuilder
      */
     public CSVStringBuilder clear() {
@@ -165,6 +178,8 @@ public class CSVStringBuilder {
     }
 
     /**
+     * Appends a comment.
+     * 
      * @param message
      *            the comment to add
      * @return the instance of CSVStringBuilder
@@ -198,7 +213,7 @@ public class CSVStringBuilder {
      * @return the instance of CSVStringBuilder
      */
     public CSVStringBuilder eol() {
-        sb.append(configuration.getEOL());
+        sb.append(configuration.getEol());
         emptyLine = true;
         comment = false;
         return this;

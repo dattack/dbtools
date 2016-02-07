@@ -83,15 +83,15 @@ final class JoinKey implements Comparable<JoinKey> {
     }
 
     @Override
-    public int compareTo(final JoinKey o) {
+    public int compareTo(final JoinKey other) {
 
-        if (values.size() != o.values.size()) {
+        if (values.size() != other.values.size()) {
             throw new IllegalArgumentException("Unable to compare two keys with different values");
         }
 
         CompareToBuilder builder = new CompareToBuilder();
         for (int i = 0; i < values.size(); i++) {
-            builder.append(values.get(i), o.values.get(i));
+            builder.append(values.get(i), other.values.get(i));
         }
 
         return builder.toComparison();

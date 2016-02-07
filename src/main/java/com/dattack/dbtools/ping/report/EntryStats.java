@@ -21,22 +21,22 @@ package com.dattack.dbtools.ping.report;
  */
 public class EntryStats {
 
-    private final long x;
-    private final long y;
+    private final long valueX;
+    private final long valueY;
     private final int group;
 
-    public EntryStats(final long x, final long y, final int group) {
-        this.x = x;
-        this.y = y;
+    public EntryStats(final long valueX, final long valueY, final int group) {
+        this.valueX = valueX;
+        this.valueY = valueY;
         this.group = group;
     }
 
     public long getX() {
-        return x;
+        return valueX;
     }
 
     public long getY() {
-        return y;
+        return valueY;
     }
 
     public int getGroup() {

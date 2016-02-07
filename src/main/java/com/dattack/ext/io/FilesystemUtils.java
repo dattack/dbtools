@@ -25,6 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A collection of useful methods to deal with filesystem operations.
  * 
@@ -33,6 +36,8 @@ import java.text.MessageFormat;
  */
 public final class FilesystemUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilesystemUtils.class);
+    
     private FilesystemUtils() {
         // static class
     }
@@ -53,6 +58,7 @@ public final class FilesystemUtils {
                 return new File(uri);
             } catch (final URISyntaxException e) {
                 // URI syntax error? we have a valid URL
+                LOGGER.warn(e.getMessage());
                 return new File(path);
             }
         }

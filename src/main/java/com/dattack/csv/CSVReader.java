@@ -27,7 +27,7 @@ import com.dattack.ext.io.IOUtils;
 
 /**
  * @author cvarela
- *
+ * @since 0.1
  */
 public class CSVReader implements Closeable {
 
@@ -55,19 +55,24 @@ public class CSVReader implements Closeable {
         return false;
     }
 
+    /**
+     * Iterate over the reader and returns the next object.
+     * 
+     * @return the next object o <tt>null</tt> if no one exists
+     * @throws IOException
+     *             if an I/O error occurs
+     */
     public synchronized CSVObject next() throws IOException {
 
         String line = "";
         CSVObject object = null;
         while ((line = StringUtils.trimToNull(getReader().readLine())) != null) {
-            if (line != null) {
-                if (isComment(line)) {
-                    continue;
-                }
-                String[] data = line.split(configuration.getSeparator());
-                object = new CSVObject(data);
-                break;
+            if (isComment(line)) {
+                continue;
             }
+            String[] data = line.split(configuration.getSeparator());
+            object = new CSVObject(data);
+            break;
         }
 
         return object;

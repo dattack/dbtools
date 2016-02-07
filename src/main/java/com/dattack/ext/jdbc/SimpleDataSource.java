@@ -55,7 +55,6 @@ public final class SimpleDataSource extends AbstractDataSource {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public Connection getConnection() throws SQLException {
         if (ensureDriverLoadedNeeded) {
@@ -64,7 +63,6 @@ public final class SimpleDataSource extends AbstractDataSource {
         return this.getConnection(username, password);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Connection getConnection(final String user, final String pass) throws SQLException {
 

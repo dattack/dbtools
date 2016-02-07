@@ -36,6 +36,13 @@ public final class Identifier implements Serializable {
             return new Identifier(this);
         }
 
+        /**
+         * Concatenates the value used to instantiate a new identifier.
+         * 
+         * @param text
+         *            the value to use
+         * @return self object
+         */
         public IdentifierBuilder withValue(final String text) {
             if (value == null) {
                 this.value = text;

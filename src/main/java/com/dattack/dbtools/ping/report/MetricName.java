@@ -110,6 +110,13 @@ public class MetricName {
         return StringUtils.trimToEmpty(text).replaceAll("\"", "");
     }
 
+    /**
+     * Creates a MetricName from its value.
+     * 
+     * @param text
+     *            the metric name
+     * @return the MetricName
+     */
     public static MetricName parse(final String text) {
 
         if (text == null) {

@@ -18,7 +18,6 @@ package com.dattack.dbtools.drules.engine;
 import java.util.List;
 
 import com.dattack.dbtools.drules.beans.ConfigurationBean;
-import com.dattack.dbtools.drules.beans.EventActionLogBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.drules.beans.TaskBean;
@@ -61,15 +60,17 @@ public final class FlightRecorder {
     }
 
     /**
+     * Returns the current report.
+     * 
      * @return the report
      */
     public Report getReport() {
         return report;
     }
 
-    public void handleLog(final EventActionLogBean action, final List<RowData> rowDataList) {
+    public void handleLog(final List<RowData> rowDataList) {
 
-        report.handleLog(action, rowDataList);
+        report.handleLog(rowDataList);
     }
 
     public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList) {

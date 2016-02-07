@@ -21,7 +21,19 @@ package com.dattack.dbtools.drules.beans;
  */
 public interface SourceCommandBeanVisitor {
 
-	void visite(SqlQueryBean bean);
-	
-	void visite(ForEachBean bean);
+    /**
+     * Visitor method.
+     * 
+     * @param bean
+     *            the element to visit
+     */
+    void visit(SqlQueryBean bean);
+
+    /**
+     * Visitor method.
+     * 
+     * @param bean
+     *            the element to visit
+     */
+    void visit(ForEachBean bean);
 }

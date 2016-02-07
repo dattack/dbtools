@@ -53,48 +53,48 @@ public class HtmlEmailBuilder {
         bccList = new ArrayList<InternetAddress>();
     }
 
-    public HtmlEmailBuilder withHostName(final String hostname) {
-        this.hostname = hostname;
+    public HtmlEmailBuilder withHostName(final String value) {
+        this.hostname = value;
         return this;
     }
 
-    public HtmlEmailBuilder withPort(final Integer port) {
-        this.port = port;
+    public HtmlEmailBuilder withPort(final Integer value) {
+        this.port = value;
         return this;
     }
 
-    public HtmlEmailBuilder withUsername(final String username) {
-        this.username = username;
+    public HtmlEmailBuilder withUsername(final String value) {
+        this.username = value;
         return this;
     }
 
-    public HtmlEmailBuilder withPassword(final String password) {
-        this.password = password;
+    public HtmlEmailBuilder withPassword(final String value) {
+        this.password = value;
         return this;
     }
 
-    public HtmlEmailBuilder withSSLOnConnect(final Boolean sslOnConnect) {
-        this.sslOnConnect = sslOnConnect;
+    public HtmlEmailBuilder withSslOnConnect(final Boolean value) {
+        this.sslOnConnect = value;
         return this;
     }
 
-    public HtmlEmailBuilder withStartTlsEnabled(final Boolean startTlsEnabled) {
-        this.startTlsEnabled = startTlsEnabled;
+    public HtmlEmailBuilder withStartTlsEnabled(final Boolean value) {
+        this.startTlsEnabled = value;
         return this;
     }
 
-    public HtmlEmailBuilder withFrom(final String from) {
-        this.from = from;
+    public HtmlEmailBuilder withFrom(final String value) {
+        this.from = value;
         return this;
     }
 
-    public HtmlEmailBuilder withSubject(final String subject) {
-        this.subject = subject;
+    public HtmlEmailBuilder withSubject(final String value) {
+        this.subject = value;
         return this;
     }
 
-    public HtmlEmailBuilder withMessage(final String message) {
-        this.message = message;
+    public HtmlEmailBuilder withMessage(final String value) {
+        this.message = value;
         return this;
     }
 
@@ -113,6 +113,12 @@ public class HtmlEmailBuilder {
         return this;
     }
 
+    /**
+     * Builder method.
+     * 
+     * @return the HtmlEmail
+     * @throws EmailException if an error occurs while creating the email
+     */
     public HtmlEmail build() throws EmailException {
 
         Assert.isNotBlank(hostname, String.format("Invalid SMTP server (hostname: '%s')", hostname));

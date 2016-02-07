@@ -60,6 +60,6 @@ public final class NotificationActionSendMailBean implements NotificationActionB
 
     @Override
     public void accept(final NotificationActionBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

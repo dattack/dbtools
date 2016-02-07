@@ -21,7 +21,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
- *
  * @author cvarela
  * @since 0.1
  */
@@ -42,6 +41,6 @@ public class EventActionExecuteSqlBean implements EventActionBean {
 
     @Override
     public void accept(final EventActionBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

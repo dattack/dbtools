@@ -40,6 +40,6 @@ public final class JoinResultMatchBean implements JoinResultBean {
     }
 
     public void accept(final JoinResultBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

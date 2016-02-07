@@ -51,7 +51,7 @@ public final class JNDIDataSource extends AbstractDataSource {
          *            the JNDI name
          * @return the self object
          */
-        public DataSourceBuilder withJNDIName(final String value) {
+        public DataSourceBuilder withJndiName(final String value) {
             jndiName = value;
             return this;
         }

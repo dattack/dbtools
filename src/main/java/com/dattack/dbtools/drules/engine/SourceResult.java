@@ -27,26 +27,26 @@ import com.dattack.ext.jdbc.JDBCUtils;
  */
 final class SourceResult {
 
-	private final Identifier sourceAlias;
-	private final Connection connection;
-	private final ResultSet resultSet;
+    private final Identifier sourceAlias;
+    private final Connection connection;
+    private final ResultSet resultSet;
 
-	public SourceResult(final Identifier sourceAlias, final Connection connection, final ResultSet resultSet) {
-		this.sourceAlias = sourceAlias;
-		this.connection = connection;
-		this.resultSet = resultSet;
-	}
+    public SourceResult(final Identifier sourceAlias, final Connection connection, final ResultSet resultSet) {
+        this.sourceAlias = sourceAlias;
+        this.connection = connection;
+        this.resultSet = resultSet;
+    }
 
-	public Identifier getSourceAlias() {
-		return sourceAlias;
-	}
+    public Identifier getSourceAlias() {
+        return sourceAlias;
+    }
 
-	public ResultSet getResultSet() {
-		return resultSet;
-	}
+    public ResultSet getResultSet() {
+        return resultSet;
+    }
 
-	public void close() {
-		JDBCUtils.closeQuietly(resultSet);
-		JDBCUtils.closeQuietly(connection);
-	}
+    public void close() {
+        JDBCUtils.closeQuietly(resultSet);
+        JDBCUtils.closeQuietly(connection);
+    }
 }

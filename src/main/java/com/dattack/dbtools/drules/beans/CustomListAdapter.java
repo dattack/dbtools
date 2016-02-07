@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * Implements a {@link XmlAdapter} that use a comma or space to separate the elements in the list.
  *
  * @param <T>
- *            the datatype of the elements in the list.
+ *            the data type of the elements in the list.
  * @author cvarela
  * @since 0.1
  */
@@ -64,6 +64,7 @@ public abstract class CustomListAdapter<T> extends XmlAdapter<String, List<T>> {
     }
 
     /**
+     * Creates a new instance of T.
      * @param text
      *            a single value represented as a text
      * @return the T-instance

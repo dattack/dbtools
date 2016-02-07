@@ -26,7 +26,7 @@ import com.dattack.dbtools.drules.beans.JoinBean;
  */
 public final class JoinStrategyFactory {
 
-    private static transient final JoinStrategyFactory INSTANCE = new JoinStrategyFactory();
+    private static final transient JoinStrategyFactory INSTANCE = new JoinStrategyFactory();
 
     public static JoinStrategyFactory getInstance() {
         return INSTANCE;
@@ -36,6 +36,17 @@ public final class JoinStrategyFactory {
         // singleton
     }
 
+    /**
+     * Creates the join strategy defined by the {@link JoinBean#getType()}.
+     * 
+     * @param joinBean
+     *            the JoinBean
+     * @param sourceResultList
+     *            the SourceResultGroup
+     * @return the join strategy
+     * @throws IllegalArgumentException
+     *             if the join type is unknown
+     */
     public JoinStrategy create(final JoinBean joinBean, final SourceResultGroup sourceResultList)
             throws IllegalArgumentException {
 

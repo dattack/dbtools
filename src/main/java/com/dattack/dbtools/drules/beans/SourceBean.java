@@ -29,31 +29,31 @@ import javax.xml.bind.annotation.XmlElements;
  */
 public final class SourceBean implements Serializable {
 
-	private static final long serialVersionUID = -4213185381768896599L;
+    private static final long serialVersionUID = -4213185381768896599L;
 
-	@XmlAttribute(name = XmlTokens.ATTRIBUTE_JNDI, required = true)
-	private String jndi;
+    @XmlAttribute(name = XmlTokens.ATTRIBUTE_JNDI, required = true)
+    private String jndi;
 
-	@XmlAttribute(name = XmlTokens.ATTRIBUTE_ID, required = false)
-	private Identifier id;
+    @XmlAttribute(name = XmlTokens.ATTRIBUTE_ID, required = false)
+    private Identifier id;
 
-	@XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_SQL, type = SqlQueryBean.class),
-			@XmlElement(name = XmlTokens.ELEMENT_FOREACH, type = ForEachBean.class) })
-	private final List<SourceCommandBean> commandList;
+    @XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_SQL, type = SqlQueryBean.class),
+            @XmlElement(name = XmlTokens.ELEMENT_FOREACH, type = ForEachBean.class) })
+    private final List<SourceCommandBean> commandList;
 
-	public SourceBean() {
-		this.commandList = new ArrayList<SourceCommandBean>();
-	}
+    public SourceBean() {
+        this.commandList = new ArrayList<SourceCommandBean>();
+    }
 
-	public String getJndi() {
-		return jndi;
-	}
+    public String getJndi() {
+        return jndi;
+    }
 
-	public Identifier getId() {
-		return id;
-	}
+    public Identifier getId() {
+        return id;
+    }
 
-	public List<SourceCommandBean> getCommandList() {
-		return commandList;
-	}
+    public List<SourceCommandBean> getCommandList() {
+        return commandList;
+    }
 }

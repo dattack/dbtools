@@ -21,7 +21,19 @@ package com.dattack.dbtools.drules.beans;
  */
 public interface JoinResultBeanVisitor {
 
-	void visite(final JoinResultMatchBean item);
+    /**
+     * Visitor method.
+     * 
+     * @param item
+     *            the element to visit
+     */
+    void visit(final JoinResultMatchBean item);
 
-	void visite(final JoinResultMissingBean item);
+    /**
+     * Visitor method.
+     * 
+     * @param item
+     *            the element to visit
+     */
+    void visit(final JoinResultMissingBean item);
 }

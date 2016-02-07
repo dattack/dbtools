@@ -37,7 +37,6 @@ abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
         iterator = this.bindingMap.keySet().iterator();
     }
 
-    /** {@inheritDoc} */
     @Override
     public final void close() {
         bindingMap = null;
@@ -45,6 +44,8 @@ abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
     }
 
     /**
+     * Instantiate a new object of T using the provided values.
+     * 
      * @param key
      *            the key from the binding map
      * @param value
@@ -53,7 +54,6 @@ abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
      */
     protected abstract T create(Object key, Object value);
 
-    /** {@inheritDoc} */
     @Override
     public final boolean hasMore() throws NamingException {
         if (bindingMap == null) {
@@ -62,7 +62,6 @@ abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
         return hasMoreElements();
     }
 
-    /** {@inheritDoc} */
     @Override
     public final boolean hasMoreElements() {
         if (iterator == null) {
@@ -71,7 +70,6 @@ abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
         return iterator.hasNext();
     }
 
-    /** {@inheritDoc} */
     @Override
     public final T next() throws NamingException {
         if (bindingMap == null) {
@@ -80,7 +78,6 @@ abstract class AbstractNamingEnumeration<T> implements NamingEnumeration<T> {
         return nextElement();
     }
 
-    /** {@inheritDoc} */
     @Override
     public final T nextElement() {
         if (bindingMap == null) {

@@ -25,6 +25,6 @@ public final class EventActionLogBean implements EventActionBean {
 
     @Override
     public void accept(final EventActionBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

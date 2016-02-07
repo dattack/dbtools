@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
  * @author cvarela
  * @since 0.1
  */
@@ -39,6 +38,13 @@ public final class DrulesBean implements Serializable {
         this.taskBeanList = new ArrayList<TaskBean>();
     }
 
+    /**
+     * Find a TaskBean by Identifier.
+     * 
+     * @param taskId
+     *            the desired identifier
+     * @return the TaskBean or null if not exists
+     */
     public TaskBean getTask(final Identifier taskId) {
 
         for (final TaskBean taskBean : taskBeanList) {

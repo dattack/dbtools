@@ -19,12 +19,12 @@ package com.dattack.dbtools.drules.beans;
  * @author cvarela
  * @since 0.1
  */
-public final class EventActionThrowErrorBean extends EventActionThrowableBean implements EventActionBean {
+public final class EventActionThrowErrorBean extends EventActionThrowableBean {
 
     private static final long serialVersionUID = 8385813181177204575L;
 
     @Override
     public void accept(final EventActionBeanVisitor visitor) {
-        visitor.visite(this);
+        visitor.visit(this);
     }
 }

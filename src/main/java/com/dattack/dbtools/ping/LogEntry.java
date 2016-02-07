@@ -95,6 +95,14 @@ public class LogEntry implements Serializable {
             rows++;
         }
 
+        /**
+         * Adds a new {@link DataRow} from a ResultSet.
+         * 
+         * @param rs
+         *            the ResultSet that contains the data
+         * @throws SQLException
+         *             if an database error occurs
+         */
         public void addRow(final ResultSet rs) throws SQLException {
 
             incrRows();
@@ -108,6 +116,11 @@ public class LogEntry implements Serializable {
             }
         }
 
+        /**
+         * Initialize method.
+         * 
+         * @return self object
+         */
         public LogEntryBuilder init() {
             this.eventTime = System.currentTimeMillis();
             this.connectionTime = UNKNOWN;

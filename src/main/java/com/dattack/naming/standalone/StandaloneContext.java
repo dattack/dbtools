@@ -42,9 +42,6 @@ public class StandaloneContext extends AbstractContext {
         super(that);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Context createSubcontext(final Name name) throws NamingException {
 

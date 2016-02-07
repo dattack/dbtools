@@ -51,6 +51,14 @@ public final class RowData {
         return fieldValueList;
     }
 
+    /**
+     * Adds a pair Identifier=Value.
+     * 
+     * @param name
+     *            the field name
+     * @param value
+     *            the field value
+     */
     public void addField(final Identifier name, final Object value) {
         this.fieldValueList.add(new IdentifierValuePair(name, value));
         if (joinKey == null) {

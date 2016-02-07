@@ -29,48 +29,48 @@ import org.apache.commons.lang.ObjectUtils;
  */
 public final class CollectionUtils {
 
-	private CollectionUtils() {
-		// static class
-	}
+    private CollectionUtils() {
+        // static class
+    }
 
-	/**
-	 * Null-safe check if the specified collection is empty.
-	 * 
-	 * @param collection
-	 *            the collection to check
-	 * @return true if empty or null
-	 */
-	public static boolean isEmpty(final Collection<?> collection) {
-		return collection == null || collection.isEmpty();
-	}
-	
-	/**
-	 * Null-safe check if the specified collection is not empty.
-	 * 
-	 * @param collection
-	 *            the collection to check
-	 * @return true if non-null and non-empty
-	 */
-	public static boolean isNotEmpty(final Collection<?> collection) {
-		return !(isEmpty(collection));
-	}
+    /**
+     * Null-safe check if the specified collection is empty.
+     * 
+     * @param collection
+     *            the collection to check
+     * @return true if empty or null
+     */
+    public static boolean isEmpty(final Collection<?> collection) {
+        return collection == null || collection.isEmpty();
+    }
 
-	/**
-	 * Adapts a Object-value <code>List</code> to a String-value one. If the
-	 * list to adapt is <code>null</code>, then an empty list is returned.
-	 * 
-	 * @param list
-	 *            the List to adapt, may be null
-	 * @return the adapted List
-	 */
-	public static List<String> listAsString(final List<Object> list) {
+    /**
+     * Null-safe check if the specified collection is not empty.
+     * 
+     * @param collection
+     *            the collection to check
+     * @return true if non-null and non-empty
+     */
+    public static boolean isNotEmpty(final Collection<?> collection) {
+        return !(isEmpty(collection));
+    }
 
-		List<String> result = new ArrayList<String>();
-		if (list != null) {
-			for (final Object obj : list) {
-				result.add(ObjectUtils.toString(obj));
-			}
-		}
-		return result;
-	}
+    /**
+     * Adapts a Object-value <code>List</code> to a String-value one. If the list to adapt is <code>null</code>, then an
+     * empty list is returned.
+     * 
+     * @param list
+     *            the List to adapt, may be null
+     * @return the adapted List
+     */
+    public static List<String> listAsString(final List<Object> list) {
+
+        List<String> result = new ArrayList<String>();
+        if (list != null) {
+            for (final Object obj : list) {
+                result.add(ObjectUtils.toString(obj));
+            }
+        }
+        return result;
+    }
 }
