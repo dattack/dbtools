@@ -348,7 +348,7 @@ public abstract class AbstractContext implements Cloneable, Context {
                 return this.clone();
             } catch (CloneNotSupportedException e) {
                 // this shouldn't happen, since we are Cloneable
-                throw new InternalError(e);
+                throw new InternalError(e.getMessage());
             }
         }
 
