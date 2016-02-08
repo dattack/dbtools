@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlValue;
  * @author cvarela
  * @since 0.1
  */
-public abstract class EventActionThrowableBean implements EventActionBean {
+public abstract class AbstractEventActionThrowableBean implements EventActionBean {
 
     private static final int MAX_EVENTS_DEFAULT = 1;
 
@@ -37,7 +37,7 @@ public abstract class EventActionThrowableBean implements EventActionBean {
     @XmlValue
     private String templateText;
 
-    EventActionThrowableBean() {
+    AbstractEventActionThrowableBean() {
         this.maxEvents = MAX_EVENTS_DEFAULT;
         this.currentEvents = 0;
     }

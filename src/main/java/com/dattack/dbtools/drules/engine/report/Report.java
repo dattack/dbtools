@@ -33,7 +33,7 @@ import com.dattack.dbtools.GlobalConfiguration;
 import com.dattack.dbtools.TemplateHelper;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
-import com.dattack.dbtools.drules.beans.EventActionThrowableBean;
+import com.dattack.dbtools.drules.beans.AbstractEventActionThrowableBean;
 import com.dattack.dbtools.drules.engine.IdentifierValuePair;
 import com.dattack.dbtools.drules.engine.PropertyNames;
 import com.dattack.dbtools.drules.engine.RowData;
@@ -63,7 +63,7 @@ public class Report {
         buffer.append(text);
     }
 
-    private Template createTemplate(final EventActionThrowableBean action) throws ConfigurationException, IOException {
+    private Template createTemplate(final AbstractEventActionThrowableBean action) throws ConfigurationException, IOException {
 
         if (StringUtils.isNotBlank(action.getTemplateText())) {
             return TemplateHelper.createTemplate(action.getTemplateText());
@@ -78,7 +78,7 @@ public class Report {
                 .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_THROWABLE_KEY));
     }
 
-    private void handle(final EventActionThrowableBean action, final List<RowData> rowDataList, final String status) {
+    private void handle(final AbstractEventActionThrowableBean action, final List<RowData> rowDataList, final String status) {
 
         try {
             final Map<Object, Object> dataModel = new HashMap<Object, Object>();

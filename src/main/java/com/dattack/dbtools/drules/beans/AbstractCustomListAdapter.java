@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * @author cvarela
  * @since 0.1
  */
-public abstract class CustomListAdapter<T> extends XmlAdapter<String, List<T>> {
+public abstract class AbstractCustomListAdapter<T> extends XmlAdapter<String, List<T>> {
 
     // whitespace or comma character
     private static final String SEPARATOR_REGEX = "\\s*(,|\\s)\\s*";

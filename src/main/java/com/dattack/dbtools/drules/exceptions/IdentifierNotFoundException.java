@@ -23,7 +23,7 @@ import com.dattack.dbtools.drules.beans.Identifier;
  * @author cvarela
  * @since 0.1
  */
-public class IdentifierNotFoundException extends IntegratorException {
+public class IdentifierNotFoundException extends AbstractDrulesException {
 
     private static final long serialVersionUID = 8870365523740741549L;
 

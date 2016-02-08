@@ -19,7 +19,7 @@ package com.dattack.dbtools.drules.beans;
  * @author cvarela
  * @since 0.1
  */
-public final class StringListAdapter extends CustomListAdapter<String> {
+public final class StringListAdapter extends AbstractCustomListAdapter<String> {
 
     @Override
     protected String create(final String text) {

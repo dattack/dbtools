@@ -19,7 +19,7 @@ package com.dattack.dbtools.drules.exceptions;
  * @author cvarela
  * @since 0.1
  */
-public class ConfigurationMistakeException extends IntegratorException {
+public class ConfigurationMistakeException extends AbstractDrulesException {
 
     private static final long serialVersionUID = -1907144195373864929L;
 

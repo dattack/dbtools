@@ -19,7 +19,7 @@ package com.dattack.dbtools.drules.beans;
  * @author cvarela
  * @since 0.1
  */
-public class EventActionThrowWarningBean extends EventActionThrowableBean {
+public class EventActionThrowWarningBean extends AbstractEventActionThrowableBean {
 
     private static final long serialVersionUID = 4145897352559043203L;
 

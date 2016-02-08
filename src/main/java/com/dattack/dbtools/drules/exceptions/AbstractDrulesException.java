@@ -21,11 +21,11 @@ package com.dattack.dbtools.drules.exceptions;
  * @author cvarela
  * @since 0.1
  */
-public abstract class IntegratorException extends RuntimeException {
+public abstract class AbstractDrulesException extends RuntimeException {
 
     private static final long serialVersionUID = 8305544418991155317L;
 
-    public IntegratorException(final String message) {
+    public AbstractDrulesException(final String message) {
         super(message);
     }
 }
