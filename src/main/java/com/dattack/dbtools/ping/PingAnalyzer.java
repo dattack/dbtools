@@ -23,6 +23,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.configuration.ConfigurationException;
 
 import com.dattack.dbtools.ping.report.MetricName;
@@ -86,7 +87,7 @@ public final class PingAnalyzer {
                 ping.execute(new File(file), context);
             }
 
-        } catch (final Exception e) {
+        } catch (final ParseException | ConfigurationException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -98,8 +99,8 @@ public final class PingAnalyzer {
             if (txt != null) {
                 return Long.valueOf(txt);
             }
-        } catch (@SuppressWarnings("unused") final NumberFormatException e) {
-            // ignore
+        } catch (final NumberFormatException e) {
+            System.err.println(e.getMessage());
         }
         return null;
     }
@@ -119,9 +120,7 @@ public final class PingAnalyzer {
                 }
             };
 
-            for (final File child : file.listFiles(filter)) {
-                execute(child, context);
-            }
+            execute(file.listFiles(filter), context);
 
         } else {
 
@@ -131,6 +130,17 @@ public final class PingAnalyzer {
             } catch (final IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+    
+    private void execute(final File[] files, final ReportContext context) throws ConfigurationException {
+        
+        if (files == null) {
+            return;
+        }
+        
+        for (final File child : files) {
+            execute(child, context);
         }
     }
 }

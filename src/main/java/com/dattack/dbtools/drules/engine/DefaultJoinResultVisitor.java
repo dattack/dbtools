@@ -126,11 +126,9 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
 
     @Override
     public void visit(final JoinResultMissingBean item) {
-        if (!missingSourceList.isEmpty()) {
-            if (missingSourceList.contains(item.getSourceId())) {
-                registerMissingSource(item.getSourceId());
-                execute(item.getActionList());
-            }
+        if (!missingSourceList.isEmpty() && missingSourceList.contains(item.getSourceId())) {
+            registerMissingSource(item.getSourceId());
+            execute(item.getActionList());
         }
     }
 }

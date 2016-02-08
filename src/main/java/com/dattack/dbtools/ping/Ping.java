@@ -76,7 +76,7 @@ public final class Ping {
             final Ping ping = new Ping();
             ping.execute(args);
 
-        } catch (final Exception e) {
+        } catch (final ConfigurationException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -134,10 +134,11 @@ public final class Ping {
     private SQLSentenceProvider getSentenceProvider(final String clazzname) {
 
         SQLSentenceProvider sentenceProvider = null;
+
         if (clazzname != null) {
             try {
                 sentenceProvider = (SQLSentenceProvider) Class.forName(clazzname).newInstance();
-            } catch (final Exception e) {
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 LOGGER.trace(String.format("Using default SqlSentenceProvider: %s", e.getMessage()));
                 // ignore
             }

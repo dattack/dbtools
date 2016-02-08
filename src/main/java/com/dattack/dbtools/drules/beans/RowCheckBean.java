@@ -27,16 +27,16 @@ import javax.xml.bind.annotation.XmlElement;
  */
 public final class RowCheckBean implements Serializable {
 
-    public enum Constraint {
-        SORTED
-    }
-
     private static final long serialVersionUID = 5675788263421406766L;
 
     private final Constraint constraint;
 
     @XmlElement(name = XmlTokens.ELEMENT_JOIN)
     private final List<JoinBean> joinList;
+
+    public enum Constraint {
+        SORTED
+    }
 
     public RowCheckBean() {
         this.constraint = Constraint.SORTED;
@@ -53,9 +53,7 @@ public final class RowCheckBean implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("RowCheckBean [constraint=").append(constraint).append(", joinList=").append(joinList)
-                .append("]");
-        return builder.toString();
+        return new StringBuilder().append("RowCheckBean [constraint=").append(constraint).append(", joinList=")
+                .append(joinList).append(']').toString();
     }
 }

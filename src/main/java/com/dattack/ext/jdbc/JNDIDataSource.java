@@ -37,7 +37,7 @@ public final class JNDIDataSource extends AbstractDataSource {
     /**
      * The <code>Builder</code> pattern implementation of <code>JNDIDataSource</code>.
      */
-    public static class DataSourceBuilder implements Builder<DataSource> {
+    public static final class DataSourceBuilder implements Builder<DataSource> {
 
         private String jndiName;
 
@@ -74,7 +74,8 @@ public final class JNDIDataSource extends AbstractDataSource {
             }
             return dataSource.getConnection();
         } catch (final NamingException e) {
-            throw new SQLException("Unable to get a connection from JNDI name '" + jndiName + "': " + e.getMessage());
+            throw new SQLException(
+                    String.format("Unable to get a connection from JNDI name '%s': %s", jndiName, e.getMessage()), e);
         }
     }
 

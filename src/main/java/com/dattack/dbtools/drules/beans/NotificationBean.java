@@ -54,7 +54,7 @@ public final class NotificationBean implements Serializable {
     public String toString() {
         final StringBuilder builder = new StringBuilder();
         builder.append("NotificationBean [onWarning=").append(onWarning).append(", onError=").append(onError)
-                .append("]");
+                .append(']');
         return builder.toString();
     }
 }

@@ -43,8 +43,7 @@ public final class NotificationEventBean implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("NotificationEventBean [actionList=").append(actionList).append("]");
-        return builder.toString();
+        return new StringBuilder().append("NotificationEventBean [actionList=").append(actionList).append(']')
+                .toString();
     }
 }

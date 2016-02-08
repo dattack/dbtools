@@ -123,7 +123,7 @@ public class InnerJoinStrategy implements JoinStrategy {
             }
             joinUsingBuilder.append(identifier.getValue());
         }
-        joinUsingBuilder.append("]");
+        joinUsingBuilder.append(']');
 
         ThreadContext.getInstance().setProperty(PropertyNames.JOIN_CONDITION, joinUsingBuilder.toString());
     }

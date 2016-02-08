@@ -116,14 +116,12 @@ final class SourceExecutor implements Callable<SourceResult> {
         private void populateConfigurationFromFirstRows(final Identifier identifier, final ResultSet resultSet)
                 throws SQLException {
 
-            if (resultSet.isBeforeFirst() && resultSet.next()) {
-                if (identifier != null) {
-                    for (int columnIndex = 1; columnIndex <= resultSet.getMetaData().getColumnCount(); columnIndex++) {
-                        final String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
-                        final Object value = resultSet.getObject(columnIndex);
-                        final String key = identifier.append(columnName).getValue();
-                        configuration.setProperty(key, value);
-                    }
+            if (resultSet.isBeforeFirst() && resultSet.next() && identifier != null) {
+                for (int columnIndex = 1; columnIndex <= resultSet.getMetaData().getColumnCount(); columnIndex++) {
+                    final String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
+                    final Object value = resultSet.getObject(columnIndex);
+                    final String key = identifier.append(columnName).getValue();
+                    configuration.setProperty(key, value);
                 }
             }
         }

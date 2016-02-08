@@ -29,8 +29,8 @@ import com.dattack.dbtools.ping.LogEntry;
 class ReportStats {
 
     private final Map<MetricName, EntryGroup> groupMap;
-    private final HashMap<Integer, EntryStats> entryStatsMap;
-    private final HashMap<Integer, GroupStats> groupStatsMap;
+    private final Map<Integer, EntryStats> entryStatsMap;
+    private final Map<Integer, GroupStats> groupStatsMap;
     private final ReportContext context;
 
     public ReportStats(final ReportContext context) {

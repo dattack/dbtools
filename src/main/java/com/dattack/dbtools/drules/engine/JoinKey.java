@@ -99,9 +99,7 @@ final class JoinKey implements Comparable<JoinKey> {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("JoinKey [values=").append(values).append("]");
-        return builder.toString();
+        return new StringBuilder().append("JoinKey [values=").append(values).append("]").toString();
     }
 
 }

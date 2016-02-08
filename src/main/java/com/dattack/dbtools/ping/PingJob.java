@@ -17,6 +17,7 @@ package com.dattack.dbtools.ping;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.sql.DataSource;
@@ -26,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.ping.LogEntry.LogEntryBuilder;
 import com.dattack.dbtools.ping.log.LogWriter;
-import com.dattack.ext.jdbc.JDBCUtils;
 
 /**
  * Executes a ping-job instance.
@@ -67,49 +67,41 @@ class PingJob implements Runnable {
 
         while (testLoop(iter)) {
             iter++;
-            Connection connection = null;
-            Statement stmt = null;
-            ResultSet resultSet = null;
-
             // retrieve the SQL to be executed
             final SQLSentence sqlSentence = sentenceProvider.nextSql();
 
-            try {
+            try (Connection connection = dataSource.getConnection()) {
 
                 logEntryBuilder.init().withSqlLabel(sqlSentence.getLabel()) //
                         .withIteration(iter);
-
-                connection = dataSource.getConnection();
 
                 // sets the connection time
                 logEntryBuilder.connect();
 
                 // execute the query
-                stmt = connection.createStatement();
-                resultSet = stmt.executeQuery(sqlSentence.getSql());
+                try (Statement stmt = connection.createStatement()) {
+                    try (ResultSet resultSet = stmt.executeQuery(sqlSentence.getSql())) {
 
-                while (resultSet.next()) {
-                    logEntryBuilder.addRow(resultSet);
+                        while (resultSet.next()) {
+                            logEntryBuilder.addRow(resultSet);
+                        }
+
+                        // sets the total time
+                        logWriter.write(logEntryBuilder.build());
+                    }
                 }
 
-                // sets the total time
-                logWriter.write(logEntryBuilder.build());
-
-            } catch (final Exception e) {
+            } catch (final SQLException e) {
                 logWriter.write(logEntryBuilder.withException(e).build());
                 LOGGER.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
                         e.getMessage());
-            } finally {
-                JDBCUtils.closeQuietly(resultSet);
-                JDBCUtils.closeQuietly(stmt);
-                JDBCUtils.closeQuietly(connection);
             }
 
             if (testLoop(iter) && configuration.getTimeBetweenExecutions() > 0) {
                 synchronized (this) {
                     try {
                         wait(configuration.getTimeBetweenExecutions());
-                    } catch (final Exception e) {
+                    } catch (final InterruptedException e) {
                         LOGGER.warn(e.getMessage());
                     }
                 }

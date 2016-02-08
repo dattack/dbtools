@@ -46,23 +46,23 @@ import javax.naming.NotContextException;
 public abstract class AbstractContext implements Cloneable, Context {
 
     private boolean closing;
-    private Hashtable<String, Object> env;
+    private Hashtable<String, Object> env; // NOPMD by cvarela on 8/02/16 22:32
 
     private Name nameInNamespace;
 
     private NameParser nameParser;
-    private final Hashtable<Name, Context> subContexts = new Hashtable<Name, Context>();
-    private Hashtable<Name, Object> table = new Hashtable<Name, Object>();
+    private final Hashtable<Name, Context> subContexts = new Hashtable<Name, Context>(); // NOPMD by cvarela on 8/02/16
+    private Hashtable<Name, Object> table = new Hashtable<Name, Object>(); // NOPMD by cvarela on 8/02/16 22:32
 
     protected AbstractContext(final AbstractContext that) {
         this(that.env);
     }
 
-    protected AbstractContext(final Hashtable<?, ?> env) {
+    protected AbstractContext(final Hashtable<?, ?> env) { // NOPMD by cvarela on 8/02/16 22:31
         this(env, null);
     }
 
-    private AbstractContext(final Hashtable<?, ?> env, final NameParser parser) {
+    private AbstractContext(final Hashtable<?, ?> env, final NameParser parser) { // NOPMD by cvarela on 8/02/16 22:32
 
         if (parser == null) {
             try {
@@ -135,7 +135,7 @@ public abstract class AbstractContext implements Cloneable, Context {
             destroySubcontext(name);
         }
 
-        while (table.size() > 0 || subContexts.size() > 0) {
+        while (!table.isEmpty() || !subContexts.isEmpty()) {
             final List<Name> toRemove = new LinkedList<Name>();
             for (final Name name : table.keySet()) {
 
@@ -239,6 +239,7 @@ public abstract class AbstractContext implements Cloneable, Context {
         if (this.env == null) {
             return new Hashtable<String, Object>();
         }
+
         return (Hashtable<?, ?>) this.env.clone();
     }
 
@@ -273,12 +274,12 @@ public abstract class AbstractContext implements Cloneable, Context {
      * @return the subcontexts of this context.
      */
     @SuppressWarnings("unchecked")
-    protected Hashtable<Name, Object> getSubContexts() {
+    protected Hashtable<Name, Object> getSubContexts() { // NOPMD by cvarela on 8/02/16 22:30
         return (Hashtable<Name, Object>) subContexts.clone();
     }
 
     private boolean isEmpty() {
-        return (table.size() == 0 && subContexts.size() == 0);
+        return (table.isEmpty() && subContexts.isEmpty());
     }
 
     @Override

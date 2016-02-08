@@ -136,10 +136,8 @@ public class CSVFileLogWriter implements LogWriter {
         final File file = new File(filename);
         if (!file.exists()) {
             final File parent = file.getParentFile();
-            if (parent != null && !parent.exists()) {
-                if (!parent.mkdirs()) {
-                    LOGGER.warn("Unable to create directory: {}", parent);
-                }
+            if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                LOGGER.warn("Unable to create directory: {}", parent);
             }
         }
         return new FileOutputStream(file, true);

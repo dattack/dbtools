@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A suite of utilities surrounding the use of the {@link java.util.Calendar} and {@link java.util.Date} object.
@@ -33,6 +35,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public final class TimeUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtils.class);
+
     private static final long MILLIS_PER_SECOND = 1000;
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
@@ -40,11 +44,6 @@ public final class TimeUtils {
     private static final long MILLIS_PER_WEEK = 7 * MILLIS_PER_DAY;
 
     private static final List<String> ISO_8601_PATTERN_LIST = computeIso8601List();
-
-    private TimeUtils() {
-        // utility class
-    }
-    
 
     private static List<String> computeIso8601List() {
 
@@ -95,8 +94,8 @@ public final class TimeUtils {
                 try {
                     parser.applyPattern(pattern);
                     return parser.parse(txt);
-                } catch (@SuppressWarnings("unused") final ParseException e) {
-                    // ignore exception
+                } catch (final ParseException e) {
+                    LOGGER.trace(e.getMessage());
                 }
             }
         }
@@ -207,5 +206,9 @@ public final class TimeUtils {
             }
         }
         return result;
+    }
+
+    private TimeUtils() {
+        // utility class
     }
 }

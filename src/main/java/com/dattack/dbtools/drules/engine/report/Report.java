@@ -41,6 +41,7 @@ import com.dattack.dbtools.drules.engine.ThreadContext;
 import com.dattack.ext.misc.ConfigurationUtil;
 
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * @author cvarela
@@ -63,7 +64,8 @@ public class Report {
         buffer.append(text);
     }
 
-    private Template createTemplate(final AbstractEventActionThrowableBean action) throws ConfigurationException, IOException {
+    private Template createTemplate(final AbstractEventActionThrowableBean action)
+            throws ConfigurationException, IOException {
 
         if (StringUtils.isNotBlank(action.getTemplateText())) {
             return TemplateHelper.createTemplate(action.getTemplateText());
@@ -78,7 +80,8 @@ public class Report {
                 .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_THROWABLE_KEY));
     }
 
-    private void handle(final AbstractEventActionThrowableBean action, final List<RowData> rowDataList, final String status) {
+    private void handle(final AbstractEventActionThrowableBean action, final List<RowData> rowDataList,
+            final String status) {
 
         try {
             final Map<Object, Object> dataModel = new HashMap<Object, Object>();
@@ -91,9 +94,8 @@ public class Report {
             final Template template = createTemplate(action);
             template.process(dataModel, outputWriter);
             append(outputWriter.toString());
-        } catch (final Exception e) {
+        } catch (ConfigurationException | IOException | TemplateException e) {
             LOGGER.warn(e.getMessage(), e);
-            // TODO: launch a RuntimeException
         }
     }
 

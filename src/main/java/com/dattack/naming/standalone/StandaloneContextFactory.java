@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.naming.ConfigurationException;
@@ -56,7 +57,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneContextFactory.class);
 
-    private CompositeConfiguration getConfiguration(final Hashtable<?, ?> environment) {
+    private CompositeConfiguration getConfiguration(final Map<?, ?> environment) {
 
         final BaseConfiguration baseConf = new BaseConfiguration();
         for (final Entry<?, ?> entry : environment.entrySet()) {
@@ -94,7 +95,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
                             loader.loadDirectory(dir, ctx, extraClasspath);
                             context = ctx;
                         } catch (final IOException e) {
-                            throw new NamingException(e.getMessage());
+                            throw (NamingException) new NamingException(e.getMessage()).initCause(e);
                         }
                     } else {
                         throw new ConfigurationException(

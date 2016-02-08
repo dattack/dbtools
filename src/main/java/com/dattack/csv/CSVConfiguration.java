@@ -37,7 +37,7 @@ public final class CSVConfiguration {
     /**
      * Builder class used to build a {@link CSVConfiguration} instance.
      */
-    public static class CsvConfigurationBuilder implements Builder<CSVConfiguration> {
+    public static final class CsvConfigurationBuilder implements Builder<CSVConfiguration> {
 
         /**
          * The default comment-line character to use.
