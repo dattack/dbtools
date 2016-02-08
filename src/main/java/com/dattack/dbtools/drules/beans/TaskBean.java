@@ -34,7 +34,7 @@ public final class TaskBean implements Serializable {
     private static final long serialVersionUID = 7388023420557429959L;
 
     @XmlAttribute(name = XmlTokens.ATTRIBUTE_ID, required = true)
-    private Identifier id;
+    private Identifier identifier;
 
     @XmlAttribute(name = XmlTokens.ATTRIBUTE_NAME, required = false)
     private String name;
@@ -57,7 +57,7 @@ public final class TaskBean implements Serializable {
     }
 
     public Identifier getId() {
-        return id;
+        return identifier;
     }
 
     public String getName() {

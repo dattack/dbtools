@@ -35,7 +35,7 @@ public final class SourceBean implements Serializable {
     private String jndi;
 
     @XmlAttribute(name = XmlTokens.ATTRIBUTE_ID, required = false)
-    private Identifier id;
+    private Identifier identifier;
 
     @XmlElements({ @XmlElement(name = XmlTokens.ELEMENT_SQL, type = SqlQueryBean.class),
             @XmlElement(name = XmlTokens.ELEMENT_FOREACH, type = ForEachBean.class) })
@@ -50,7 +50,7 @@ public final class SourceBean implements Serializable {
     }
 
     public Identifier getId() {
-        return id;
+        return identifier;
     }
 
     public List<SourceCommandBean> getCommandList() {

@@ -27,7 +27,7 @@ public final class SqlQueryBean implements SourceCommandBean {
     private static final long serialVersionUID = -8673720034464586206L;
 
     @XmlAttribute(name = XmlTokens.ATTRIBUTE_ID, required = false)
-    private Identifier id;
+    private Identifier identifier;
 
     @XmlValue
     private String sql;
@@ -49,7 +49,7 @@ public final class SqlQueryBean implements SourceCommandBean {
     }
 
     public Identifier getId() {
-        return id;
+        return identifier;
     }
 
     public String getSql() {

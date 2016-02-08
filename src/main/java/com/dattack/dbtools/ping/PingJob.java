@@ -69,7 +69,7 @@ class PingJob implements Runnable {
             iter++;
             Connection connection = null;
             Statement stmt = null;
-            ResultSet rs = null;
+            ResultSet resultSet = null;
 
             // retrieve the SQL to be executed
             final SQLSentence sqlSentence = sentenceProvider.nextSql();
@@ -86,10 +86,10 @@ class PingJob implements Runnable {
 
                 // execute the query
                 stmt = connection.createStatement();
-                rs = stmt.executeQuery(sqlSentence.getSql());
+                resultSet = stmt.executeQuery(sqlSentence.getSql());
 
-                while (rs.next()) {
-                    logEntryBuilder.addRow(rs);
+                while (resultSet.next()) {
+                    logEntryBuilder.addRow(resultSet);
                 }
 
                 // sets the total time
@@ -100,7 +100,7 @@ class PingJob implements Runnable {
                 LOGGER.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
                         e.getMessage());
             } finally {
-                JDBCUtils.closeQuietly(rs);
+                JDBCUtils.closeQuietly(resultSet);
                 JDBCUtils.closeQuietly(stmt);
                 JDBCUtils.closeQuietly(connection);
             }

@@ -47,14 +47,14 @@ public final class PingJobConfiguration implements Serializable {
     /**
      * The <code>Builder</code> pattern implementation of <code>PingJobConfiguration</code>.
      */
-    public static class PingConfigurationBuilder implements Builder<PingJobConfiguration> {
+    public static final class PingConfigurationBuilder implements Builder<PingJobConfiguration> {
 
         private static final String TASK_NAME_CONFIGURATION_VAR = "task.name";
-        private static final String DEFAULT_TASK_NAME = "";
-        private static final int DEFAULT_EXECUTIONS = 0; // UNLIMITED
-        private static final int DEFAULT_THREADS = 1;
-        private static final int DEFAULT_TIME_BETWEEN_EXECUTIONS = 0; // NOT WAIT
-        private static final long DEFAULT_MAX_ROWS_TO_DUMP = 0;
+        private static final String TASK_NAME = "";
+        private static final int EXECUTIONS = 0; // UNLIMITED
+        private static final int THREADS = 1;
+        private static final int TIME_BETWEEN_EXECUTIONS = 0; // NOT WAIT
+        private static final long MAX_ROWS_TO_DUMP = 0;
 
         private String datasource;
         private String name;
@@ -86,11 +86,11 @@ public final class PingJobConfiguration implements Serializable {
             configuration.addConfiguration(baseConfiguration);
 
             // default values
-            withName(DEFAULT_TASK_NAME);
-            withExecutions(DEFAULT_EXECUTIONS);
-            withThreads(DEFAULT_THREADS);
-            withTimeBetweenExecutions(DEFAULT_TIME_BETWEEN_EXECUTIONS);
-            withMaxRowsToDump(DEFAULT_MAX_ROWS_TO_DUMP);
+            withName(TASK_NAME);
+            withExecutions(EXECUTIONS);
+            withThreads(THREADS);
+            withTimeBetweenExecutions(TIME_BETWEEN_EXECUTIONS);
+            withMaxRowsToDump(MAX_ROWS_TO_DUMP);
         }
 
         @Override
@@ -194,7 +194,7 @@ public final class PingJobConfiguration implements Serializable {
          * @return self instance
          */
         public PingConfigurationBuilder withThreads(final int value) {
-            if (value >= DEFAULT_THREADS) {
+            if (value >= THREADS) {
                 this.threads = value;
             }
             return this;

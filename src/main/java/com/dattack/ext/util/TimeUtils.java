@@ -41,7 +41,12 @@ public final class TimeUtils {
 
     private static final List<String> ISO_8601_PATTERN_LIST = computeIso8601List();
 
-    private static final List<String> computeIso8601List() {
+    private TimeUtils() {
+        // utility class
+    }
+    
+
+    private static List<String> computeIso8601List() {
 
         final String[] patterns = { //
             "yyyy-MM-dd'T'HH:mm", //
@@ -55,8 +60,8 @@ public final class TimeUtils {
         Collections.sort(patternList, new Comparator<String>() {
 
             @Override
-            public int compare(final String o1, final String o2) {
-                return Integer.valueOf(o1.length()).compareTo(o2.length());
+            public int compare(final String obj1, final String obj2) {
+                return Integer.valueOf(obj1.length()).compareTo(obj2.length());
             }
         });
         return patternList;
@@ -89,8 +94,7 @@ public final class TimeUtils {
             if (txt.length() <= pattern.length()) {
                 try {
                     parser.applyPattern(pattern);
-                    final Date date = parser.parse(txt);
-                    return date;
+                    return parser.parse(txt);
                 } catch (@SuppressWarnings("unused") final ParseException e) {
                     // ignore exception
                 }

@@ -40,13 +40,13 @@ public final class JDBCUtils {
     /**
      * Close a <code>ResultSet</code> ignoring <code>null</code> values and exceptions.
      * 
-     * @param rs
+     * @param resultSet
      *            the ResultSet to close, may be null.
      */
-    public static void closeQuietly(final ResultSet rs) {
-        if (rs != null) {
+    public static void closeQuietly(final ResultSet resultSet) {
+        if (resultSet != null) {
             try {
-                rs.close();
+                resultSet.close();
             } catch (final SQLException e) {
                 LOGGER.warn(e.getMessage());
             }

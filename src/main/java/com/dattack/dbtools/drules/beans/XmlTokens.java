@@ -72,6 +72,6 @@ public final class XmlTokens {
     public static final String ELEMENT_USERNAME = "username";
 
     public static final String VALUE_JOIN_TYPE_INNER = "inner";
-    public static final String VALUE_ROW_CHECK_CONSTRAINT_SORTED = "sorted";
+    public static final String CONSTRAINT_SORTED = "sorted";
 
 }

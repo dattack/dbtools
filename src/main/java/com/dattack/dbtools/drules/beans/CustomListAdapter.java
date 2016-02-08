@@ -45,16 +45,16 @@ public abstract class CustomListAdapter<T> extends XmlAdapter<String, List<T>> {
     @Override
     public final String marshal(final List<T> strings) {
 
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
 
         for (final T string : strings) {
-            if (sb.length() > 0) {
-                sb.append(", ");
+            if (buffer.length() > 0) {
+                buffer.append(", ");
             }
-            sb.append(string);
+            buffer.append(string);
         }
 
-        return sb.toString();
+        return buffer.toString();
     }
 
     @Override

@@ -64,16 +64,16 @@ public class DataSourceFactory implements ResourceFactory<DataSource> {
         final String user = configuration.getString(USERNAME_KEY);
         final String password = configuration.getString(PASSWORD_KEY);
 
-        DataSource ds = null;
+        DataSource dataSource = null;
         try {
             final Properties props = ConfigurationConverter.getProperties(configuration);
-            ds = BasicDataSourceFactory.createDataSource(props);
+            dataSource = BasicDataSourceFactory.createDataSource(props);
         } catch (final Exception e) {
             // we will use a DataSource without a connection pool
             LOGGER.warn(e.getMessage());
-            ds = new SimpleDataSource(driver, url, user, password);
+            dataSource = new SimpleDataSource(driver, url, user, password);
         }
 
-        return new DataSourceClasspathDecorator(ds, extraClasspath);
+        return new DataSourceClasspathDecorator(dataSource, extraClasspath);
     }
 }

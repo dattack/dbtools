@@ -62,9 +62,9 @@ public class SQLSentenceWeightedRandomProvider implements SQLSentenceProvider {
             throw new IllegalArgumentException("The sentence list must not be null or empty");
         }
 
-        final float cw = randomGenerator.nextFloat();
+        final float randomWeight = randomGenerator.nextFloat();
         for (int i = 0; i < cumulativeWeight.length; i++) {
-            if (cumulativeWeight[i] > cw) {
+            if (cumulativeWeight[i] > randomWeight) {
                 return sentenceList.get(i);
             }
         }

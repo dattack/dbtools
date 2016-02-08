@@ -120,18 +120,18 @@ public class Report {
 
     private String log(final List<RowData> rowDataList) {
 
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         for (final RowData rowData : rowDataList) {
             for (final Iterator<IdentifierValuePair> it = rowData.getFieldValueList().iterator(); it.hasNext();) {
                 final IdentifierValuePair item = it.next();
-                sb.append(item.getKey()).append(": ").append(item.getValue());
+                buffer.append(item.getKey()).append(": ").append(item.getValue());
                 if (it.hasNext()) {
-                    sb.append(", ");
+                    buffer.append(", ");
                 }
             }
-            sb.append("\n");
+            buffer.append("\n");
         }
-        return sb.toString();
+        return buffer.toString();
     }
 
     @Override

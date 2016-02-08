@@ -68,11 +68,11 @@ public final class JNDIDataSource extends AbstractDataSource {
 
         try {
             final InitialContext context = new InitialContext();
-            final DataSource ds = (DataSource) context.lookup(jndiName);
-            if (ds == null) {
+            final DataSource dataSource = (DataSource) context.lookup(jndiName);
+            if (dataSource == null) {
                 throw new SQLException("Unknown JNDI resource '" + jndiName + "'");
             }
-            return ds.getConnection();
+            return dataSource.getConnection();
         } catch (final NamingException e) {
             throw new SQLException("Unable to get a connection from JNDI name '" + jndiName + "': " + e.getMessage());
         }

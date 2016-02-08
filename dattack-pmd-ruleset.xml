@@ -193,7 +193,7 @@
       <priority>4</priority>
    </rule>
    <rule ref="rulesets/java/naming.xml/BooleanGetMethodName"/>
-   <rule ref="rulesets/java/naming.xml/ShortClassName"/>
+<!--    <rule ref="rulesets/java/naming.xml/ShortClassName"/>-->
    <rule ref="rulesets/java/naming.xml/GenericsNaming"/>
 
    <!-- optimizations -->

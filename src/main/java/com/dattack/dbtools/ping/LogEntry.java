@@ -76,19 +76,19 @@ public class LogEntry implements Serializable {
         /**
          * Adds a new {@link DataRow} from a ResultSet.
          *
-         * @param rs
+         * @param resultSet
          *            the ResultSet that contains the data
          * @throws SQLException
          *             if an database error occurs
          */
-        public void addRow(final ResultSet rs) throws SQLException {
+        public void addRow(final ResultSet resultSet) throws SQLException {
 
             incrRows();
             if (maxRowsToDump > rows) {
-                final int columnCount = rs.getMetaData().getColumnCount();
+                final int columnCount = resultSet.getMetaData().getColumnCount();
                 final DataRow dataRow = new DataRow(columnCount);
                 for (int i = 1; i <= columnCount; i++) {
-                    dataRow.add(rs.getObject(i));
+                    dataRow.add(resultSet.getObject(i));
                 }
                 this.rowList.add(dataRow);
             }
