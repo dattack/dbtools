@@ -39,7 +39,7 @@ public final class NamingLoader {
 
     private static final String TYPE_KEY = "type";
 
-    private static final Logger log = LoggerFactory.getLogger(NamingLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NamingLoader.class);
 
     private static Object getObject(final Properties properties, final List<String> extraClasspath) {
 
@@ -50,7 +50,7 @@ public final class NamingLoader {
             return factory.getObjectInstance(properties, extraClasspath);
         }
 
-        log.warn("Unable to get a factory for type ''{0}''", type);
+        LOGGER.warn("Unable to get a factory for type ''{0}''", type);
         return null;
     }
 
@@ -69,7 +69,7 @@ public final class NamingLoader {
             context.rebind(key, value);
         }
 
-        log.info("Binding object '{}' to JNDI name '{}'", value.getClass().getName(), key);
+        LOGGER.info("Binding object '{}' to JNDI name '{}'", value.getClass().getName(), key);
     }
 
     private static void load(final Properties properties, /* final Context ctxt, */ final Context parentCtxt,

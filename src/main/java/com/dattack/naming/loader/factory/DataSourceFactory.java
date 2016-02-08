@@ -38,7 +38,7 @@ import com.dattack.ext.misc.ConfigurationUtil;
  */
 public class DataSourceFactory implements ResourceFactory<DataSource> {
 
-    private static final Logger log = LoggerFactory.getLogger(DataSourceFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceFactory.class);
 
     private static final String DRIVER_KEY = "driverClassName";
     private static final String URL_KEY = "url";
@@ -70,7 +70,7 @@ public class DataSourceFactory implements ResourceFactory<DataSource> {
             ds = BasicDataSourceFactory.createDataSource(props);
         } catch (final Exception e) {
             // we will use a DataSource without a connection pool
-            log.warn(e.getMessage());
+            LOGGER.warn(e.getMessage());
             ds = new SimpleDataSource(driver, url, user, password);
         }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE integrity>
+<!DOCTYPE drules>
 
-<integrity xmlns:xi="http://www.w3.org/2001/XInclude">
+<drules xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <task id="varenv" name="Gas Oil variables">
     <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
@@ -298,4 +298,4 @@
 	<xi:include href="notifications.xml" />
   </task>
 -->
-</integrity>
+</drules>

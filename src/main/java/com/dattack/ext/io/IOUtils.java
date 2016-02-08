@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class IOUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(IOUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IOUtils.class);
 
     private IOUtils() {
         // utility class
@@ -46,7 +46,7 @@ public final class IOUtils {
             try {
                 obj.close();
             } catch (final IOException e) {
-                log.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
     }

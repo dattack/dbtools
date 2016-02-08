@@ -32,7 +32,7 @@ import com.dattack.dbtools.drules.beans.JoinResultBean;
  */
 public class InnerJoinStrategy implements JoinStrategy {
 
-    private static final Logger log = LoggerFactory.getLogger(InnerJoinStrategy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InnerJoinStrategy.class);
 
     private final SourceResultGroup sourceResultList;
     private final JoinBean joinBean;
@@ -71,7 +71,7 @@ public class InnerJoinStrategy implements JoinStrategy {
             do {
                 minKey = rowDataMap.getMinKey();
 
-                log.debug("Min key: {}", minKey);
+                LOGGER.debug("Min key: {}", minKey);
 
                 if (minKey == null) {
                     break;
@@ -89,11 +89,11 @@ public class InnerJoinStrategy implements JoinStrategy {
                         rowDataMap.putData(rowData.getSourceId(),
                                 factory.create(sourceResultList.get(rowData.getSourceId())));
 
-                        log.debug("    Source: {}, Key: {} -> Matches", rowData.getSourceId().getValue(),
+                        LOGGER.debug("    Source: {}, Key: {} -> Matches", rowData.getSourceId().getValue(),
                                 rowData.getKey());
                     } else {
                         // no matches
-                        log.debug("    Source: {}, Key: {} -> Not Matches", rowData.getSourceId().getValue(),
+                        LOGGER.debug("    Source: {}, Key: {} -> Not Matches", rowData.getSourceId().getValue(),
                                 rowData.getKey());
                         missingSourceList.add(rowData.getSourceId());
                     }

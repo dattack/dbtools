@@ -29,10 +29,10 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dattack.ext.io.FilesystemUtils;
@@ -43,7 +43,7 @@ import com.dattack.ext.io.FilesystemUtils;
  */
 public final class DataSourceClasspathDecorator extends DataSourceDecorator {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(JNDIDataSource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JNDIDataSource.class);
 
     private final List<String> extraClasspath;
     private volatile boolean initialized;
@@ -70,10 +70,10 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
                         configureJarClasspath(file);
                     }
                 } catch (final Exception e) {
-                    log.warn(e.getMessage());
+                    LOGGER.warn(e.getMessage());
                 }
             } else {
-                log.debug("Missing directory/file: '{}'", path);
+                LOGGER.debug("Missing directory/file: '{}'", path);
             }
         }
 
@@ -107,10 +107,10 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
         final List<URL> urlList = new ArrayList<URL>();
         for (final File jar : jars) {
             try {
-                log.info("Scanning JAR: {}", jar);
+                LOGGER.info("Scanning JAR: {}", jar);
                 urlList.add(jar.toURI().toURL());
             } catch (final MalformedURLException e) {
-                log.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
 
@@ -122,11 +122,11 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
 
         final List<URL> urlList = new ArrayList<URL>();
         try {
-            log.info("Scanning JAR: {}", jar);
+            LOGGER.info("Scanning JAR: {}", jar);
             urlList.add(jar.toURI().toURL());
             configureClasspath(urlList);
         } catch (final MalformedURLException e) {
-            log.warn(e.getMessage());
+            LOGGER.warn(e.getMessage());
         }
     }
 
@@ -182,7 +182,7 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
     }
 
     @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
         if (!initialized) {
             configureClasspath();
         }

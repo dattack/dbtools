@@ -62,7 +62,7 @@ import com.dattack.ext.util.CollectionUtils;
  */
 public class DrulesEngine {
 
-    private static final Logger log = LoggerFactory.getLogger(DrulesEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DrulesEngine.class);
 
     private ThreadFactory createThreadFactory() {
         return new ThreadFactoryBuilder() //
@@ -71,7 +71,7 @@ public class DrulesEngine {
 
                     @Override
                     public void uncaughtException(final Thread thread, final Throwable throwable) {
-                        log.error("Uncaught exception throwed by thread '{}': {}", thread.getName(),
+                        LOGGER.error("Uncaught exception throwed by thread '{}': {}", thread.getName(),
                                 throwable.getMessage());
                     }
                 }).build();
@@ -103,7 +103,7 @@ public class DrulesEngine {
 
             ConfigurationBean configurationBean = getConfigurationBean();
 
-            log.info("SMTP hostname: " + configurationBean.getConfigurationSmtpBean().getHostname().toString());
+            LOGGER.info("SMTP hostname: " + configurationBean.getConfigurationSmtpBean().getHostname().toString());
 
             execute(taskBean, configurationBean);
 
@@ -116,7 +116,7 @@ public class DrulesEngine {
             throws InterruptedException, ExecutionException, ConfigurationException, IOException, JAXBException,
             SAXException, ParserConfigurationException {
 
-        log.info("Integrity task (Task ID: {}, Task name: {}): STARTED", taskBean.getId(), taskBean.getName());
+        LOGGER.info("Integrity task (Task ID: {}, Task name: {}): STARTED", taskBean.getId(), taskBean.getName());
 
         // start the flight recorder
         final FlightRecorder flightRecorder = new FlightRecorder(taskBean, configurationBean);
@@ -146,7 +146,7 @@ public class DrulesEngine {
 
         sourceResultGroup.close();
 
-        log.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
+        LOGGER.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
     }
 
     private void executeJsEvals(final TaskBean taskBean) {

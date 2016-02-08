@@ -26,6 +26,14 @@ import com.dattack.dbtools.Builder;
  */
 public final class CSVConfiguration {
 
+    private final char commentChar;
+    private final String eol;
+    private final char escapeChar;
+    private final String nullValue;
+    private final char quoteChar;
+    private final DateFormat dateFormat;
+    private final String separator;
+    
     /**
      * Builder class used to build a {@link CSVConfiguration} instance.
      */
@@ -161,14 +169,6 @@ public final class CSVConfiguration {
         }
     }
 
-    private final char commentChar;
-    private final String eol;
-    private final char escapeChar;
-    private final String nullValue;
-    private final char quoteChar;
-    private final DateFormat dateFormat;
-
-    private final String separator;
 
     private CSVConfiguration(final CsvConfigurationBuilder builder) {
         this.commentChar = builder.commentChar;

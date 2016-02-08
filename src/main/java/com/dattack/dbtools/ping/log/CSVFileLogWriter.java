@@ -41,7 +41,7 @@ import com.dattack.ext.io.IOUtils;
  */
 public class CSVFileLogWriter implements LogWriter {
 
-    private static final Logger log = LoggerFactory.getLogger(CSVFileLogWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CSVFileLogWriter.class);
 
     private final CSVStringBuilder csvBuilder;
     private final String filename;
@@ -58,7 +58,7 @@ public class CSVFileLogWriter implements LogWriter {
             final File parent = file.getParentFile();
             if (parent != null && !parent.exists()) {
                 if (!parent.mkdirs()) {
-                    log.warn("Unable to create directory: {}", parent);
+                    LOGGER.warn("Unable to create directory: {}", parent);
                 }
             }
         }
@@ -82,7 +82,7 @@ public class CSVFileLogWriter implements LogWriter {
             out = getOutputStream();
             out.write(message.getBytes());
         } catch (final IOException e) {
-            log.warn(e.getMessage());
+            LOGGER.warn(e.getMessage());
         } finally {
             IOUtils.closeQuietly(out);
         }

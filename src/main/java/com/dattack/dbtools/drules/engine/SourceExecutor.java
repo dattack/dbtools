@@ -85,7 +85,7 @@ final class SourceExecutor implements Callable<SourceResult> {
                     executeForEachLoop(bean);
                 } while (resultSet.next());
             } catch (SQLException e) {
-                log.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
 
@@ -176,7 +176,7 @@ final class SourceExecutor implements Callable<SourceResult> {
         }
     }
 
-    private static final Logger log = LoggerFactory.getLogger(SourceExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceExecutor.class);
     private final SourceBean sourceBean;
 
     private final Configuration initialConfiguration;
@@ -193,7 +193,7 @@ final class SourceExecutor implements Callable<SourceResult> {
 
         final String jndiName = getInterpolatedJndiName();
 
-        log.info("Configuring datasource with JNDI name: '{}'", jndiName);
+        LOGGER.info("Configuring datasource with JNDI name: '{}'", jndiName);
         Connection connection = getConnection(jndiName);
 
         DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
@@ -210,7 +210,7 @@ final class SourceExecutor implements Callable<SourceResult> {
 
     private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {
 
-        log.info("Executing SQL sentence [{}@{}]: {}", Thread.currentThread().getName(), sourceBean.getId(), sql);
+        LOGGER.info("Executing SQL sentence [{}@{}]: {}", Thread.currentThread().getName(), sourceBean.getId(), sql);
 
         boolean isResultSet = statement.execute(sql);
 

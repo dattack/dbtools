@@ -36,7 +36,7 @@ import com.dattack.ext.jdbc.JDBCUtils;
  */
 class PingJob implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger(PingJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PingJob.class);
 
     private final PingJobConfiguration configuration;
     private final DataSource dataSource;
@@ -57,7 +57,7 @@ class PingJob implements Runnable {
 
         final String threadName = Thread.currentThread().getName();
 
-        log.info("Running job '{}' at thread '{}'", configuration.getName(), threadName);
+        LOGGER.info("Running job '{}' at thread '{}'", configuration.getName(), threadName);
 
         long iter = 0;
 
@@ -97,7 +97,7 @@ class PingJob implements Runnable {
 
             } catch (final Exception e) {
                 logWriter.write(logEntryBuilder.withException(e).build());
-                log.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
+                LOGGER.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
                         e.getMessage());
             } finally {
                 JDBCUtils.closeQuietly(rs);
@@ -110,13 +110,13 @@ class PingJob implements Runnable {
                     try {
                         wait(configuration.getTimeBetweenExecutions());
                     } catch (final Exception e) {
-                        log.warn(e.getMessage());
+                        LOGGER.warn(e.getMessage());
                     }
                 }
             }
         }
 
-        log.info("Job finished (job-name: '{}', thread: '{}')", configuration.getName(), threadName);
+        LOGGER.info("Job finished (job-name: '{}', thread: '{}')", configuration.getName(), threadName);
     }
 
     private boolean testLoop(final long iteration) {

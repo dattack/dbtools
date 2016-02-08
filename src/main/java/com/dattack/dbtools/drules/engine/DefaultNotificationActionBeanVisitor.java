@@ -50,7 +50,7 @@ import freemarker.template.TemplateException;
  */
 public class DefaultNotificationActionBeanVisitor implements NotificationActionBeanVisitor {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultNotificationActionBeanVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNotificationActionBeanVisitor.class);
 
     private final FlightRecorder flightRecorder;
 
@@ -64,13 +64,13 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         try {
 
             if (flightRecorder.getConfigurationBean() == null) {
-                log.warn("Missing SMTP configuration. Please, check your configuration file.");
+                LOGGER.warn("Missing SMTP configuration. Please, check your configuration file.");
             } else {
                 sendMail(flightRecorder.getConfigurationBean().getConfigurationSmtpBean(), action);
             }
 
         } catch (final Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -78,7 +78,7 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
             throws EmailException, AddressException, ConfigurationException, TemplateException, IOException {
 
         if (config == null) {
-            log.warn("Missing SMTP configuration. Please, check your configuration file.");
+            LOGGER.warn("Missing SMTP configuration. Please, check your configuration file.");
             return;
         }
 

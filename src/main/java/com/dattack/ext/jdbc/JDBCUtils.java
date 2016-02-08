@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class JDBCUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(JDBCUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCUtils.class);
 
     private JDBCUtils() {
         // utility class
@@ -48,7 +48,7 @@ public final class JDBCUtils {
             try {
                 rs.close();
             } catch (final SQLException e) {
-                log.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
     }
@@ -64,7 +64,7 @@ public final class JDBCUtils {
             try {
                 stmt.close();
             } catch (final SQLException e) {
-                log.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
     }
@@ -80,7 +80,7 @@ public final class JDBCUtils {
             try {
                 connection.close();
             } catch (final SQLException e) {
-                log.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
     }

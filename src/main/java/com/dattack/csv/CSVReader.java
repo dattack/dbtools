@@ -49,10 +49,7 @@ public class CSVReader implements Closeable {
     }
 
     private boolean isComment(final String line) {
-        if (line.charAt(0) == configuration.getCommentChar()) {
-            return true;
-        }
-        return false;
+        return (line.charAt(0) == configuration.getCommentChar());
     }
 
     /**
@@ -66,13 +63,12 @@ public class CSVReader implements Closeable {
 
         String line = "";
         CSVObject object = null;
-        while ((line = StringUtils.trimToNull(getReader().readLine())) != null) {
+        while ((object == null) && (line = StringUtils.trimToNull(getReader().readLine())) != null) {
             if (isComment(line)) {
                 continue;
             }
-            String[] data = line.split(configuration.getSeparator());
+            final String[] data = line.split(configuration.getSeparator());
             object = new CSVObject(data);
-            break;
         }
 
         return object;

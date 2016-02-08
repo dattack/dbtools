@@ -30,11 +30,11 @@ public class CSVStringBuilder {
 
     private static final int DEFAULT_CAPACITY = 100;
 
-    private boolean comment;
+    private boolean isComment;
 
     private final CSVConfiguration configuration;
     private boolean emptyLine;
-    private final StringBuilder sb;
+    private final StringBuilder rebuild;
 
     public CSVStringBuilder(final CSVConfiguration configuration) {
         this(configuration, DEFAULT_CAPACITY);
@@ -50,9 +50,9 @@ public class CSVStringBuilder {
      */
     public CSVStringBuilder(final CSVConfiguration configuration, final int capacity) {
         this.configuration = configuration;
-        this.sb = new StringBuilder(capacity);
+        this.rebuild = new StringBuilder(capacity);
         this.emptyLine = true;
-        this.comment = false;
+        this.isComment = false;
     }
 
     /**
@@ -130,7 +130,7 @@ public class CSVStringBuilder {
         if (value == null) {
             appendValue(configuration.getNullStr());
         } else {
-            appendValue(value, !comment);
+            appendValue(value, !isComment);
         }
 
         return this;
@@ -143,13 +143,13 @@ public class CSVStringBuilder {
     private void appendValue(final String value, final boolean quote) {
 
         if (!emptyLine) {
-            sb.append(configuration.getSeparator());
+            rebuild.append(configuration.getSeparator());
         }
 
         if (quote) {
-            sb.append(configuration.getQuoteChar()).append(value).append(configuration.getQuoteChar());
+            rebuild.append(configuration.getQuoteChar()).append(value).append(configuration.getQuoteChar());
         } else {
-            sb.append(value);
+            rebuild.append(value);
         }
 
         emptyLine = false;
@@ -161,9 +161,9 @@ public class CSVStringBuilder {
      * @return the instance of CSVStringBuilder
      */
     public CSVStringBuilder clear() {
-        sb.setLength(0);
+        rebuild.setLength(0);
         emptyLine = true;
-        comment = false;
+        isComment = false;
         return this;
     }
 
@@ -191,16 +191,16 @@ public class CSVStringBuilder {
 
     private void comment(final String message, final boolean eol) {
 
-        if (!emptyLine || comment) {
+        if (!emptyLine || isComment) {
             eol();
         }
 
-        sb.append(configuration.getCommentChar());
+        rebuild.append(configuration.getCommentChar());
         if (message != null) {
-            sb.append(message);
+            rebuild.append(message);
         }
 
-        comment = true;
+        isComment = true;
 
         if (eol) {
             eol();
@@ -213,14 +213,14 @@ public class CSVStringBuilder {
      * @return the instance of CSVStringBuilder
      */
     public CSVStringBuilder eol() {
-        sb.append(configuration.getEol());
+        rebuild.append(configuration.getEol());
         emptyLine = true;
-        comment = false;
+        isComment = false;
         return this;
     }
 
     @Override
     public String toString() {
-        return sb.toString();
+        return rebuild.toString();
     }
 }

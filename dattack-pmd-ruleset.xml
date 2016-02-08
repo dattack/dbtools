@@ -74,7 +74,7 @@
       </properties>
    </rule>
    <rule ref="rulesets/java/design.xml/ConstructorCallsOverridableMethod"/>
-   <rule ref="rulesets/java/design.xml/AccessorClassGeneration"/>
+<!--    <rule ref="rulesets/java/design.xml/AccessorClassGeneration"/> -->
    <rule ref="rulesets/java/design.xml/FinalFieldCouldBeStatic">
       <priority>4</priority>
    </rule>
@@ -121,7 +121,7 @@
    <rule ref="rulesets/java/design.xml/AbstractClassWithoutAnyMethod"/>
    <rule ref="rulesets/java/design.xml/TooFewBranchesForASwitchStatement"/>
    <rule ref="rulesets/java/design.xml/LogicInversion"/>
-   <rule ref="rulesets/java/design.xml/UseVarargs"/>
+<!--   <rule ref="rulesets/java/design.xml/UseVarargs"/> -->
    <rule ref="rulesets/java/design.xml/FieldDeclarationsShouldBeAtStartOfClass"/>
    <rule ref="rulesets/java/design.xml/GodClass"/>
 
@@ -158,7 +158,7 @@
    </rule>
    <rule ref="rulesets/java/strings.xml/StringBufferInstantiationWithChar"/>
    <rule ref="rulesets/java/strings.xml/UseEqualsToCompareStrings"/>
-   <rule ref="rulesets/java/strings.xml/AvoidStringBufferField"/>
+<!--    <rule ref="rulesets/java/strings.xml/AvoidStringBufferField"/> -->
 
    <!-- naming -->
 
@@ -204,9 +204,9 @@
    <rule ref="rulesets/java/optimizations.xml/MethodArgumentCouldBeFinal">
       <priority>4</priority>
    </rule>
-   <rule ref="rulesets/java/optimizations.xml/AvoidInstantiatingObjectsInLoops">
-      <priority>2</priority>
-   </rule>
+<!--    <rule ref="rulesets/java/optimizations.xml/AvoidInstantiatingObjectsInLoops"> -->
+<!--       <priority>2</priority> -->
+<!--    </rule> -->
    <rule ref="rulesets/java/optimizations.xml/UseArrayListInsteadOfVector"/>
    <rule ref="rulesets/java/optimizations.xml/SimplifyStartsWith"/>
    <rule ref="rulesets/java/optimizations.xml/UseStringBufferForStringAppends"/>
@@ -276,9 +276,9 @@
 
    <!-- coupling -->
 
-   <rule ref="rulesets/java/coupling.xml/LawOfDemeter">
-      <priority>2</priority>
-   </rule>
+<!--    <rule ref="rulesets/java/coupling.xml/LawOfDemeter"> -->
+<!--       <priority>2</priority> -->
+<!--    </rule> -->
 
    <!-- codesize -->
 

@@ -33,7 +33,7 @@ import com.dattack.dbtools.ping.PingJobConfiguration.PingConfigurationBuilder;
  */
 final class PingJobConfigurationParser {
 
-    private static final Logger log = LoggerFactory.getLogger(PingJobConfigurationParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PingJobConfigurationParser.class);
 
     private static final float DEFAULT_WEIGHT_VALUE = 1F;
     private static final String TASK_KEY = "task";
@@ -56,7 +56,7 @@ final class PingJobConfigurationParser {
 
     public static List<PingJobConfiguration> parse(final File file) throws ConfigurationException {
 
-        log.debug("parsing file '{}'", file);
+        LOGGER.debug("parsing file '{}'", file);
 
         List<PingJobConfiguration> list = new ArrayList<PingJobConfiguration>();
 

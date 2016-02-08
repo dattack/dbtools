@@ -56,7 +56,7 @@ public class ThreadFactoryBuilder {
         }
     }
 
-    private static final AtomicInteger poolNumber = new AtomicInteger(1);
+    private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
     private ThreadGroup group = null;
     private String namePrefix = null;
     private Boolean daemon = null;
@@ -75,7 +75,7 @@ public class ThreadFactoryBuilder {
             return namePrefix;
         }
 
-        return "pool-" + poolNumber.getAndIncrement() + "-thread";
+        return "pool-" + POOL_NUMBER.getAndIncrement() + "-thread";
     }
 
     public ThreadFactoryBuilder withDaemon(final boolean value) {

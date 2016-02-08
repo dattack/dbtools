@@ -39,7 +39,7 @@ import com.dattack.ext.script.JavaScriptEngine;
  */
 public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultJoinResultVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJoinResultVisitor.class);
 
     private final List<Identifier> missingSourceList;
     private final List<RowData> rowDataList;
@@ -71,7 +71,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         registerCheckExpr(checkExprBean);
 
         // eval the check expression
-        log.debug(String.format("Executing javascript expression: %s", checkExprBean.getExpression()));
+        LOGGER.debug(String.format("Executing javascript expression: %s", checkExprBean.getExpression()));
         Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(), createJavascriptParametersMap());
         if (bool == null || !bool) {
             execute(checkExprBean.getOnFail());
@@ -117,7 +117,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
                     execute(checkExprBean);
                 } catch (ScriptException e) {
                     // TODO: throw a proper exception
-                    log.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         }

@@ -54,11 +54,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
     private static final String RESOURCES_DIRECTORY_PROPERTY = StandaloneContextFactory.class.getName()
             + ".resources.directory";
 
-    private static final Logger log = LoggerFactory.getLogger(StandaloneContextFactory.class);
-
-    public StandaloneContextFactory() {
-        super();
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneContextFactory.class);
 
     private CompositeConfiguration getConfiguration(final Hashtable<?, ?> environment) {
 
@@ -91,7 +87,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
                     File dir = FilesystemUtils.locate(ObjectUtils.toString(configDir));
 
                     if ((dir != null) && dir.exists()) {
-                        log.info("Scanning directory '{}' for JNDI resources.", dir);
+                        LOGGER.info("Scanning directory '{}' for JNDI resources.", dir);
                         try {
                             StandaloneContext ctx = new StandaloneContext(environment);
                             final NamingLoader loader = new NamingLoader();
