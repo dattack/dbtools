@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,11 +26,13 @@ import com.dattack.dbtools.Builder;
 
 /**
  * Implementation of a <code>DataSource</code> that references a object registered in a JNDI context.
- * 
+ *
  * @author cvarela
  * @since 0.1
  */
 public final class JNDIDataSource extends AbstractDataSource {
+
+    private final String jndiName;
 
     /**
      * The <code>Builder</code> pattern implementation of <code>JNDIDataSource</code>.
@@ -46,7 +48,7 @@ public final class JNDIDataSource extends AbstractDataSource {
 
         /**
          * Sets the JNDI name.
-         * 
+         *
          * @param value
          *            the JNDI name
          * @return the self object
@@ -56,8 +58,6 @@ public final class JNDIDataSource extends AbstractDataSource {
             return this;
         }
     }
-
-    private final String jndiName;
 
     private JNDIDataSource(final DataSourceBuilder builder) {
         this.jndiName = builder.jndiName;

@@ -197,15 +197,11 @@ final class SourceExecutor implements Callable<SourceResult> {
         final Connection connection = getConnection(jndiName);
 
         final DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
-        try {
-            for (final Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
-                final SourceCommandBean command = it.next();
-                command.accept(visitor);
-            }
-            return new SourceResult(sourceBean.getId(), connection, visitor.getLastResultSet());
-        } finally {
-            //
+        for (final Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
+            final SourceCommandBean command = it.next();
+            command.accept(visitor);
         }
+        return new SourceResult(sourceBean.getId(), connection, visitor.getLastResultSet());
     }
 
     private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {
