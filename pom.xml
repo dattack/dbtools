@@ -159,7 +159,7 @@
                         </dependency>
                     </dependencies>
                     <configuration>
-                        <configLocation>checkstyle.xml</configLocation>
+                        <configLocation>dattack-checkstyle.xml</configLocation>
                         <failOnViolation>false</failOnViolation>
                         <format>xml</format>
                         <format>html</format>
@@ -177,6 +177,9 @@
                     <artifactId>maven-pmd-plugin</artifactId>
                     <version>${maven-pmd-plugin.version}</version>
                     <configuration>
+                        <rulesets>
+                            <ruleset>dattack-pmd-ruleset.xml</ruleset>
+                        </rulesets>
                         <linkXref>true</linkXref>
                         <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                         <minimumTokens>100</minimumTokens>
@@ -231,6 +234,36 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <outputDirectory>${eclipse.outputDirectory}</outputDirectory>
+                    <additionalBuildcommands>
+                        <buildcommand>com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder</buildcommand>
+                        <buildcommand>net.sourceforge.pmd.eclipse.plugin.pmdBuilder</buildcommand>
+                    </additionalBuildcommands>
+                    <additionalProjectnatures>
+                        <projectnature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</projectnature>
+                        <projectnature>net.sourceforge.pmd.eclipse.plugin.pmdNature</projectnature>
+                    </additionalProjectnatures>
+                    <additionalConfig>
+                        <file>
+                            <name>.checkstyle</name>
+                            <location>${project.baseUri}/dattack-eclipse-checkstyle</location>
+                        </file>
+                        <file>
+                            <name>.pmd</name>
+                            <location>${project.baseUri}/dattack-eclipse-pmd</location>
+                        </file>
+                        <file>
+                            <name>.ruleset</name>
+                            <location>${project.baseUri}/dattack-pmd-ruleset.xml</location>
+                        </file>
+                    </additionalConfig>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
@@ -362,7 +395,7 @@
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
+                    <configLocation>dattack-checkstyle.xml</configLocation>
                     <failOnViolation>false</failOnViolation>
                     <format>xml</format>
                     <format>html</format>
@@ -372,6 +405,9 @@
             <plugin>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
+                    <rulesets>
+                        <ruleset>dattack-pmd-ruleset.xml</ruleset>
+                    </rulesets>
                     <linkXref>true</linkXref>
                     <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
