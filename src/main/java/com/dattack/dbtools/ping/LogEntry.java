@@ -44,7 +44,7 @@ public class LogEntry implements Serializable {
     private final String threadName;
     private final List<DataRow> rowList;
 
-    public static class LogEntryBuilder implements Serializable, Builder<LogEntry> {
+    public static final class LogEntryBuilder implements Serializable, Builder<LogEntry> {
 
         private static final long serialVersionUID = 9149270318492709877L;
 
