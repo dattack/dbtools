@@ -21,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
  * @author cvarela
  * @since 0.1
  */
-public class Assert {
+public final class Assert {
 
     private Assert() {
         // static class

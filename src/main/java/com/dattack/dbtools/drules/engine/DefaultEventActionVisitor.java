@@ -58,10 +58,10 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
     public void visit(final EventActionEvalJsBean item) {
 
         try {
-            Object value = JavaScriptEngine.eval(item.getExpression(),
+            final Object value = JavaScriptEngine.eval(item.getExpression(),
                     ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
             ThreadContext.getInstance().setProperty(item.getName(), value);
-        } catch (ScriptException e) {
+        } catch (final ScriptException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -78,7 +78,7 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
                 final SourceExecutor sourceExecutor = new SourceExecutor(sourceBean,
                         ConfigurationUtils.cloneConfiguration(ThreadContext.getInstance().getConfiguration()));
                 sourceResult = sourceExecutor.call();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             } finally {
                 if (sourceResult != null) {

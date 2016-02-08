@@ -38,7 +38,7 @@ public final class JoinStrategyFactory {
 
     /**
      * Creates the join strategy defined by the {@link JoinBean#getType()}.
-     * 
+     *
      * @param joinBean
      *            the JoinBean
      * @param sourceResultList
@@ -63,7 +63,7 @@ public final class JoinStrategyFactory {
     private InnerJoinStrategy createInnerJoinStrategy(final JoinBean joinBean,
             final SourceResultGroup sourceResultList) {
 
-        List<Identifier> sourceNames = joinBean.getSources();
+        final List<Identifier> sourceNames = joinBean.getSources();
         if (sourceNames.size() != 2) {
             // TODO: throw other exception or support join over two or more sources
             throw new RuntimeException(

@@ -23,13 +23,35 @@ import org.apache.commons.lang.StringUtils;
  */
 public class MetricName {
 
-    public static final String CONNECTION_TIME_KEY = "Connection time";
-    public static final String FIRST_ROW_TIME_KEY = "First row time";
-    public static final String EXECUTION_TIME_KEY = "Total time";
-
     private final String taskName;
     private final String sqlLabel;
     private final String metric;
+
+    public static final String CONNECTION_TIME_KEY = "Connection time";
+
+    public static final String FIRST_ROW_TIME_KEY = "First row time";
+    public static final String EXECUTION_TIME_KEY = "Total time";
+
+    /**
+     * Creates a MetricName from its value.
+     *
+     * @param text
+     *            the metric name
+     * @return the MetricName
+     */
+    public static MetricName parse(final String text) {
+
+        if (text == null) {
+            throw new NullPointerException("Unable to parse a 'null' value as a metric name");
+        }
+
+        final String[] tokens = text.split(":");
+        if (tokens.length > 3) {
+            throw new IllegalArgumentException(String.format("Unable to parse the metric name (value: %s)", text));
+        }
+
+        return new MetricName(tokens);
+    }
 
     public MetricName(final String taskName, final String sqlLabel, final String metric) {
         this.taskName = normalize(taskName);
@@ -60,16 +82,31 @@ public class MetricName {
 
     }
 
-    public String getTaskName() {
-        return taskName;
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        final MetricName rhs = (MetricName) obj;
+        return isEquals(taskName, rhs.taskName) && isEquals(sqlLabel, rhs.sqlLabel) && isEquals(metric, rhs.metric);
+    }
+
+    public String getMetric() {
+        return metric;
     }
 
     public String getSqlLabel() {
         return sqlLabel;
     }
 
-    public String getMetric() {
-        return metric;
+    public String getTaskName() {
+        return taskName;
     }
 
     @Override
@@ -82,52 +119,16 @@ public class MetricName {
         return result;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (obj.getClass() != getClass()) {
-            return false;
-        }
-        MetricName rhs = (MetricName) obj;
-        return isEquals(taskName, rhs.taskName) && isEquals(sqlLabel, rhs.sqlLabel) && isEquals(metric, rhs.metric);
-    }
-
     private boolean isEquals(final String text1, final String text2) {
         return text1.equalsIgnoreCase(text2) || StringUtils.isBlank(text1) || StringUtils.isBlank(text2);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s (%s - %s)", metric, taskName, sqlLabel);
     }
 
     private String normalize(final String text) {
         return StringUtils.trimToEmpty(text).replaceAll("\"", "");
     }
 
-    /**
-     * Creates a MetricName from its value.
-     * 
-     * @param text
-     *            the metric name
-     * @return the MetricName
-     */
-    public static MetricName parse(final String text) {
-
-        if (text == null) {
-            throw new NullPointerException("Unable to parse a 'null' value as a metric name");
-        }
-
-        String[] tokens = text.split(":");
-        if (tokens.length > 3) {
-            throw new IllegalArgumentException(String.format("Unable to parse the metric name (value: %s)", text));
-        }
-
-        return new MetricName(tokens);
+    @Override
+    public String toString() {
+        return String.format("%s (%s - %s)", metric, taskName, sqlLabel);
     }
 }

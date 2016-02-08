@@ -42,20 +42,14 @@ public class InnerJoinStrategy implements JoinStrategy {
         this.joinBean = joinBean;
     }
 
-    private void setExecutionProperties() {
+    private RowDataMap createRowDataMap() throws SQLException {
 
-        StringBuilder joinUsingBuilder = new StringBuilder();
-        joinUsingBuilder.append("USING[");
-        for (int i = 0; i < joinBean.getUsing().size(); i++) {
-            Identifier identifier = joinBean.getUsing().get(i);
-            if (i > 0) {
-                joinUsingBuilder.append(", ");
-            }
-            joinUsingBuilder.append(identifier.getValue());
+        final RowDataMap rowDataMap = new RowDataMap();
+        for (final SourceResult sr : sourceResultList) {
+            final RowDataFactory factory = new RowDataFactory(sr.getSourceAlias(), joinBean.getUsing());
+            rowDataMap.putData(sr.getSourceAlias(), factory.create(sr));
         }
-        joinUsingBuilder.append("]");
-
-        ThreadContext.getInstance().setProperty(PropertyNames.JOIN_CONDITION, joinUsingBuilder.toString());
+        return rowDataMap;
     }
 
     @Override
@@ -65,7 +59,7 @@ public class InnerJoinStrategy implements JoinStrategy {
 
             setExecutionProperties();
 
-            RowDataMap rowDataMap = createRowDataMap();
+            final RowDataMap rowDataMap = createRowDataMap();
 
             JoinKey minKey = null;
             do {
@@ -77,15 +71,15 @@ public class InnerJoinStrategy implements JoinStrategy {
                     break;
                 }
 
-                List<RowData> currentRowDataList = new ArrayList<RowData>(rowDataMap.getSize());
-                List<Identifier> missingSourceList = new ArrayList<Identifier>();
+                final List<RowData> currentRowDataList = new ArrayList<RowData>(rowDataMap.getSize());
+                final List<Identifier> missingSourceList = new ArrayList<Identifier>();
                 for (final RowData rowData : rowDataMap.getRows()) {
 
                     currentRowDataList.add(rowData);
 
                     if (minKey.equals(rowData.getKey())) {
                         // matches
-                        RowDataFactory factory = new RowDataFactory(rowData.getSourceId(), joinBean.getUsing());
+                        final RowDataFactory factory = new RowDataFactory(rowData.getSourceId(), joinBean.getUsing());
                         rowDataMap.putData(rowData.getSourceId(),
                                 factory.create(sourceResultList.get(rowData.getSourceId())));
 
@@ -103,7 +97,7 @@ public class InnerJoinStrategy implements JoinStrategy {
 
             } while (true);
 
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             e.printStackTrace();
         }
     }
@@ -111,19 +105,26 @@ public class InnerJoinStrategy implements JoinStrategy {
     private void executeJoinResult(final List<Identifier> missingSourceList, final List<RowData> rowDataList,
             final FlightRecorder flightRecorder) {
 
-        DefaultJoinResultVisitor visitor = new DefaultJoinResultVisitor(missingSourceList, rowDataList, flightRecorder);
+        final DefaultJoinResultVisitor visitor = new DefaultJoinResultVisitor(missingSourceList, rowDataList,
+                flightRecorder);
         for (final JoinResultBean joinResult : joinBean.getEventList()) {
             joinResult.accept(visitor);
         }
     }
 
-    private RowDataMap createRowDataMap() throws SQLException {
+    private void setExecutionProperties() {
 
-        RowDataMap rowDataMap = new RowDataMap();
-        for (SourceResult sr : sourceResultList) {
-            RowDataFactory factory = new RowDataFactory(sr.getSourceAlias(), joinBean.getUsing());
-            rowDataMap.putData(sr.getSourceAlias(), factory.create(sr));
+        final StringBuilder joinUsingBuilder = new StringBuilder();
+        joinUsingBuilder.append("USING[");
+        for (int i = 0; i < joinBean.getUsing().size(); i++) {
+            final Identifier identifier = joinBean.getUsing().get(i);
+            if (i > 0) {
+                joinUsingBuilder.append(", ");
+            }
+            joinUsingBuilder.append(identifier.getValue());
         }
-        return rowDataMap;
+        joinUsingBuilder.append("]");
+
+        ThreadContext.getInstance().setProperty(PropertyNames.JOIN_CONDITION, joinUsingBuilder.toString());
     }
 }

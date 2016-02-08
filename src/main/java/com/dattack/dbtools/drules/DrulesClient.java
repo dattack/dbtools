@@ -49,7 +49,7 @@ public final class DrulesClient {
 
     private static Options createOptions() {
 
-        Options options = new Options();
+        final Options options = new Options();
 
         options.addOption(Option.builder(DRULES_OPTION) //
                 .required(true) //
@@ -80,21 +80,21 @@ public final class DrulesClient {
 
     private static void execute(final String[] args) throws Exception {
 
-        Options options = createOptions();
+        final Options options = createOptions();
 
         try {
-            CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args);
-            String filename = cmd.getOptionValue(DRULES_OPTION);
-            Identifier taskId = new IdentifierBuilder().withValue(cmd.getOptionValue(TASK_OPTION)).build();
+            final CommandLineParser parser = new DefaultParser();
+            final CommandLine cmd = parser.parse(options, args);
+            final String filename = cmd.getOptionValue(DRULES_OPTION);
+            final Identifier taskId = new IdentifierBuilder().withValue(cmd.getOptionValue(TASK_OPTION)).build();
 
-            CompositeConfiguration cc = null;
+            CompositeConfiguration configuration = null;
             if (cmd.hasOption(PROPERTIES_OPTION)) {
-                cc = loadProperties(cmd.getOptionValues(PROPERTIES_OPTION));
+                configuration = loadProperties(cmd.getOptionValues(PROPERTIES_OPTION));
             }
 
             final DrulesEngine engine = new DrulesEngine();
-            engine.execute(filename, taskId, cc);
+            engine.execute(filename, taskId, configuration);
         } catch (@SuppressWarnings("unused") final ParseException e) {
             showUsage(options);
         }
@@ -102,22 +102,23 @@ public final class DrulesClient {
 
     private static CompositeConfiguration loadProperties(final String[] propertyFiles) throws ConfigurationException {
 
-        CompositeConfiguration cc = new CompositeConfiguration();
-        cc.addConfiguration(GlobalConfiguration.getConfiguration());
+        final CompositeConfiguration configuration = new CompositeConfiguration();
+        configuration.addConfiguration(GlobalConfiguration.getConfiguration());
 
         if (propertyFiles != null) {
-            for (String filename : propertyFiles) {
+            for (final String filename : propertyFiles) {
                 if (StringUtils.isNotBlank(filename)) {
-                    cc.addConfiguration(new PropertiesConfiguration(ConfigurationUtil.interpolate(filename, cc)));
+                    configuration.addConfiguration(
+                            new PropertiesConfiguration(ConfigurationUtil.interpolate(filename, configuration)));
                 }
             }
         }
-        return cc;
+        return configuration;
     }
 
     /**
      * Main() method.
-     * 
+     *
      * @param args
      *            the arguments
      */
@@ -133,13 +134,13 @@ public final class DrulesClient {
     }
 
     private static void showUsage(final Options options) {
-        HelpFormatter formatter = new HelpFormatter();
+        final HelpFormatter formatter = new HelpFormatter();
         final int descPadding = 5;
         final int leftPadding = 4;
         formatter.setDescPadding(descPadding);
         formatter.setLeftPadding(leftPadding);
-        String header = "\n";
-        String footer = "\nPlease report issues at https://github.com/dattack/dbtools/issues";
+        final String header = "\n";
+        final String footer = "\nPlease report issues at https://github.com/dattack/dbtools/issues";
         formatter.printHelp("drules ", header, options, footer, true);
     }
 

@@ -31,6 +31,19 @@ import com.dattack.ext.misc.ConfigurationUtil;
  */
 public final class PingJobConfiguration implements Serializable {
 
+    private static final long serialVersionUID = -8595562721719896797L;
+
+    private final String datasource;
+
+    private final int executions;
+    private final String providerClassName;
+    private final String name;
+    private final List<SQLSentence> queryList;
+    private final int threads;
+    private final long timeBetweenExecutions;
+    private final String logFile;
+    private final long maxRowsToDump;
+
     /**
      * The <code>Builder</code> pattern implementation of <code>PingJobConfiguration</code>.
      */
@@ -86,18 +99,6 @@ public final class PingJobConfiguration implements Serializable {
         }
 
         /**
-         * Sets the classname of the sql-sentence provider strategy to use.
-         *
-         * @param value
-         *            the JNDI name
-         * @return self instance
-         */
-        public PingConfigurationBuilder withProviderClassName(final String value) {
-            this.providerClassName = value;
-            return this;
-        }
-
-        /**
          * Sets the JNDI name of the datasource to use.
          *
          * @param value
@@ -123,6 +124,32 @@ public final class PingJobConfiguration implements Serializable {
         }
 
         /**
+         * Sets the log file pathname.
+         *
+         * @param value
+         *            the log file pathname.
+         * @return self instance
+         */
+        public PingConfigurationBuilder withLogFile(final String value) {
+            this.logFile = value;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of rows to log. If the value is negative, then unlimited value is used.
+         *
+         * @param value
+         *            the maximum number of rows to log
+         * @return self instance
+         */
+        public PingConfigurationBuilder withMaxRowsToDump(final long value) {
+            if (value >= 0) {
+                this.maxRowsToDump = value;
+            }
+            return this;
+        }
+
+        /**
          * Sets the task's name.
          *
          * @param value
@@ -136,14 +163,14 @@ public final class PingJobConfiguration implements Serializable {
         }
 
         /**
-         * Sets the log file pathname.
+         * Sets the classname of the sql-sentence provider strategy to use.
          *
          * @param value
-         *            the log file pathname.
+         *            the JNDI name
          * @return self instance
          */
-        public PingConfigurationBuilder withLogFile(final String value) {
-            this.logFile = value;
+        public PingConfigurationBuilder withProviderClassName(final String value) {
+            this.providerClassName = value;
             return this;
         }
 
@@ -187,33 +214,7 @@ public final class PingJobConfiguration implements Serializable {
             }
             return this;
         }
-
-        /**
-         * Sets the maximum number of rows to log. If the value is negative, then unlimited value is used.
-         *
-         * @param value
-         *            the maximum number of rows to log
-         * @return self instance
-         */
-        public PingConfigurationBuilder withMaxRowsToDump(final long value) {
-            if (value >= 0) {
-                this.maxRowsToDump = value;
-            }
-            return this;
-        }
     }
-
-    private static final long serialVersionUID = -8595562721719896797L;
-
-    private final String datasource;
-    private final int executions;
-    private final String providerClassName;
-    private final String name;
-    private final List<SQLSentence> queryList;
-    private final int threads;
-    private final long timeBetweenExecutions;
-    private final String logFile;
-    private final long maxRowsToDump;
 
     private PingJobConfiguration(final PingConfigurationBuilder builder) {
         this.datasource = builder.datasource;
@@ -227,10 +228,6 @@ public final class PingJobConfiguration implements Serializable {
         this.maxRowsToDump = builder.maxRowsToDump;
     }
 
-    public long getMaxRowsToDump() {
-        return maxRowsToDump;
-    }
-
     public String getDatasource() {
         return datasource;
     }
@@ -239,12 +236,20 @@ public final class PingJobConfiguration implements Serializable {
         return executions;
     }
 
-    public String getProviderClassName() {
-        return providerClassName;
+    public String getLogFile() {
+        return logFile;
+    }
+
+    public long getMaxRowsToDump() {
+        return maxRowsToDump;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getProviderClassName() {
+        return providerClassName;
     }
 
     public List<SQLSentence> getQueryList() {
@@ -257,9 +262,5 @@ public final class PingJobConfiguration implements Serializable {
 
     public long getTimeBetweenExecutions() {
         return timeBetweenExecutions;
-    }
-
-    public String getLogFile() {
-        return logFile;
     }
 }

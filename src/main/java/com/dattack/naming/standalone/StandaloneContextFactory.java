@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ import com.dattack.naming.loader.NamingLoader;
 
 /**
  * Initial Context Factory for {@link StandaloneContext}.
- * 
+ *
  * @author cvarela
  * @since 0.1
  */
@@ -58,12 +58,12 @@ public final class StandaloneContextFactory implements InitialContextFactory {
 
     private CompositeConfiguration getConfiguration(final Hashtable<?, ?> environment) {
 
-        BaseConfiguration baseConf = new BaseConfiguration();
-        for (Entry<?, ?> entry : environment.entrySet()) {
+        final BaseConfiguration baseConf = new BaseConfiguration();
+        for (final Entry<?, ?> entry : environment.entrySet()) {
             baseConf.setProperty(ObjectUtils.toString(entry.getKey()), entry.getValue());
         }
 
-        CompositeConfiguration configuration = ConfigurationUtil.createEnvSystemConfiguration();
+        final CompositeConfiguration configuration = ConfigurationUtil.createEnvSystemConfiguration();
         configuration.addConfiguration(baseConf);
         return configuration;
     }
@@ -74,31 +74,31 @@ public final class StandaloneContextFactory implements InitialContextFactory {
         synchronized (StandaloneContextFactory.class) {
             if (context == null) {
 
-                CompositeConfiguration configuration = getConfiguration(environment);
+                final CompositeConfiguration configuration = getConfiguration(environment);
 
-                final Object configDir = ConfigurationUtil.interpolate(
-                        configuration.getProperty(RESOURCES_DIRECTORY_PROPERTY), configuration);
+                final Object configDir = ConfigurationUtil
+                        .interpolate(configuration.getProperty(RESOURCES_DIRECTORY_PROPERTY), configuration);
 
                 if (configDir != null) {
 
-                    List<String> extraClasspath = CollectionUtils.listAsString(configuration
-                            .getList(CLASSPATH_DIRECTORY_PROPERTY));
+                    final List<String> extraClasspath = CollectionUtils
+                            .listAsString(configuration.getList(CLASSPATH_DIRECTORY_PROPERTY));
 
-                    File dir = FilesystemUtils.locate(ObjectUtils.toString(configDir));
+                    final File dir = FilesystemUtils.locate(ObjectUtils.toString(configDir));
 
                     if ((dir != null) && dir.exists()) {
                         LOGGER.info("Scanning directory '{}' for JNDI resources.", dir);
                         try {
-                            StandaloneContext ctx = new StandaloneContext(environment);
+                            final StandaloneContext ctx = new StandaloneContext(environment);
                             final NamingLoader loader = new NamingLoader();
                             loader.loadDirectory(dir, ctx, extraClasspath);
                             context = ctx;
-                        } catch (IOException e) {
+                        } catch (final IOException e) {
                             throw new NamingException(e.getMessage());
                         }
                     } else {
-                        throw new ConfigurationException(MessageFormat.format(
-                                "JNDI configuration error: directory ''{0}'' not exists", dir));
+                        throw new ConfigurationException(
+                                MessageFormat.format("JNDI configuration error: directory ''{0}'' not exists", dir));
                     }
                 } else {
                     throw new ConfigurationException(MessageFormat.format(

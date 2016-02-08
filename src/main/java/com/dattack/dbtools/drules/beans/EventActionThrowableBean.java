@@ -71,7 +71,7 @@ public abstract class EventActionThrowableBean implements EventActionBean {
 
     /**
      * Sets the maximum number of elements to handle.
-     * 
+     *
      * @param maxEvents
      *            the maximum number of events to handle
      */

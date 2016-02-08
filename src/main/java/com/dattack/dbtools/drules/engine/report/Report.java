@@ -49,7 +49,7 @@ import freemarker.template.Template;
 public class Report {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Report.class);
-    
+
     private static final String STATUS_WARNING = "WARNING";
     private static final String STATUS_ERROR = "ERROR";
 
@@ -61,38 +61,6 @@ public class Report {
 
     void append(final String text) {
         buffer.append(text);
-    }
-
-    public void handleLog(final List<RowData> rowDataList) {
-
-        append(log(rowDataList));
-    }
-
-    public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList) {
-        handle(action, rowDataList, STATUS_ERROR);
-    }
-
-    public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList) {
-        handle(action, rowDataList, STATUS_WARNING);
-    }
-
-    private void handle(final EventActionThrowableBean action, final List<RowData> rowDataList, final String status) {
-
-        try {
-            Map<Object, Object> dataModel = new HashMap<Object, Object>();
-            dataModel.putAll(ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
-            dataModel.put(PropertyNames.STATUS, status);
-            dataModel.put("rowDataList", rowDataList);
-            dataModel.put(PropertyNames.LOG, log(rowDataList));
-
-            StringWriter outputWriter = new StringWriter();
-            Template template = createTemplate(action);
-            template.process(dataModel, outputWriter);
-            append(outputWriter.toString());
-        } catch (Exception e) {
-            LOGGER.warn(e.getMessage(), e);
-            // TODO: launch a RuntimeException
-        }
     }
 
     private Template createTemplate(final EventActionThrowableBean action) throws ConfigurationException, IOException {
@@ -110,12 +78,52 @@ public class Report {
                 .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_THROWABLE_KEY));
     }
 
+    private void handle(final EventActionThrowableBean action, final List<RowData> rowDataList, final String status) {
+
+        try {
+            final Map<Object, Object> dataModel = new HashMap<Object, Object>();
+            dataModel.putAll(ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
+            dataModel.put(PropertyNames.STATUS, status);
+            dataModel.put("rowDataList", rowDataList);
+            dataModel.put(PropertyNames.LOG, log(rowDataList));
+
+            final StringWriter outputWriter = new StringWriter();
+            final Template template = createTemplate(action);
+            template.process(dataModel, outputWriter);
+            append(outputWriter.toString());
+        } catch (final Exception e) {
+            LOGGER.warn(e.getMessage(), e);
+            // TODO: launch a RuntimeException
+        }
+    }
+
+    public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList) {
+        handle(action, rowDataList, STATUS_ERROR);
+    }
+
+    public void handleLog(final List<RowData> rowDataList) {
+
+        append(log(rowDataList));
+    }
+
+    public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList) {
+        handle(action, rowDataList, STATUS_WARNING);
+    }
+
+    String interpolate(final String message, final String status, final String log) {
+        final CompositeConfiguration configuration = new CompositeConfiguration(
+                ThreadContext.getInstance().getConfiguration());
+        configuration.setProperty(PropertyNames.LOG, log);
+        configuration.setProperty(PropertyNames.STATUS, status);
+        return ConfigurationUtil.interpolate(message, configuration);
+    }
+
     private String log(final List<RowData> rowDataList) {
-        
-        StringBuilder sb = new StringBuilder();
-        for (RowData rowData: rowDataList) {
-            for (Iterator<IdentifierValuePair> it = rowData.getFieldValueList().iterator(); it.hasNext(); ) {
-                IdentifierValuePair item = it.next();
+
+        final StringBuilder sb = new StringBuilder();
+        for (final RowData rowData : rowDataList) {
+            for (final Iterator<IdentifierValuePair> it = rowData.getFieldValueList().iterator(); it.hasNext();) {
+                final IdentifierValuePair item = it.next();
                 sb.append(item.getKey()).append(": ").append(item.getValue());
                 if (it.hasNext()) {
                     sb.append(", ");
@@ -124,14 +132,6 @@ public class Report {
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-    String interpolate(final String message, final String status, final String log) {
-        CompositeConfiguration configuration = new CompositeConfiguration(
-                ThreadContext.getInstance().getConfiguration());
-        configuration.setProperty(PropertyNames.LOG, log);
-        configuration.setProperty(PropertyNames.STATUS, status);
-        return ConfigurationUtil.interpolate(message, configuration);
     }
 
     @Override

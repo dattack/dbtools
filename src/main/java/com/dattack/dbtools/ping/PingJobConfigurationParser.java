@@ -50,15 +50,11 @@ final class PingJobConfigurationParser {
     private static final String THIS_KEY = ""; // empty
     private static final String LOG_FILE_KEY = "log-file";
 
-    private PingJobConfigurationParser() {
-        // static class
-    }
-
     public static List<PingJobConfiguration> parse(final File file) throws ConfigurationException {
 
         LOGGER.debug("parsing file '{}'", file);
 
-        List<PingJobConfiguration> list = new ArrayList<PingJobConfiguration>();
+        final List<PingJobConfiguration> list = new ArrayList<PingJobConfiguration>();
 
         final XMLConfiguration config = new XMLConfiguration();
         config.setDelimiterParsingDisabled(true);
@@ -68,15 +64,15 @@ final class PingJobConfigurationParser {
 
         for (final HierarchicalConfiguration taskElement : taskList) {
 
-            PingConfigurationBuilder builder = new PingConfigurationBuilder() //
+            final PingConfigurationBuilder builder = new PingConfigurationBuilder() //
                     .withName(taskElement.getString(NAME_KEY)) //
                     .withDatasource(taskElement.getString(DATASOURCE_KEY));
 
             final List<HierarchicalConfiguration> queryElementList = taskElement.configurationsAt(QUERY_KEY);
             for (final HierarchicalConfiguration queryElement : queryElementList) {
-                String label = queryElement.getString(QUERY_LABEL_KEY);
-                String sql = queryElement.getString(THIS_KEY);
-                float weight = queryElement.getFloat(QUERY_WEIGHT_KEY, DEFAULT_WEIGHT_VALUE);
+                final String label = queryElement.getString(QUERY_LABEL_KEY);
+                final String sql = queryElement.getString(THIS_KEY);
+                final float weight = queryElement.getFloat(QUERY_WEIGHT_KEY, DEFAULT_WEIGHT_VALUE);
                 builder.withQuery(new SQLSentence(label, sql, weight));
             }
 
@@ -106,5 +102,9 @@ final class PingJobConfigurationParser {
         }
 
         return list;
+    }
+
+    private PingJobConfigurationParser() {
+        // static class
     }
 }

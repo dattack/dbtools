@@ -55,7 +55,7 @@ public final class PingAnalyzer {
         try {
 
             // create Options object
-            Options options = new Options();
+            final Options options = new Options();
 
             // add t option
             options.addOption(START_DATE_OPTION, true, "the date for an analysis run to begin");
@@ -66,23 +66,23 @@ public final class PingAnalyzer {
             options.addOption(MAX_VALUE_OPTION, true, "the maximum value to use");
             options.addOption(MIN_VALUE_OPTION, true, "the minimum value to use");
 
-            CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args);
+            final CommandLineParser parser = new DefaultParser();
+            final CommandLine cmd = parser.parse(options, args);
 
-            ReportContext context = new ReportContext();
+            final ReportContext context = new ReportContext();
             context.setStartDate(TimeUtils.parseDate(cmd.getOptionValue(START_DATE_OPTION)));
             context.setEndDate(TimeUtils.parseDate(cmd.getOptionValue(END_DATE_OPTION)));
             context.setTimeSpan(TimeUtils.parseTimeSpanMillis(cmd.getOptionValue(SPAN_OPTION)));
             context.setMaxValue(parseLong(cmd.getOptionValue(MAX_VALUE_OPTION)));
             context.setMinValue(parseLong(cmd.getOptionValue(MIN_VALUE_OPTION)));
             if (cmd.hasOption(METRIC_OPTION)) {
-                for (String metricName : cmd.getOptionValues(METRIC_OPTION)) {
+                for (final String metricName : cmd.getOptionValues(METRIC_OPTION)) {
                     context.addMetricNameFilter(MetricName.parse(metricName));
                 }
             }
 
             final PingAnalyzer ping = new PingAnalyzer();
-            for (String file : cmd.getOptionValues(DATA_FILE_OPTION)) {
+            for (final String file : cmd.getOptionValues(DATA_FILE_OPTION)) {
                 ping.execute(new File(file), context);
             }
 
@@ -98,7 +98,7 @@ public final class PingAnalyzer {
             if (txt != null) {
                 return Long.valueOf(txt);
             }
-        } catch (@SuppressWarnings("unused") NumberFormatException e) {
+        } catch (@SuppressWarnings("unused") final NumberFormatException e) {
             // ignore
         }
         return null;
@@ -126,9 +126,9 @@ public final class PingAnalyzer {
         } else {
 
             try {
-                Reporter reporter = new Reporter();
+                final Reporter reporter = new Reporter();
                 reporter.execute(file, context);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }

@@ -58,74 +58,6 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         this.flightRecorder = flightRecorder;
     }
 
-    @Override
-    public void visit(final NotificationActionSendMailBean action) {
-
-        try {
-
-            if (flightRecorder.getConfigurationBean() == null) {
-                LOGGER.warn("Missing SMTP configuration. Please, check your configuration file.");
-            } else {
-                sendMail(flightRecorder.getConfigurationBean().getConfigurationSmtpBean(), action);
-            }
-
-        } catch (final Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
-    private void sendMail(final ConfigurationSmtpBean config, final NotificationActionSendMailBean action)
-            throws EmailException, AddressException, ConfigurationException, TemplateException, IOException {
-
-        if (config == null) {
-            LOGGER.warn("Missing SMTP configuration. Please, check your configuration file.");
-            return;
-        }
-
-        CompositeConfiguration configuration = new CompositeConfiguration();
-        configuration.addConfiguration(ThreadContext.getInstance().getConfiguration());
-        configuration.setDelimiterParsingDisabled(true);
-        configuration.setProperty(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
-        configuration.setProperty(PropertyNames.LOG, flightRecorder.getReport().toString());
-
-        for (ConfigurationMailingListBean item : config.getMailingLists()) {
-            configuration.setProperty(item.getName(), item.getAddressList());
-        }
-
-        HtmlEmailBuilder htmlEmailBuilder = new HtmlEmailBuilder() //
-                .withHostName(ConfigurationUtil.interpolate(config.getHostname(), configuration)) //
-                .withPort(config.getPort()) //
-                .withUsername(ConfigurationUtil.interpolate(config.getUsername(), configuration)) //
-                .withPassword(ConfigurationUtil.interpolate(config.getPassword(), configuration)) //
-                .withFrom(ConfigurationUtil.interpolate(config.getFrom(), configuration)) //
-                .withSubject(ConfigurationUtil.interpolate(action.getSubject(), configuration)) //
-                .withMessage(formatMessage(action, configuration)) //
-                .withSslOnConnect(config.isSslOnConnect()) //
-                .withStartTlsEnabled(config.isStartTlsEnabled()); //
-
-        for (String to : action.getToAddressesList()) {
-            String[] addresses = StringUtils.split(ConfigurationUtil.interpolate(to, configuration), " ,");
-            for (String item : addresses) {
-                htmlEmailBuilder.withToAddress(new InternetAddress(item));
-            }
-        }
-
-        htmlEmailBuilder.build().send();
-    }
-
-    private String formatMessage(final NotificationActionSendMailBean action, final Configuration configuration)
-            throws TemplateException, IOException, ConfigurationException {
-
-        Template template = createTemplate(action);
-
-        Map<Object, Object> dataModel = new HashMap<Object, Object>();
-        dataModel.putAll(ConfigurationConverter.getMap(configuration));
-
-        StringWriter outputWriter = new StringWriter();
-        template.process(dataModel, outputWriter);
-        return outputWriter.toString();
-    }
-
     private Template createTemplate(final NotificationActionSendMailBean bean)
             throws ConfigurationException, IOException {
 
@@ -140,5 +72,73 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         // use default template
         return TemplateHelper
                 .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_EMAIL_KEY));
+    }
+
+    private String formatMessage(final NotificationActionSendMailBean action, final Configuration configuration)
+            throws TemplateException, IOException, ConfigurationException {
+
+        final Template template = createTemplate(action);
+
+        final Map<Object, Object> dataModel = new HashMap<Object, Object>();
+        dataModel.putAll(ConfigurationConverter.getMap(configuration));
+
+        final StringWriter outputWriter = new StringWriter();
+        template.process(dataModel, outputWriter);
+        return outputWriter.toString();
+    }
+
+    private void sendMail(final ConfigurationSmtpBean config, final NotificationActionSendMailBean action)
+            throws EmailException, AddressException, ConfigurationException, TemplateException, IOException {
+
+        if (config == null) {
+            LOGGER.warn("Missing SMTP configuration. Please, check your configuration file.");
+            return;
+        }
+
+        final CompositeConfiguration configuration = new CompositeConfiguration();
+        configuration.addConfiguration(ThreadContext.getInstance().getConfiguration());
+        configuration.setDelimiterParsingDisabled(true);
+        configuration.setProperty(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
+        configuration.setProperty(PropertyNames.LOG, flightRecorder.getReport().toString());
+
+        for (final ConfigurationMailingListBean item : config.getMailingLists()) {
+            configuration.setProperty(item.getName(), item.getAddressList());
+        }
+
+        final HtmlEmailBuilder htmlEmailBuilder = new HtmlEmailBuilder() //
+                .withHostName(ConfigurationUtil.interpolate(config.getHostname(), configuration)) //
+                .withPort(config.getPort()) //
+                .withUsername(ConfigurationUtil.interpolate(config.getUsername(), configuration)) //
+                .withPassword(ConfigurationUtil.interpolate(config.getPassword(), configuration)) //
+                .withFrom(ConfigurationUtil.interpolate(config.getFrom(), configuration)) //
+                .withSubject(ConfigurationUtil.interpolate(action.getSubject(), configuration)) //
+                .withMessage(formatMessage(action, configuration)) //
+                .withSslOnConnect(config.isSslOnConnect()) //
+                .withStartTlsEnabled(config.isStartTlsEnabled()); //
+
+        for (final String to : action.getToAddressesList()) {
+            final String[] addresses = StringUtils.split(ConfigurationUtil.interpolate(to, configuration), " ,");
+            for (final String item : addresses) {
+                htmlEmailBuilder.withToAddress(new InternetAddress(item));
+            }
+        }
+
+        htmlEmailBuilder.build().send();
+    }
+
+    @Override
+    public void visit(final NotificationActionSendMailBean action) {
+
+        try {
+
+            if (flightRecorder.getConfigurationBean() == null) {
+                LOGGER.warn("Missing SMTP configuration. Please, check your configuration file.");
+            } else {
+                sendMail(flightRecorder.getConfigurationBean().getConfigurationSmtpBean(), action);
+            }
+
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 }

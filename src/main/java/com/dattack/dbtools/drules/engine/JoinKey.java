@@ -38,7 +38,7 @@ final class JoinKey implements Comparable<JoinKey> {
 
     public void addField(final Identifier fieldName, final Object fieldValue) {
 
-        int index = keyFieldList.indexOf(fieldName);
+        final int index = keyFieldList.indexOf(fieldName);
         if (index >= 0) {
             if (index >= values.size()) {
                 this.values.add(index, fieldValue);
@@ -46,6 +46,43 @@ final class JoinKey implements Comparable<JoinKey> {
                 this.values.set(index, fieldValue);
             }
         }
+    }
+
+    @Override
+    public int compareTo(final JoinKey other) {
+
+        if (values.size() != other.values.size()) {
+            throw new IllegalArgumentException("Unable to compare two keys with different values");
+        }
+
+        final CompareToBuilder builder = new CompareToBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            builder.append(values.get(i), other.values.get(i));
+        }
+
+        return builder.toComparison();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final JoinKey other = (JoinKey) obj;
+        if (values == null) {
+            if (other.values != null) {
+                return false;
+            }
+        } else if (!values.equals(other.values)) {
+            return false;
+        }
+        return true;
     }
 
     public List<Object> getValues() {
@@ -61,45 +98,8 @@ final class JoinKey implements Comparable<JoinKey> {
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        JoinKey other = (JoinKey) obj;
-        if (values == null) {
-            if (other.values != null) {
-                return false;
-            }
-        } else if (!values.equals(other.values)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int compareTo(final JoinKey other) {
-
-        if (values.size() != other.values.size()) {
-            throw new IllegalArgumentException("Unable to compare two keys with different values");
-        }
-
-        CompareToBuilder builder = new CompareToBuilder();
-        for (int i = 0; i < values.size(); i++) {
-            builder.append(values.get(i), other.values.get(i));
-        }
-
-        return builder.toComparison();
-    }
-
-    @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("JoinKey [values=").append(values).append("]");
         return builder.toString();
     }

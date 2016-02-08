@@ -42,9 +42,9 @@ class ReportStats {
 
     List<EntryStats> add(final LogEntry logEntry) {
 
-        long eventTime = normalizeEventTime(logEntry.getEventTime());
+        final long eventTime = normalizeEventTime(logEntry.getEventTime());
 
-        List<EntryStats> list = new ArrayList<EntryStats>();
+        final List<EntryStats> list = new ArrayList<EntryStats>();
 
         // connection time
         addEntryStats(list,
@@ -64,34 +64,28 @@ class ReportStats {
         return list;
     }
 
-    private long normalizeEventTime(final long eventTime) {
-        if (context.getTimeSpan() != null && context.getTimeSpan() > 0) {
-            return (eventTime / context.getTimeSpan()) * context.getTimeSpan();
+    private void addEntryStats(final List<EntryStats> list, final MetricName metricName, final long valueX,
+            final long valueY) {
+
+        if (context.getMetricNameList().isEmpty() || context.getMetricNameList().contains(metricName)) {
+
+            final EntryStats entry = process(
+                    new EntryStats(valueX, normalizeValue(valueY), getGroup(metricName).getId()));
+            if (entry != null) {
+                GroupStats groupStats = groupStatsMap.get(entry.getGroup());
+                if (groupStats == null) {
+                    groupStats = new GroupStats(entry.getGroup());
+                    groupStatsMap.put(entry.getGroup(), groupStats);
+                }
+                groupStats.addEntry(entry);
+                list.add(entry);
+            }
         }
-        return eventTime;
-    }
-
-    private EntryStats process(final EntryStats entryStats) {
-
-        EntryStats previousEntryStats = entryStatsMap.get(entryStats.getGroup());
-        if (previousEntryStats == null) {
-            // it's a new metric
-            entryStatsMap.put(entryStats.getGroup(), entryStats);
-        } else if (previousEntryStats.getX() < entryStats.getX()) {
-            // it's a new X value so returns the previous one
-            entryStatsMap.put(entryStats.getGroup(), entryStats);
-            return previousEntryStats;
-
-        } else if (previousEntryStats.getX() == entryStats.getX() && previousEntryStats.getY() < entryStats.getY()) {
-            // update with MAX value
-            entryStatsMap.put(entryStats.getGroup(), entryStats);
-        }
-        return null;
     }
 
     List<EntryGroup> getEntryGroups() {
 
-        List<EntryGroup> list = new ArrayList<EntryGroup>();
+        final List<EntryGroup> list = new ArrayList<EntryGroup>();
         list.addAll(groupMap.values());
         return list;
     }
@@ -105,26 +99,15 @@ class ReportStats {
         return group;
     }
 
-    private void addEntryStats(final List<EntryStats> list, final MetricName metricName, final long valueX,
-            final long valueY) {
-
-        if (context.getMetricNameList().isEmpty() || context.getMetricNameList().contains(metricName)) {
-
-            EntryStats entry = process(new EntryStats(valueX, normalizeValue(valueY), getGroup(metricName).getId()));
-            if (entry != null) {
-                GroupStats groupStats = groupStatsMap.get(entry.getGroup());
-                if (groupStats == null) {
-                    groupStats = new GroupStats(entry.getGroup());
-                    groupStatsMap.put(entry.getGroup(), groupStats);
-                }
-                groupStats.addEntry(entry);
-                list.add(entry);
-            }
-        }
-    }
-
     public GroupStats getGroupStats(final int group) {
         return groupStatsMap.get(group);
+    }
+
+    private long normalizeEventTime(final long eventTime) {
+        if (context.getTimeSpan() != null && context.getTimeSpan() > 0) {
+            return (eventTime / context.getTimeSpan()) * context.getTimeSpan();
+        }
+        return eventTime;
     }
 
     private long normalizeValue(final long value) {
@@ -136,5 +119,23 @@ class ReportStats {
             normalizedValue = context.getMaxValue();
         }
         return normalizedValue;
+    }
+
+    private EntryStats process(final EntryStats entryStats) {
+
+        final EntryStats previousEntryStats = entryStatsMap.get(entryStats.getGroup());
+        if (previousEntryStats == null) {
+            // it's a new metric
+            entryStatsMap.put(entryStats.getGroup(), entryStats);
+        } else if (previousEntryStats.getX() < entryStats.getX()) {
+            // it's a new X value so returns the previous one
+            entryStatsMap.put(entryStats.getGroup(), entryStats);
+            return previousEntryStats;
+
+        } else if (previousEntryStats.getX() == entryStats.getX() && previousEntryStats.getY() < entryStats.getY()) {
+            // update with MAX value
+            entryStatsMap.put(entryStats.getGroup(), entryStats);
+        }
+        return null;
     }
 }

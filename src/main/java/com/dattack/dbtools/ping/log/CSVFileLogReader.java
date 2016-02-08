@@ -45,10 +45,15 @@ public class CSVFileLogReader implements LogReader {
     }
 
     @Override
+    public void close() throws IOException {
+        reader.close();
+    }
+
+    @Override
     public synchronized LogEntry next() throws IOException {
 
         while (true) {
-            CSVObject rawObject = reader.next();
+            final CSVObject rawObject = reader.next();
 
             if (rawObject == null) {
                 return null;
@@ -74,10 +79,5 @@ public class CSVFileLogReader implements LogReader {
                 continue;
             }
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-        reader.close();
     }
 }

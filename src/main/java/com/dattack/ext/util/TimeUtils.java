@@ -51,7 +51,7 @@ public final class TimeUtils {
             "yyyy-MM-dd HH:mm:ss", //
             "yyyy-MM-dd HH:mm:ss.S" };
 
-        List<String> patternList = Arrays.asList(patterns);
+        final List<String> patternList = Arrays.asList(patterns);
         Collections.sort(patternList, new Comparator<String>() {
 
             @Override
@@ -60,6 +60,91 @@ public final class TimeUtils {
             }
         });
         return patternList;
+    }
+
+    /**
+     * <p>
+     * Parses a string representing a date by trying a variety of different parsers based on ISO 8601 standard (Data
+     * elements and interchange formats -- Information interchange -- Representation of dates and times).
+     * </p>
+     * <p>
+     * The parse will try a few parse pattern in turn. A parse is only deemed successful if it parses the whole of the
+     * input string.
+     * </p>
+     * <b>This method is null-safe.</b>
+     *
+     * @param txt
+     *            the date to parse
+     * @return the parsed date or null if no parse patterns match
+     */
+    public static Date parseDate(final String txt) {
+
+        if (StringUtils.isBlank(txt)) {
+            return null;
+        }
+
+        final SimpleDateFormat parser = new SimpleDateFormat();
+
+        for (final String pattern : ISO_8601_PATTERN_LIST) {
+            if (txt.length() <= pattern.length()) {
+                try {
+                    parser.applyPattern(pattern);
+                    final Date date = parser.parse(txt);
+                    return date;
+                } catch (@SuppressWarnings("unused") final ParseException e) {
+                    // ignore exception
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Computes the number of milliseconds represented by the specified span expression.
+     *
+     * @param text
+     *            the span expression
+     * @return the number of milliseconds
+     */
+    private static Long parseTimeSpanExpression(final String text) {
+
+        long timeInMillis = 0;
+        long value = 0;
+        for (int i = 0; i < text.length(); i++) {
+            final char charAt = text.charAt(i);
+            if (Character.isDigit(charAt)) {
+                value = value * 10 + Character.digit(charAt, 10);
+            } else {
+                switch (charAt) {
+                case 'w':
+                case 'W':
+                    timeInMillis += value * MILLIS_PER_WEEK;
+                    break;
+                case 'd':
+                case 'D':
+                    timeInMillis += value * MILLIS_PER_DAY;
+                    break;
+                case 'h':
+                case 'H':
+                    timeInMillis += value * MILLIS_PER_HOUR;
+                    break;
+                case 'm':
+                case 'M':
+                    timeInMillis += value * MILLIS_PER_MINUTE;
+                    break;
+                case 's':
+                case 'S':
+                    timeInMillis += value * MILLIS_PER_SECOND;
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("Unknown time unit: '%s'", charAt));
+                    // ignore value
+                }
+                value = 0;
+            }
+        }
+        timeInMillis += value;
+        return timeInMillis;
     }
 
     /**
@@ -113,95 +198,10 @@ public final class TimeUtils {
         if (text != null) {
             try {
                 result = Long.valueOf(text);
-            } catch (@SuppressWarnings("unused") NumberFormatException e) {
+            } catch (@SuppressWarnings("unused") final NumberFormatException e) {
                 result = parseTimeSpanExpression(text);
             }
         }
         return result;
-    }
-
-    /**
-     * Computes the number of milliseconds represented by the specified span expression.
-     *
-     * @param text
-     *            the span expression
-     * @return the number of milliseconds
-     */
-    private static Long parseTimeSpanExpression(final String text) {
-
-        long timeInMillis = 0;
-        long value = 0;
-        for (int i = 0; i < text.length(); i++) {
-            char charAt = text.charAt(i);
-            if (Character.isDigit(charAt)) {
-                value = value * 10 + Character.digit(charAt, 10);
-            } else {
-                switch (charAt) {
-                case 'w':
-                case 'W':
-                    timeInMillis += value * MILLIS_PER_WEEK;
-                    break;
-                case 'd':
-                case 'D':
-                    timeInMillis += value * MILLIS_PER_DAY;
-                    break;
-                case 'h':
-                case 'H':
-                    timeInMillis += value * MILLIS_PER_HOUR;
-                    break;
-                case 'm':
-                case 'M':
-                    timeInMillis += value * MILLIS_PER_MINUTE;
-                    break;
-                case 's':
-                case 'S':
-                    timeInMillis += value * MILLIS_PER_SECOND;
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("Unknown time unit: '%s'", charAt));
-                    // ignore value
-                }
-                value = 0;
-            }
-        }
-        timeInMillis += value;
-        return timeInMillis;
-    }
-
-    /**
-     * <p>
-     * Parses a string representing a date by trying a variety of different parsers based on ISO 8601 standard (Data
-     * elements and interchange formats -- Information interchange -- Representation of dates and times).
-     * </p>
-     * <p>
-     * The parse will try a few parse pattern in turn. A parse is only deemed successful if it parses the whole of the
-     * input string.
-     * </p>
-     * <b>This method is null-safe.</b>
-     *
-     * @param txt
-     *            the date to parse
-     * @return the parsed date or null if no parse patterns match
-     */
-    public static Date parseDate(final String txt) {
-
-        if (StringUtils.isBlank(txt)) {
-            return null;
-        }
-
-        SimpleDateFormat parser = new SimpleDateFormat();
-
-        for (final String pattern : ISO_8601_PATTERN_LIST) {
-            if (txt.length() <= pattern.length()) {
-                try {
-                    parser.applyPattern(pattern);
-                    Date date = parser.parse(txt);
-                    return date;
-                } catch (@SuppressWarnings("unused") ParseException e) {
-                    // ignore exception
-                }
-            }
-        }
-        return null;
     }
 }

@@ -38,23 +38,23 @@ public final class NotificationBean implements Serializable {
     @XmlElement(name = XmlTokens.ELEMENT_ON_SUCCESS)
     private NotificationEventBean onSuccess;
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("NotificationBean [onWarning=").append(onWarning).append(", onError=").append(onError)
-                .append("]");
-        return builder.toString();
-    }
-
     public NotificationEventBean getOnError() {
         return onError;
+    }
+
+    public NotificationEventBean getOnSuccess() {
+        return onSuccess;
     }
 
     public NotificationEventBean getOnWarning() {
         return onWarning;
     }
 
-    public NotificationEventBean getOnSuccess() {
-        return onSuccess;
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("NotificationBean [onWarning=").append(onWarning).append(", onError=").append(onError)
+                .append("]");
+        return builder.toString();
     }
 }

@@ -79,7 +79,7 @@ public class DrulesEngine {
 
     /**
      * Executes the task defined in the file whose identifier matches the indicated.
-     * 
+     *
      * @param drulesFilename
      *            the file name
      * @param taskId
@@ -94,20 +94,20 @@ public class DrulesEngine {
 
             ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
 
-            DrulesBean drulesBean = DrulesParser.parseIntegrityBean(drulesFilename);
+            final DrulesBean drulesBean = DrulesParser.parseIntegrityBean(drulesFilename);
 
-            TaskBean taskBean = drulesBean.getTask(taskId);
+            final TaskBean taskBean = drulesBean.getTask(taskId);
             if (taskBean == null) {
                 throw new IdentifierNotFoundException(TaskBean.class, taskId);
             }
 
-            ConfigurationBean configurationBean = getConfigurationBean();
+            final ConfigurationBean configurationBean = getConfigurationBean();
 
             LOGGER.info("SMTP hostname: " + configurationBean.getConfigurationSmtpBean().getHostname().toString());
 
             execute(taskBean, configurationBean);
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -124,7 +124,7 @@ public class DrulesEngine {
         executeJsEvals(taskBean);
 
         // executes the source' statements and retrieves the ResultSets to check
-        SourceResultGroup sourceResultGroup = getSourceResultsList(taskBean.getSources());
+        final SourceResultGroup sourceResultGroup = getSourceResultsList(taskBean.getSources());
 
         // execute checks
         executeRowChecks(taskBean, sourceResultGroup, flightRecorder);
@@ -136,10 +136,10 @@ public class DrulesEngine {
         if (taskBean.getNotification() != null) {
             executeNotifications(taskBean.getNotification(), flightRecorder);
         } else {
-            String notificationsFile = GlobalConfiguration
+            final String notificationsFile = GlobalConfiguration
                     .getProperty(GlobalConfiguration.DRULES_NOTIFICATIONS_FILE_KEY);
             if (StringUtils.isNotBlank(notificationsFile)) {
-                NotificationBean notification = DrulesParser.parseNotificationBean(notificationsFile);
+                final NotificationBean notification = DrulesParser.parseNotificationBean(notificationsFile);
                 executeNotifications(notification, flightRecorder);
             }
         }
@@ -152,11 +152,11 @@ public class DrulesEngine {
     private void executeJsEvals(final TaskBean taskBean) {
 
         if (CollectionUtils.isNotEmpty(taskBean.getEvalList())) {
-            for (EventActionEvalJsBean item : taskBean.getEvalList()) {
+            for (final EventActionEvalJsBean item : taskBean.getEvalList()) {
                 try {
-                    Object value = JavaScriptEngine.eval(item.getExpression());
+                    final Object value = JavaScriptEngine.eval(item.getExpression());
                     ThreadContext.getInstance().setProperty(item.getName(), value);
-                } catch (ScriptException e) {
+                } catch (final ScriptException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
@@ -166,7 +166,7 @@ public class DrulesEngine {
 
     private void executeNotification(final NotificationEventBean bean, final FlightRecorder flightRecorder) {
 
-        NotificationActionBeanVisitor visitor = new DefaultNotificationActionBeanVisitor(flightRecorder);
+        final NotificationActionBeanVisitor visitor = new DefaultNotificationActionBeanVisitor(flightRecorder);
         for (final NotificationActionBean action : bean.getActionList()) {
             action.accept(visitor);
         }
@@ -188,13 +188,13 @@ public class DrulesEngine {
     private void executeRowChecks(final TaskBean taskBean, final SourceResultGroup sourceResultList,
             final FlightRecorder flightRecorder) {
 
-        for (RowCheckBean rowCheck : taskBean.getRowChecks()) {
+        for (final RowCheckBean rowCheck : taskBean.getRowChecks()) {
             // TODO: clone the sourceResultList to execute more than one loop
             if (taskBean.getRowChecks().size() > 1) {
                 throw new RuntimeException("TODO: clone the sourceResultList to execute more than one loop");
             }
 
-            for (JoinBean joinBean : rowCheck.getJoinList()) {
+            for (final JoinBean joinBean : rowCheck.getJoinList()) {
                 JoinStrategyFactory.getInstance().create(joinBean, sourceResultList).execute(flightRecorder);
             }
         }
@@ -210,18 +210,18 @@ public class DrulesEngine {
     private SourceResultGroup getSourceResultsList(final List<SourceBean> sourceList)
             throws InterruptedException, ExecutionException {
 
-        ExecutorService executorService = Executors.newCachedThreadPool(createThreadFactory());
+        final ExecutorService executorService = Executors.newCachedThreadPool(createThreadFactory());
 
-        List<Future<SourceResult>> futureList = new ArrayList<Future<SourceResult>>();
+        final List<Future<SourceResult>> futureList = new ArrayList<Future<SourceResult>>();
 
         for (final SourceBean sourceBean : sourceList) {
             futureList.add(executorService.submit(new SourceExecutor(sourceBean,
                     ConfigurationUtils.cloneConfiguration(ThreadContext.getInstance().getConfiguration()))));
         }
 
-        SourceResultGroup sourceResultList = new SourceResultGroup();
+        final SourceResultGroup sourceResultList = new SourceResultGroup();
 
-        for (Future<SourceResult> future : futureList) {
+        for (final Future<SourceResult> future : futureList) {
             sourceResultList.add(future.get());
         }
         executorService.shutdown();

@@ -34,10 +34,6 @@ public final class JavaScriptEngine {
 
     private static final String JAVA_SCRIPT_ENGINE_NAME = "js";
 
-    private JavaScriptEngine() {
-        // utility class
-    }
-
     /**
      * Executes the specified JavaScript.
      *
@@ -68,51 +64,12 @@ public final class JavaScriptEngine {
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName(JAVA_SCRIPT_ENGINE_NAME);
         if (params != null) {
-            for (Entry<Object, Object> entry : params.entrySet()) {
+            for (final Entry<Object, Object> entry : params.entrySet()) {
                 engine.put(ObjectUtils.toString(entry.getKey()), entry.getValue());
             }
         }
 
         return engine.eval(script);
-    }
-
-    /**
-     * Executes the specified JavaScript.
-     *
-     * @param script
-     *            the JavaScript source to be evaluated
-     * @return the value returned from the execution of the script
-     * @throws ScriptException
-     *             if an error occurrs
-     */
-    public static Number evalNumber(final String script) throws ScriptException {
-        return evalNumber(script, null);
-    }
-
-    /**
-     * Executes the specified JavaScript.
-     *
-     * @param script
-     *            the JavaScript source to be evaluated
-     * @param params
-     *            a key/value pairs that can be used as variables into the script
-     * @return the value returned from the execution of the script
-     * @throws ScriptException
-     *             if error occurs in script
-     */
-    public static Number evalNumber(final String script, final Map<Object, Object> params) throws ScriptException {
-
-        Object obj = eval(script, params);
-        if (obj == null) {
-            return null;
-        }
-
-        if (obj instanceof Number) {
-            return (Number) obj;
-        }
-
-        throw new ScriptException(
-                String.format("Unable to cast script result from %s to %s", obj.getClass(), Number.class));
     }
 
     /**
@@ -141,7 +98,7 @@ public final class JavaScriptEngine {
      */
     public static Boolean evalBoolean(final String script, final Map<Object, Object> params) throws ScriptException {
 
-        Object obj = eval(script, params);
+        final Object obj = eval(script, params);
         if (obj == null) {
             return null;
         }
@@ -152,5 +109,48 @@ public final class JavaScriptEngine {
 
         throw new ScriptException(
                 String.format("Unable to cast script result from %s to %s", obj.getClass(), Boolean.class));
+    }
+
+    /**
+     * Executes the specified JavaScript.
+     *
+     * @param script
+     *            the JavaScript source to be evaluated
+     * @return the value returned from the execution of the script
+     * @throws ScriptException
+     *             if an error occurrs
+     */
+    public static Number evalNumber(final String script) throws ScriptException {
+        return evalNumber(script, null);
+    }
+
+    /**
+     * Executes the specified JavaScript.
+     *
+     * @param script
+     *            the JavaScript source to be evaluated
+     * @param params
+     *            a key/value pairs that can be used as variables into the script
+     * @return the value returned from the execution of the script
+     * @throws ScriptException
+     *             if error occurs in script
+     */
+    public static Number evalNumber(final String script, final Map<Object, Object> params) throws ScriptException {
+
+        final Object obj = eval(script, params);
+        if (obj == null) {
+            return null;
+        }
+
+        if (obj instanceof Number) {
+            return (Number) obj;
+        }
+
+        throw new ScriptException(
+                String.format("Unable to cast script result from %s to %s", obj.getClass(), Number.class));
+    }
+
+    private JavaScriptEngine() {
+        // utility class
     }
 }

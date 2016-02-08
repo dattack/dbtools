@@ -30,113 +30,6 @@ import com.dattack.dbtools.ping.log.CSVFileLogReader;
  */
 public class Reporter {
 
-    /**
-     * Process all data from an input file and generates a HTML report.
-     * 
-     * @param dataFile
-     *            the input file
-     * @param context
-     *            the report context
-     * @throws IOException
-     *             if an I/O error occurs
-     */
-    public void execute(final File dataFile, final ReportContext context) throws IOException {
-
-        try (CSVFileLogReader logReader = new CSVFileLogReader(dataFile)) {
-
-            // Javascript file
-            String jsFilename = dataFile.getName() + ".js";
-            try (PrintWriter jsWriter = new PrintWriter(new File(dataFile.getParent(), jsFilename), "UTF-8")) {
-                createJs(context, jsWriter, logReader);
-            }
-
-            // HTML file
-            String htmlFilename = dataFile.getName() + ".html";
-            try (PrintWriter htmlWriter = new PrintWriter(new File(dataFile.getParent(), htmlFilename), "UTF-8")) {
-                createHtml(htmlWriter, jsFilename, dataFile.getName());
-            }
-        }
-    }
-
-    private void createJs(final ReportContext context, final PrintWriter writer, final CSVFileLogReader logReader)
-            throws IOException {
-
-        ReportStats reportStats = new ReportStats(context);
-
-        writer.println("var items = [");
-
-        int items = 0;
-
-        long startDate = Long.MAX_VALUE;
-        long endDate = Long.MIN_VALUE;
-
-        long reportStartDateFilter = -1;
-        long reportEndDateFilter = Long.MAX_VALUE;
-
-        if (context.getStartDate() != null) {
-            reportStartDateFilter = context.getStartDate().getTime();
-        }
-
-        if (context.getEndDate() != null) {
-            reportEndDateFilter = context.getEndDate().getTime();
-        }
-
-        while (true) {
-            LogEntry item = logReader.next();
-            if (item == null) {
-                break;
-            }
-
-            // apply time filters
-            if (item.getEventTime() < reportStartDateFilter || item.getEventTime() > reportEndDateFilter) {
-                continue;
-            }
-
-            startDate = Math.min(startDate, item.getEventTime());
-            endDate = Math.max(endDate, item.getEventTime());
-
-            final List<EntryStats> entryStatsList = reportStats.add(item);
-
-            for (EntryStats entryStats : entryStatsList) {
-                String line = String.format("{x: '%s', y: %d, group: %d}",
-                        context.getDateFormat().format(new Date(entryStats.getX())), entryStats.getY(),
-                        entryStats.getGroup());
-                if (items > 0) {
-                    writer.print(",");
-                }
-                writer.print(line);
-                items++;
-            }
-        }
-
-        writer.println("];");
-        writer.println("var groups = new vis.DataSet();");
-
-        for (EntryGroup entryGroup : reportStats.getEntryGroups()) {
-
-            GroupStats groupStats = reportStats.getGroupStats(entryGroup.getId());
-            if (groupStats != null) {
-                System.out.format("%n%nGroup (%d): %s%n", entryGroup.getId(), entryGroup.getName());
-                System.out.format("Elements: %d%n", groupStats.getStatistics().getN());
-                System.out.format("Min. value: %s%n", groupStats.getStatistics().getMin());
-                System.out.format("Max. value: %s%n", groupStats.getStatistics().getMax());
-                System.out.format("Mean: %s%n", groupStats.getStatistics().getMean());
-                System.out.format("Standard deviation: %s%n", groupStats.getStatistics().getStandardDeviation());
-            }
-            writer.println(
-                    String.format("groups.add({id: '%d', content: '%s', options: {drawPoints: {style: 'circle'}}});",
-                            entryGroup.getId(), entryGroup.getName()));
-
-        }
-
-        writer.println("var container = document.getElementById('visualization');");
-        writer.println("var dataset = new vis.DataSet(items);");
-        writer.println(String.format("var options = {defaultGroup: 'ungrouped',legend: true,start: '%s',end: '%s'};",
-                context.getDateFormat().format(new Date(startDate)), //
-                context.getDateFormat().format(new Date(endDate))));
-        writer.println("var graph2d = new vis.Graph2d(container, dataset, groups, options);");
-    }
-
     private void createHtml(final PrintWriter writer, final String jsFile, final String logFile) {
 
         writer.println("<!DOCTYPE HTML>");
@@ -161,5 +54,112 @@ public class Reporter {
         writer.println(String.format("<script src='%s'></script>", jsFile));
         writer.println("</body>");
         writer.println("</html>");
+    }
+
+    private void createJs(final ReportContext context, final PrintWriter writer, final CSVFileLogReader logReader)
+            throws IOException {
+
+        final ReportStats reportStats = new ReportStats(context);
+
+        writer.println("var items = [");
+
+        int items = 0;
+
+        long startDate = Long.MAX_VALUE;
+        long endDate = Long.MIN_VALUE;
+
+        long reportStartDateFilter = -1;
+        long reportEndDateFilter = Long.MAX_VALUE;
+
+        if (context.getStartDate() != null) {
+            reportStartDateFilter = context.getStartDate().getTime();
+        }
+
+        if (context.getEndDate() != null) {
+            reportEndDateFilter = context.getEndDate().getTime();
+        }
+
+        while (true) {
+            final LogEntry item = logReader.next();
+            if (item == null) {
+                break;
+            }
+
+            // apply time filters
+            if (item.getEventTime() < reportStartDateFilter || item.getEventTime() > reportEndDateFilter) {
+                continue;
+            }
+
+            startDate = Math.min(startDate, item.getEventTime());
+            endDate = Math.max(endDate, item.getEventTime());
+
+            final List<EntryStats> entryStatsList = reportStats.add(item);
+
+            for (final EntryStats entryStats : entryStatsList) {
+                final String line = String.format("{x: '%s', y: %d, group: %d}",
+                        context.getDateFormat().format(new Date(entryStats.getX())), entryStats.getY(),
+                        entryStats.getGroup());
+                if (items > 0) {
+                    writer.print(",");
+                }
+                writer.print(line);
+                items++;
+            }
+        }
+
+        writer.println("];");
+        writer.println("var groups = new vis.DataSet();");
+
+        for (final EntryGroup entryGroup : reportStats.getEntryGroups()) {
+
+            final GroupStats groupStats = reportStats.getGroupStats(entryGroup.getId());
+            if (groupStats != null) {
+                System.out.format("%n%nGroup (%d): %s%n", entryGroup.getId(), entryGroup.getName());
+                System.out.format("Elements: %d%n", groupStats.getStatistics().getN());
+                System.out.format("Min. value: %s%n", groupStats.getStatistics().getMin());
+                System.out.format("Max. value: %s%n", groupStats.getStatistics().getMax());
+                System.out.format("Mean: %s%n", groupStats.getStatistics().getMean());
+                System.out.format("Standard deviation: %s%n", groupStats.getStatistics().getStandardDeviation());
+            }
+            writer.println(
+                    String.format("groups.add({id: '%d', content: '%s', options: {drawPoints: {style: 'circle'}}});",
+                            entryGroup.getId(), entryGroup.getName()));
+
+        }
+
+        writer.println("var container = document.getElementById('visualization');");
+        writer.println("var dataset = new vis.DataSet(items);");
+        writer.println(String.format("var options = {defaultGroup: 'ungrouped',legend: true,start: '%s',end: '%s'};",
+                context.getDateFormat().format(new Date(startDate)), //
+                context.getDateFormat().format(new Date(endDate))));
+        writer.println("var graph2d = new vis.Graph2d(container, dataset, groups, options);");
+    }
+
+    /**
+     * Process all data from an input file and generates a HTML report.
+     *
+     * @param dataFile
+     *            the input file
+     * @param context
+     *            the report context
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    public void execute(final File dataFile, final ReportContext context) throws IOException {
+
+        try (CSVFileLogReader logReader = new CSVFileLogReader(dataFile)) {
+
+            // Javascript file
+            final String jsFilename = dataFile.getName() + ".js";
+            try (PrintWriter jsWriter = new PrintWriter(new File(dataFile.getParent(), jsFilename), "UTF-8")) {
+                createJs(context, jsWriter, logReader);
+            }
+
+            // HTML file
+            final String htmlFilename = dataFile.getName() + ".html";
+            try (PrintWriter htmlWriter = new PrintWriter(new File(dataFile.getParent(), htmlFilename), "UTF-8")) {
+                createHtml(htmlWriter, jsFilename, dataFile.getName());
+            }
+        }
     }
 }

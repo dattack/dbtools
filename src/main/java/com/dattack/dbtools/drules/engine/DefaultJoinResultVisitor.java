@@ -53,13 +53,13 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     }
 
     private Map<Object, Object> createJavascriptParametersMap() {
-        HashMap<Object, Object> params = new HashMap<Object, Object>();
-        for (RowData rowData : rowDataList) {
+        final HashMap<Object, Object> params = new HashMap<Object, Object>();
+        for (final RowData rowData : rowDataList) {
 
-            HashMap<String, Object> sourceParams = new HashMap<String, Object>();
+            final HashMap<String, Object> sourceParams = new HashMap<String, Object>();
             params.put(rowData.getSourceId().getValue(), sourceParams);
 
-            for (IdentifierValuePair item : rowData.getFieldValueList()) {
+            for (final IdentifierValuePair item : rowData.getFieldValueList()) {
                 sourceParams.put(item.getKey().getValue(), item.getValue());
             }
         }
@@ -72,7 +72,8 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
 
         // eval the check expression
         LOGGER.debug(String.format("Executing javascript expression: %s", checkExprBean.getExpression()));
-        Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(), createJavascriptParametersMap());
+        final Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(),
+                createJavascriptParametersMap());
         if (bool == null || !bool) {
             execute(checkExprBean.getOnFail());
         } else {
@@ -90,7 +91,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     private void execute(final List<EventActionBean> actionList) {
 
         final DefaultEventActionVisitor visitor = new DefaultEventActionVisitor(rowDataList, flightRecorder);
-        for (EventActionBean action : actionList) {
+        for (final EventActionBean action : actionList) {
             action.accept(visitor);
         }
     }
@@ -112,10 +113,10 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     @Override
     public void visit(final JoinResultMatchBean item) {
         if (missingSourceList.isEmpty()) {
-            for (CheckExprBean checkExprBean : item.getCheckList()) {
+            for (final CheckExprBean checkExprBean : item.getCheckList()) {
                 try {
                     execute(checkExprBean);
-                } catch (ScriptException e) {
+                } catch (final ScriptException e) {
                     // TODO: throw a proper exception
                     LOGGER.error(e.getMessage(), e);
                 }

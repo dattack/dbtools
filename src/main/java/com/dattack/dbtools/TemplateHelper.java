@@ -56,7 +56,7 @@ public final class TemplateHelper {
                 result = cfg;
                 if (result == null) {
                     result = new Configuration(Configuration.VERSION_2_3_23);
-                    String templatesDir = GlobalConfiguration.getProperty(GlobalConfiguration.TEMPLATES_DIRECTORY_KEY);
+                    final String templatesDir = GlobalConfiguration.getProperty(GlobalConfiguration.TEMPLATES_DIRECTORY_KEY);
                     if (StringUtils.isNotBlank(templatesDir)) {
                         result.setDirectoryForTemplateLoading(new File(templatesDir));
                     } else {

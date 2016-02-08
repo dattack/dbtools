@@ -37,13 +37,10 @@ public final class ThreadContext {
     private static final ThreadLocal<ThreadContext> THREAD_LOCAL = new ThreadLocal<ThreadContext>();
 
     private MapConfiguration internalConfiguration;
-    
-    private ThreadContext() {
-    }
 
     /**
      * Singleton method.
-     * 
+     *
      * @return the singleton
      */
     public static synchronized ThreadContext getInstance() {
@@ -56,30 +53,11 @@ public final class ThreadContext {
         return obj;
     }
 
-    private void setInitialConfiguration() {
-        setInitialConfiguration(null);
+    private ThreadContext() {
     }
 
-    /**
-     * Sets the initial configuration to use.
-     * 
-     * @param configuration
-     *            the initial configuration
-     */
-    public void setInitialConfiguration(final Configuration configuration) {
-
-        if (internalConfiguration != null) {
-            LOGGER.warn("InitialConfiguration ");
-        }
-
-        CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
-        compositeConfiguration.setDelimiterParsingDisabled(true);
-        compositeConfiguration.addConfiguration(new SystemConfiguration());
-        if (configuration != null) {
-            compositeConfiguration.addConfiguration(configuration);
-        }
-        internalConfiguration = new MapConfiguration(new HashMap<String, Object>());
-        internalConfiguration.copy(compositeConfiguration);
+    public void clearProperty(final String key) {
+        getInternalConfiguration().clearProperty(key);
     }
 
     public Configuration getConfiguration() {
@@ -94,15 +72,37 @@ public final class ThreadContext {
         return internalConfiguration;
     }
 
-    public void setProperty(final String key, final Object value) {
-        getInternalConfiguration().setProperty(key, value);
-    }
-
-    public void clearProperty(final String key) {
-        getInternalConfiguration().clearProperty(key);
-    }
-
     public String interpolate(final String value) {
         return ConfigurationUtil.interpolate(value, getInternalConfiguration());
+    }
+
+    private void setInitialConfiguration() {
+        setInitialConfiguration(null);
+    }
+
+    /**
+     * Sets the initial configuration to use.
+     *
+     * @param configuration
+     *            the initial configuration
+     */
+    public void setInitialConfiguration(final Configuration configuration) {
+
+        if (internalConfiguration != null) {
+            LOGGER.warn("InitialConfiguration ");
+        }
+
+        final CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
+        compositeConfiguration.setDelimiterParsingDisabled(true);
+        compositeConfiguration.addConfiguration(new SystemConfiguration());
+        if (configuration != null) {
+            compositeConfiguration.addConfiguration(configuration);
+        }
+        internalConfiguration = new MapConfiguration(new HashMap<String, Object>());
+        internalConfiguration.copy(compositeConfiguration);
+    }
+
+    public void setProperty(final String key, final Object value) {
+        getInternalConfiguration().setProperty(key, value);
     }
 }

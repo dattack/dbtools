@@ -28,6 +28,10 @@ import org.apache.commons.lang.StringUtils;
 @XmlJavaTypeAdapter(IdentifierAdapter.class)
 public final class Identifier implements Serializable {
 
+    private static final long serialVersionUID = 4467866944887901631L;
+
+    private String value;
+
     public static class IdentifierBuilder {
 
         private String value;
@@ -38,7 +42,7 @@ public final class Identifier implements Serializable {
 
         /**
          * Concatenates the value used to instantiate a new identifier.
-         * 
+         *
          * @param text
          *            the value to use
          * @return self object
@@ -53,16 +57,20 @@ public final class Identifier implements Serializable {
         }
     }
 
-    private static final long serialVersionUID = 4467866944887901631L;
-
-    private String value;
-
     public Identifier() {
         // public constructor
     }
 
     private Identifier(final IdentifierBuilder builder) {
         this.value = normalize(builder.value);
+    }
+
+    public Identifier append(final Identifier other) {
+        return new IdentifierBuilder().withValue(getValue()).withValue(other.getValue()).build();
+    }
+
+    public Identifier append(final String other) {
+        return new IdentifierBuilder().withValue(getValue()).withValue(other).build();
     }
 
     @Override
@@ -76,7 +84,7 @@ public final class Identifier implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Identifier other = (Identifier) obj;
+        final Identifier other = (Identifier) obj;
         if (value == null) {
             if (other.value != null) {
                 return false;
@@ -89,14 +97,6 @@ public final class Identifier implements Serializable {
 
     public String getValue() {
         return value;
-    }
-
-    public Identifier append(final String other) {
-        return new IdentifierBuilder().withValue(getValue()).withValue(other).build();
-    }
-
-    public Identifier append(final Identifier other) {
-        return new IdentifierBuilder().withValue(getValue()).withValue(other.getValue()).build();
     }
 
     @Override
@@ -113,7 +113,7 @@ public final class Identifier implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("Identifier[value=").append(value).append("]");
         return builder.toString();
     }

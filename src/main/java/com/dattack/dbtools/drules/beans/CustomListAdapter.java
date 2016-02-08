@@ -33,20 +33,14 @@ public abstract class CustomListAdapter<T> extends XmlAdapter<String, List<T>> {
     // whitespace or comma character
     private static final String SEPARATOR_REGEX = "\\s*(,|\\s)\\s*";
 
-    @Override
-    public final List<T> unmarshal(final String string) {
-
-        final List<T> identifierList = new ArrayList<T>();
-
-        for (final String s : string.split(SEPARATOR_REGEX)) {
-            final String trimmed = s.trim();
-            if (trimmed.length() > 0) {
-                identifierList.add(create(trimmed));
-            }
-        }
-
-        return identifierList;
-    }
+    /**
+     * Creates a new instance of T.
+     * 
+     * @param text
+     *            a single value represented as a text
+     * @return the T-instance
+     */
+    protected abstract T create(final String text);
 
     @Override
     public final String marshal(final List<T> strings) {
@@ -63,11 +57,18 @@ public abstract class CustomListAdapter<T> extends XmlAdapter<String, List<T>> {
         return sb.toString();
     }
 
-    /**
-     * Creates a new instance of T.
-     * @param text
-     *            a single value represented as a text
-     * @return the T-instance
-     */
-    protected abstract T create(final String text);
+    @Override
+    public final List<T> unmarshal(final String string) {
+
+        final List<T> identifierList = new ArrayList<T>();
+
+        for (final String s : string.split(SEPARATOR_REGEX)) {
+            final String trimmed = s.trim();
+            if (trimmed.length() > 0) {
+                identifierList.add(create(trimmed));
+            }
+        }
+
+        return identifierList;
+    }
 }

@@ -45,13 +45,22 @@ public final class NamingLoader {
 
         final String type = properties.getProperty(TYPE_KEY);
 
-        ResourceFactory<?> factory = ResourceFactoryRegistry.getFactory(type);
+        final ResourceFactory<?> factory = ResourceFactoryRegistry.getFactory(type);
         if (factory != null) {
             return factory.getObjectInstance(properties, extraClasspath);
         }
 
         LOGGER.warn("Unable to get a factory for type ''{0}''", type);
         return null;
+    }
+
+    private static void load(final Properties properties, /* final Context ctxt, */ final Context parentCtxt,
+            final String ctxtName, final List<String> extraClasspath) throws NamingException {
+
+        final Object value = getObject(properties, extraClasspath);
+        if (value != null) {
+            put(parentCtxt, ctxtName, value);
+        }
     }
 
     private static void put(final Context context, final String key, final Object value) throws NamingException {
@@ -70,15 +79,6 @@ public final class NamingLoader {
         }
 
         LOGGER.info("Binding object '{}' to JNDI name '{}'", value.getClass().getName(), key);
-    }
-
-    private static void load(final Properties properties, /* final Context ctxt, */ final Context parentCtxt,
-            final String ctxtName, final List<String> extraClasspath) throws NamingException {
-
-        Object value = getObject(properties, extraClasspath);
-        if (value != null) {
-            put(parentCtxt, ctxtName, value);
-        }
     }
 
     /**
@@ -111,22 +111,22 @@ public final class NamingLoader {
             throw new IllegalArgumentException(MessageFormat.format("''{0}'' isn't a directory", directory));
         }
 
-        File[] files = directory.listFiles();
+        final File[] files = directory.listFiles();
         if (files == null) {
             return;
         }
 
         for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+            final File file = files[i];
             String name = file.getName();
 
             if (file.isDirectory()) {
-                Context tmpCtxt = ctxt.createSubcontext(name);
+                final Context tmpCtxt = ctxt.createSubcontext(name);
                 loadDirectory(file, tmpCtxt, /* ctxt, */ extraClasspath);
             } else {
-                String[] extensions = new String[] { ".properties" };
+                final String[] extensions = new String[] { ".properties" };
                 for (int j = 0; j < extensions.length; j++) {
-                    String extension = extensions[j];
+                    final String extension = extensions[j];
                     if (name.endsWith(extension)) {
                         name = name.substring(0, name.length() - extension.length());
                         /* Context subcontext = */ ctxt.createSubcontext(name);
@@ -140,7 +140,7 @@ public final class NamingLoader {
     private Properties loadFile(final File file) throws IOException {
 
         try (FileInputStream fin = new FileInputStream(file)) {
-            Properties properties = new Properties();
+            final Properties properties = new Properties();
             properties.load(fin);
             return properties;
         }

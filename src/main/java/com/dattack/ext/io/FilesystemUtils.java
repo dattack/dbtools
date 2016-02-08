@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,21 +30,17 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A collection of useful methods to deal with filesystem operations.
- * 
+ *
  * @author cvarela
  * @since 0.1
  */
 public final class FilesystemUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilesystemUtils.class);
-    
-    private FilesystemUtils() {
-        // static class
-    }
 
     /**
      * Finds the file with the given name.
-     * 
+     *
      * @param path
      *            the file name
      * @return the <code>File</code>
@@ -67,21 +63,30 @@ public final class FilesystemUtils {
     }
 
     /**
-     * Reads the content of a file.
-     * 
-     * @param path
-     *            the file to read
-     * @return a <code>String</code> containing the bytes read from the file
+     * Creates the directory named by this abstract pathname, including any necessary but nonexistent parent
+     * directories.
+     *
+     * @param directory
+     *            the directory named
      * @throws IOException
-     *             if an I/O error occurs reading from the stream
+     *             if an I/O error occurs creating the directory hierarchy
      */
-    public static String readFileToString(final String path) throws IOException {
-        return readFileToString(path, Charset.defaultCharset());
+    public static void mkdirs(final File directory) throws IOException {
+        if (directory.exists()) {
+            if (directory.isFile()) {
+                throw new IOException(MessageFormat
+                        .format("Unable to create directory: file {0} exists but is not a directory", directory));
+            }
+        } else {
+            if (!directory.mkdirs()) {
+                throw new IOException("Unable to create directory " + directory);
+            }
+        }
     }
 
     /**
      * Reads the content of a file.
-     * 
+     *
      * @param path
      *            the file to read
      * @return a <code>String</code> containing the bytes read from the file
@@ -94,23 +99,7 @@ public final class FilesystemUtils {
 
     /**
      * Reads the content of a file.
-     * 
-     * @param path
-     *            the file to read
-     * @param encoding
-     *            The {@link java.nio.charset.Charset charset} to be used to decode the {@code bytes}
-     * @return a <code>String</code> containing the bytes read from the file
-     * @throws IOException
-     *             if an I/O error occurs reading from the stream
-     */
-    public static String readFileToString(final String path, final Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(locate(path).toPath());
-        return new String(encoded, encoding);
-    }
-
-    /**
-     * Reads the content of a file.
-     * 
+     *
      * @param path
      *            the file to read
      * @param encoding
@@ -120,29 +109,40 @@ public final class FilesystemUtils {
      *             if an I/O error occurs reading from the stream
      */
     public static String readFileToString(final Path path, final Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(path);
+        final byte[] encoded = Files.readAllBytes(path);
         return new String(encoded, encoding);
     }
 
     /**
-     * Creates the directory named by this abstract pathname, including any necessary but nonexistent parent
-     * directories.
-     * 
-     * @param directory
-     *            the directory named
+     * Reads the content of a file.
+     *
+     * @param path
+     *            the file to read
+     * @return a <code>String</code> containing the bytes read from the file
      * @throws IOException
-     *             if an I/O error occurs creating the directory hierarchy
+     *             if an I/O error occurs reading from the stream
      */
-    public static void mkdirs(final File directory) throws IOException {
-        if (directory.exists()) {
-            if (directory.isFile()) {
-                throw new IOException(MessageFormat.format(
-                        "Unable to create directory: file {0} exists but is not a directory", directory));
-            }
-        } else {
-            if (!directory.mkdirs()) {
-                throw new IOException("Unable to create directory " + directory);
-            }
-        }
+    public static String readFileToString(final String path) throws IOException {
+        return readFileToString(path, Charset.defaultCharset());
+    }
+
+    /**
+     * Reads the content of a file.
+     *
+     * @param path
+     *            the file to read
+     * @param encoding
+     *            The {@link java.nio.charset.Charset charset} to be used to decode the {@code bytes}
+     * @return a <code>String</code> containing the bytes read from the file
+     * @throws IOException
+     *             if an I/O error occurs reading from the stream
+     */
+    public static String readFileToString(final String path, final Charset encoding) throws IOException {
+        final byte[] encoded = Files.readAllBytes(locate(path).toPath());
+        return new String(encoded, encoding);
+    }
+
+    private FilesystemUtils() {
+        // static class
     }
 }

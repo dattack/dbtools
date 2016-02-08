@@ -26,20 +26,20 @@ import com.dattack.dbtools.drules.beans.Identifier.IdentifierBuilder;
 public final class IdentifierAdapter extends XmlAdapter<String, Identifier> {
 
     @Override
-    public Identifier unmarshal(final String value) throws Exception {
-
-        if (value == null) {
-            return null;
-        }
-        return new IdentifierBuilder().withValue(value).build();
-    }
-
-    @Override
     public String marshal(final Identifier value) throws Exception {
 
         if (value == null) {
             return null;
         }
         return value.getValue();
+    }
+
+    @Override
+    public Identifier unmarshal(final String value) throws Exception {
+
+        if (value == null) {
+            return null;
+        }
+        return new IdentifierBuilder().withValue(value).build();
     }
 }

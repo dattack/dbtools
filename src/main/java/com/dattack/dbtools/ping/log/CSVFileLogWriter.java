@@ -51,84 +51,15 @@ public class CSVFileLogWriter implements LogWriter {
         this.csvBuilder = new CSVStringBuilder(new CSVConfigurationFactory().create());
     }
 
-    private FileOutputStream getOutputStream() throws FileNotFoundException {
-
-        final File file = new File(filename);
-        if (!file.exists()) {
-            final File parent = file.getParentFile();
-            if (parent != null && !parent.exists()) {
-                if (!parent.mkdirs()) {
-                    LOGGER.warn("Unable to create directory: {}", parent);
-                }
+    private void addDataRowList(final List<DataRow> list) {
+        for (int i = 0; i < list.size(); i++) {
+            final DataRow row = list.get(i);
+            csvBuilder.comment().append(String.format(" Row %d:\t", i));
+            for (final Object obj : row.getData()) {
+                csvBuilder.append(ObjectUtils.toString(obj));
             }
+            csvBuilder.eol();
         }
-        return new FileOutputStream(file, true);
-    }
-
-    @Override
-    public synchronized void write(final LogHeader logHeader) {
-        write(format(logHeader));
-    }
-
-    @Override
-    public void write(final LogEntry logEntry) {
-        write(format(logEntry));
-    }
-
-    private void write(final String message) {
-
-        FileOutputStream out = null;
-        try {
-            out = getOutputStream();
-            out.write(message.getBytes());
-        } catch (final IOException e) {
-            LOGGER.warn(e.getMessage());
-        } finally {
-            IOUtils.closeQuietly(out);
-        }
-    }
-
-    private String format(final LogHeader header) {
-
-        String data = null;
-        synchronized (csvBuilder) {
-
-            csvBuilder.comment();
-
-            List<String> keys = new ArrayList<String>(header.getProperties().keySet());
-            Collections.sort(keys);
-
-            for (final String key : keys) {
-                csvBuilder.comment(new StringBuilder() //
-                        .append(normalize(ObjectUtils.toString(key))) //
-                        .append(": ") //
-                        .append(normalize(ObjectUtils.toString(header.getProperties().get(key)))) //
-                        .toString() //
-                );
-            }
-
-            csvBuilder.comment("SQL Sentences:");
-            for (SQLSentence sentence : header.getPingJobConfiguration().getQueryList()) {
-                csvBuilder.comment(new StringBuilder().append("  ").append(sentence.getLabel()).append(": ")
-                        .append(normalize(sentence.getSql())).toString());
-            }
-
-            csvBuilder.comment() //
-                    .append("date") //
-                    .append("task-name") //
-                    .append("thread-name") //
-                    .append("iteration") //
-                    .append("sql-label") //
-                    .append("rows") //
-                    .append("connection-time") //
-                    .append("first-row-time") //
-                    .append("total-time") //
-                    .append("message").eol();
-
-            data = csvBuilder.toString();
-            csvBuilder.clear();
-        }
-        return data;
     }
 
     private String format(final LogEntry entry) {
@@ -157,18 +88,87 @@ public class CSVFileLogWriter implements LogWriter {
         return data;
     }
 
-    private void addDataRowList(final List<DataRow> list) {
-        for (int i = 0; i < list.size(); i++) {
-            DataRow row = list.get(i);
-            csvBuilder.comment().append(String.format(" Row %d:\t", i));
-            for (Object obj : row.getData()) {
-                csvBuilder.append(ObjectUtils.toString(obj));
+    private String format(final LogHeader header) {
+
+        String data = null;
+        synchronized (csvBuilder) {
+
+            csvBuilder.comment();
+
+            final List<String> keys = new ArrayList<String>(header.getProperties().keySet());
+            Collections.sort(keys);
+
+            for (final String key : keys) {
+                csvBuilder.comment(new StringBuilder() //
+                        .append(normalize(ObjectUtils.toString(key))) //
+                        .append(": ") //
+                        .append(normalize(ObjectUtils.toString(header.getProperties().get(key)))) //
+                        .toString() //
+                );
             }
-            csvBuilder.eol();
+
+            csvBuilder.comment("SQL Sentences:");
+            for (final SQLSentence sentence : header.getPingJobConfiguration().getQueryList()) {
+                csvBuilder.comment(new StringBuilder().append("  ").append(sentence.getLabel()).append(": ")
+                        .append(normalize(sentence.getSql())).toString());
+            }
+
+            csvBuilder.comment() //
+                    .append("date") //
+                    .append("task-name") //
+                    .append("thread-name") //
+                    .append("iteration") //
+                    .append("sql-label") //
+                    .append("rows") //
+                    .append("connection-time") //
+                    .append("first-row-time") //
+                    .append("total-time") //
+                    .append("message").eol();
+
+            data = csvBuilder.toString();
+            csvBuilder.clear();
         }
+        return data;
+    }
+
+    private FileOutputStream getOutputStream() throws FileNotFoundException {
+
+        final File file = new File(filename);
+        if (!file.exists()) {
+            final File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) {
+                if (!parent.mkdirs()) {
+                    LOGGER.warn("Unable to create directory: {}", parent);
+                }
+            }
+        }
+        return new FileOutputStream(file, true);
     }
 
     private String normalize(final String text) {
         return text.replaceAll("\n", " ");
+    }
+
+    @Override
+    public void write(final LogEntry logEntry) {
+        write(format(logEntry));
+    }
+
+    @Override
+    public synchronized void write(final LogHeader logHeader) {
+        write(format(logHeader));
+    }
+
+    private void write(final String message) {
+
+        FileOutputStream out = null;
+        try {
+            out = getOutputStream();
+            out.write(message.getBytes());
+        } catch (final IOException e) {
+            LOGGER.warn(e.getMessage());
+        } finally {
+            IOUtils.closeQuietly(out);
+        }
     }
 }

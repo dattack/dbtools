@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,7 +60,7 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
             return;
         }
 
-        for (String path : extraClasspath) {
+        for (final String path : extraClasspath) {
             final File file = FilesystemUtils.locate(path);
             if (file.exists()) {
                 try {
@@ -149,6 +149,14 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
     }
 
     @Override
+    public int getLoginTimeout() throws SQLException {
+        if (!initialized) {
+            configureClasspath();
+        }
+        return super.getLoginTimeout();
+    }
+
+    @Override
     public PrintWriter getLogWriter() throws SQLException {
         if (!initialized) {
             configureClasspath();
@@ -157,11 +165,19 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
     }
 
     @Override
-    public void setLogWriter(final PrintWriter out) throws SQLException {
+    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
         if (!initialized) {
             configureClasspath();
         }
-        super.setLogWriter(out);
+        return super.getParentLogger();
+    }
+
+    @Override
+    public boolean isWrapperFor(final Class<?> iface) throws SQLException {
+        if (!initialized) {
+            configureClasspath();
+        }
+        return super.isWrapperFor(iface);
     }
 
     @Override
@@ -174,19 +190,11 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
     }
 
     @Override
-    public int getLoginTimeout() throws SQLException {
+    public void setLogWriter(final PrintWriter out) throws SQLException {
         if (!initialized) {
             configureClasspath();
         }
-        return super.getLoginTimeout();
-    }
-
-    @Override
-    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        if (!initialized) {
-            configureClasspath();
-        }
-        return super.getParentLogger();
+        super.setLogWriter(out);
     }
 
     @Override
@@ -195,13 +203,5 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
             configureClasspath();
         }
         return super.unwrap(iface);
-    }
-
-    @Override
-    public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        if (!initialized) {
-            configureClasspath();
-        }
-        return super.isWrapperFor(iface);
     }
 }

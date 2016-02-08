@@ -34,18 +34,6 @@ final class RowDataMap {
         this.sourceRowDataMap = new HashMap<Identifier, RowData>();
     }
 
-    public int getSize() {
-        return sourceRowDataMap.size();
-    }
-
-    public Collection<RowData> getRows() {
-        return sourceRowDataMap.values();
-    }
-
-    public void putData(final Identifier sourceId, final RowData joinKey) {
-        this.sourceRowDataMap.put(sourceId, joinKey);
-    }
-
     /**
      * Computes the min key of all stored rowData.
      *
@@ -54,7 +42,7 @@ final class RowDataMap {
     public JoinKey getMinKey() {
 
         JoinKey minKey = null;
-        for (RowData rowData : sourceRowDataMap.values()) {
+        for (final RowData rowData : sourceRowDataMap.values()) {
 
             if (rowData == null || rowData.getKey() == null) {
                 continue;
@@ -69,5 +57,17 @@ final class RowDataMap {
             }
         }
         return minKey;
+    }
+
+    public Collection<RowData> getRows() {
+        return sourceRowDataMap.values();
+    }
+
+    public int getSize() {
+        return sourceRowDataMap.size();
+    }
+
+    public void putData(final Identifier sourceId, final RowData joinKey) {
+        this.sourceRowDataMap.put(sourceId, joinKey);
     }
 }

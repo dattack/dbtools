@@ -48,6 +48,11 @@ import com.dattack.ext.misc.ConfigurationUtil;
  */
 final class SourceExecutor implements Callable<SourceResult> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceExecutor.class);
+
+    private final SourceBean sourceBean;
+    private final Configuration initialConfiguration;
+
     private class DefaultSourceCommandBeanVisitor implements SourceCommandBeanVisitor {
 
         private final AbstractConfiguration configuration;
@@ -73,7 +78,7 @@ final class SourceExecutor implements Callable<SourceResult> {
                 throw new NullPointerException("Invalid foreach loop (missing 'ref' value)");
             }
 
-            Identifier identifier = new IdentifierBuilder().withValue(bean.getRef()).build();
+            final Identifier identifier = new IdentifierBuilder().withValue(bean.getRef()).build();
             try (ResultSet resultSet = resultSetMap.get(identifier)) {
 
                 if (resultSet == null) {
@@ -84,7 +89,7 @@ final class SourceExecutor implements Callable<SourceResult> {
                     populateConfigurationFromResultSet(identifier, resultSet);
                     executeForEachLoop(bean);
                 } while (resultSet.next());
-            } catch (SQLException e) {
+            } catch (final SQLException e) {
                 LOGGER.error(e.getMessage(), e);
             }
         }
@@ -103,7 +108,7 @@ final class SourceExecutor implements Callable<SourceResult> {
 
         private void populateConfigurationFromFirstRows() throws SQLException {
 
-            for (Entry<Identifier, ResultSet> entry : resultSetMap.entrySet()) {
+            for (final Entry<Identifier, ResultSet> entry : resultSetMap.entrySet()) {
                 populateConfigurationFromFirstRows(entry.getKey(), entry.getValue());
             }
         }
@@ -114,9 +119,9 @@ final class SourceExecutor implements Callable<SourceResult> {
             if (resultSet.isBeforeFirst() && resultSet.next()) {
                 if (identifier != null) {
                     for (int columnIndex = 1; columnIndex <= resultSet.getMetaData().getColumnCount(); columnIndex++) {
-                        String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
-                        Object value = resultSet.getObject(columnIndex);
-                        String key = identifier.append(columnName).getValue();
+                        final String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
+                        final Object value = resultSet.getObject(columnIndex);
+                        final String key = identifier.append(columnName).getValue();
                         configuration.setProperty(key, value);
                     }
                 }
@@ -132,9 +137,9 @@ final class SourceExecutor implements Callable<SourceResult> {
 
             if (identifier != null) {
                 for (int columnIndex = 1; columnIndex <= resultSet.getMetaData().getColumnCount(); columnIndex++) {
-                    String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
-                    Object value = resultSet.getObject(columnIndex);
-                    String key = identifier.append(columnName).getValue();
+                    final String columnName = resultSet.getMetaData().getColumnLabel(columnIndex);
+                    final Object value = resultSet.getObject(columnIndex);
+                    final String key = identifier.append(columnName).getValue();
                     configuration.setProperty(key, value);
                 }
             }
@@ -165,21 +170,16 @@ final class SourceExecutor implements Callable<SourceResult> {
 
                 populateConfigurationFromFirstRows();
 
-                String interpolatedSql = ConfigurationUtil.interpolate(bean.getSql(), configuration);
+                final String interpolatedSql = ConfigurationUtil.interpolate(bean.getSql(), configuration);
                 try (ResultSet resultSet = executeStatement(statement, interpolatedSql)) {
                     setLastValues(bean, resultSet);
                 }
 
-            } catch (SQLException e) {
+            } catch (final SQLException e) {
                 throw new RuntimeException(e);
             }
         }
     }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SourceExecutor.class);
-    private final SourceBean sourceBean;
-
-    private final Configuration initialConfiguration;
 
     SourceExecutor(final SourceBean sourceBean, final Configuration initialConfiguration) {
         this.sourceBean = sourceBean;
@@ -194,12 +194,12 @@ final class SourceExecutor implements Callable<SourceResult> {
         final String jndiName = getInterpolatedJndiName();
 
         LOGGER.info("Configuring datasource with JNDI name: '{}'", jndiName);
-        Connection connection = getConnection(jndiName);
+        final Connection connection = getConnection(jndiName);
 
-        DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
+        final DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
         try {
-            for (Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
-                SourceCommandBean command = it.next();
+            for (final Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
+                final SourceCommandBean command = it.next();
                 command.accept(visitor);
             }
             return new SourceResult(sourceBean.getId(), connection, visitor.getLastResultSet());
@@ -212,7 +212,7 @@ final class SourceExecutor implements Callable<SourceResult> {
 
         LOGGER.info("Executing SQL sentence [{}@{}]: {}", Thread.currentThread().getName(), sourceBean.getId(), sql);
 
-        boolean isResultSet = statement.execute(sql);
+        final boolean isResultSet = statement.execute(sql);
 
         if (isResultSet) {
             return statement.getResultSet();

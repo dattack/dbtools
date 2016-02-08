@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,6 +37,11 @@ import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
  */
 public final class Ping {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Ping.class);
+
+    // private final ExecutorService pool;
+    private final ThreadPool pool;
+
     private class ThreadPool {
 
         private final List<Thread> threadList;
@@ -47,17 +52,15 @@ public final class Ping {
 
         public void submit(final Runnable task, final String threadName) {
 
-            Thread thread = new Thread(task, threadName);
+            final Thread thread = new Thread(task, threadName);
             thread.start();
             threadList.add(thread);
         }
     }
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(Ping.class);
 
     /**
      * The <code>main</code> method.
-     * 
+     *
      * @param args
      *            the program arguments
      */
@@ -77,9 +80,6 @@ public final class Ping {
             System.err.println(e.getMessage());
         }
     }
-
-    // private final ExecutorService pool;
-    private final ThreadPool pool;
 
     private Ping() {
         pool = new ThreadPool();
@@ -103,17 +103,17 @@ public final class Ping {
 
         } else {
 
-            List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
+            final List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
             for (final PingJobConfiguration pingJobConf : pingJobConfList) {
 
-                DataSource dataSource = new DataSourceBuilder().withJndiName(pingJobConf.getDatasource()).build();
+                final DataSource dataSource = new DataSourceBuilder().withJndiName(pingJobConf.getDatasource()).build();
 
-                SQLSentenceProvider sentenceProvider = getSentenceProvider(pingJobConf.getProviderClassName());
+                final SQLSentenceProvider sentenceProvider = getSentenceProvider(pingJobConf.getProviderClassName());
                 sentenceProvider.setSentences(pingJobConf.getQueryList());
 
                 final LogWriter logWriter = new CSVFileLogWriter(pingJobConf.getLogFile());
 
-                LogHeader logHeader = new LogHeader(pingJobConf);
+                final LogHeader logHeader = new LogHeader(pingJobConf);
                 logWriter.write(logHeader);
 
                 for (int i = 0; i < pingJobConf.getThreads(); i++) {
@@ -132,12 +132,12 @@ public final class Ping {
     }
 
     private SQLSentenceProvider getSentenceProvider(final String clazzname) {
-        
+
         SQLSentenceProvider sentenceProvider = null;
         if (clazzname != null) {
             try {
                 sentenceProvider = (SQLSentenceProvider) Class.forName(clazzname).newInstance();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 LOGGER.trace(String.format("Using default SqlSentenceProvider: %s", e.getMessage()));
                 // ignore
             }

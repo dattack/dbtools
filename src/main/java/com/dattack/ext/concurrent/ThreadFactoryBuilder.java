@@ -28,6 +28,14 @@ import org.apache.commons.lang.Validate;
  */
 public class ThreadFactoryBuilder {
 
+    private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
+
+    private ThreadGroup group;
+    private String namePrefix;
+    private Boolean daemon;
+    private Integer priority;
+    private UncaughtExceptionHandler uncaughtExceptionHandler;
+
     public class SimpleThreadFactory implements ThreadFactory {
 
         private final AtomicLong threadNumber = new AtomicLong(1);
@@ -44,7 +52,7 @@ public class ThreadFactoryBuilder {
         @Override
         public Thread newThread(final Runnable target) {
 
-            Thread thread = new Thread(group, target, generateThreadName(), 0);
+            final Thread thread = new Thread(group, target, generateThreadName(), 0);
             thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             if (daemon != null) {
                 thread.setDaemon(daemon);
@@ -55,14 +63,6 @@ public class ThreadFactoryBuilder {
             return thread;
         }
     }
-
-    private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
-    private ThreadGroup group = null;
-    private String namePrefix = null;
-    private Boolean daemon = null;
-    private Integer priority = null;
-
-    private UncaughtExceptionHandler uncaughtExceptionHandler = null;
 
     public ThreadFactory build() {
 
@@ -90,7 +90,7 @@ public class ThreadFactoryBuilder {
 
     /**
      * Sets the priority for new threads.
-     * 
+     *
      * @param value
      *            the new priority
      * @return self object
@@ -111,7 +111,7 @@ public class ThreadFactoryBuilder {
 
     /**
      * Sets the handler for uncaught exceptions.
-     * 
+     *
      * @param value
      *            the handler
      * @return self object

@@ -53,78 +53,19 @@ public class HtmlEmailBuilder {
         bccList = new ArrayList<InternetAddress>();
     }
 
-    public HtmlEmailBuilder withHostName(final String value) {
-        this.hostname = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withPort(final Integer value) {
-        this.port = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withUsername(final String value) {
-        this.username = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withPassword(final String value) {
-        this.password = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withSslOnConnect(final Boolean value) {
-        this.sslOnConnect = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withStartTlsEnabled(final Boolean value) {
-        this.startTlsEnabled = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withFrom(final String value) {
-        this.from = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withSubject(final String value) {
-        this.subject = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withMessage(final String value) {
-        this.message = value;
-        return this;
-    }
-
-    public HtmlEmailBuilder withToAddress(final InternetAddress address) {
-        this.toList.add(address);
-        return this;
-    }
-
-    public HtmlEmailBuilder withCcAddress(final InternetAddress address) {
-        this.ccList.add(address);
-        return this;
-    }
-
-    public HtmlEmailBuilder withBccAddress(final InternetAddress address) {
-        this.bccList.add(address);
-        return this;
-    }
-
     /**
      * Builder method.
-     * 
+     *
      * @return the HtmlEmail
-     * @throws EmailException if an error occurs while creating the email
+     * @throws EmailException
+     *             if an error occurs while creating the email
      */
     public HtmlEmail build() throws EmailException {
 
         Assert.isNotBlank(hostname, String.format("Invalid SMTP server (hostname: '%s')", hostname));
         Assert.isNotBlank(from, String.format("Invalid email address (FROM: '%s'", from));
 
-        HtmlEmail email = new HtmlEmail();
+        final HtmlEmail email = new HtmlEmail();
         email.setHostName(hostname);
         email.setFrom(from);
         email.setSubject(subject);
@@ -161,5 +102,65 @@ public class HtmlEmailBuilder {
             email.setBcc(bccList);
         }
         return email;
+    }
+
+    public HtmlEmailBuilder withBccAddress(final InternetAddress address) {
+        this.bccList.add(address);
+        return this;
+    }
+
+    public HtmlEmailBuilder withCcAddress(final InternetAddress address) {
+        this.ccList.add(address);
+        return this;
+    }
+
+    public HtmlEmailBuilder withFrom(final String value) {
+        this.from = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withHostName(final String value) {
+        this.hostname = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withMessage(final String value) {
+        this.message = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withPassword(final String value) {
+        this.password = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withPort(final Integer value) {
+        this.port = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withSslOnConnect(final Boolean value) {
+        this.sslOnConnect = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withStartTlsEnabled(final Boolean value) {
+        this.startTlsEnabled = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withSubject(final String value) {
+        this.subject = value;
+        return this;
+    }
+
+    public HtmlEmailBuilder withToAddress(final InternetAddress address) {
+        this.toList.add(address);
+        return this;
+    }
+
+    public HtmlEmailBuilder withUsername(final String value) {
+        this.username = value;
+        return this;
     }
 }

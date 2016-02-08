@@ -29,6 +29,21 @@ import com.dattack.dbtools.Builder;
  */
 public class LogEntry implements Serializable {
 
+    private static final long serialVersionUID = 9149270318492709877L;
+
+    private final long connectionTime;
+
+    private final Exception exception;
+    private final long executionTime;
+    private final long firstRowTime;
+    private final long iteration;
+    private final long rows;
+    private final String sqlLabel;
+    private final long startTime;
+    private final String taskName;
+    private final String threadName;
+    private final List<DataRow> rowList;
+
     public static class LogEntryBuilder implements Serializable, Builder<LogEntry> {
 
         private static final long serialVersionUID = 9149270318492709877L;
@@ -58,6 +73,27 @@ public class LogEntry implements Serializable {
             this.maxRowsToDump = Math.max(0, maxRowsToDump);
         }
 
+        /**
+         * Adds a new {@link DataRow} from a ResultSet.
+         *
+         * @param rs
+         *            the ResultSet that contains the data
+         * @throws SQLException
+         *             if an database error occurs
+         */
+        public void addRow(final ResultSet rs) throws SQLException {
+
+            incrRows();
+            if (maxRowsToDump > rows) {
+                final int columnCount = rs.getMetaData().getColumnCount();
+                final DataRow dataRow = new DataRow(columnCount);
+                for (int i = 1; i <= columnCount; i++) {
+                    dataRow.add(rs.getObject(i));
+                }
+                this.rowList.add(dataRow);
+            }
+        }
+
         @Override
         public LogEntry build() {
 
@@ -69,9 +105,13 @@ public class LogEntry implements Serializable {
                 // empty resultset
                 this.firstRowTime = totalTime;
             }
-            LogEntry logEntry = new LogEntry(this);
+            final LogEntry logEntry = new LogEntry(this);
             init();
             return logEntry;
+        }
+
+        private long computeRelativeTime() {
+            return System.currentTimeMillis() - eventTime;
         }
 
         /**
@@ -79,10 +119,6 @@ public class LogEntry implements Serializable {
          */
         public synchronized void connect() {
             this.connectionTime = computeRelativeTime();
-        }
-
-        private long computeRelativeTime() {
-            return System.currentTimeMillis() - eventTime;
         }
 
         /**
@@ -96,29 +132,8 @@ public class LogEntry implements Serializable {
         }
 
         /**
-         * Adds a new {@link DataRow} from a ResultSet.
-         * 
-         * @param rs
-         *            the ResultSet that contains the data
-         * @throws SQLException
-         *             if an database error occurs
-         */
-        public void addRow(final ResultSet rs) throws SQLException {
-
-            incrRows();
-            if (maxRowsToDump > rows) {
-                int columnCount = rs.getMetaData().getColumnCount();
-                DataRow dataRow = new DataRow(columnCount);
-                for (int i = 1; i <= columnCount; i++) {
-                    dataRow.add(rs.getObject(i));
-                }
-                this.rowList.add(dataRow);
-            }
-        }
-
-        /**
          * Initialize method.
-         * 
+         *
          * @return self object
          */
         public LogEntryBuilder init() {
@@ -138,6 +153,11 @@ public class LogEntry implements Serializable {
             return this;
         }
 
+        public LogEntryBuilder withConnectionTime(final long value) {
+            this.connectionTime = value;
+            return this;
+        }
+
         public LogEntryBuilder withEventTime(final long value) {
             this.eventTime = value;
             return this;
@@ -148,8 +168,18 @@ public class LogEntry implements Serializable {
             return this;
         }
 
+        public LogEntryBuilder withFirstRowTime(final long value) {
+            this.firstRowTime = value;
+            return this;
+        }
+
         public LogEntryBuilder withIteration(final long value) {
             this.iteration = value;
+            return this;
+        }
+
+        public LogEntryBuilder withRows(final long value) {
+            this.rows = value;
             return this;
         }
 
@@ -168,40 +198,11 @@ public class LogEntry implements Serializable {
             return this;
         }
 
-        public LogEntryBuilder withRows(final long value) {
-            this.rows = value;
-            return this;
-        }
-
-        public LogEntryBuilder withConnectionTime(final long value) {
-            this.connectionTime = value;
-            return this;
-        }
-
-        public LogEntryBuilder withFirstRowTime(final long value) {
-            this.firstRowTime = value;
-            return this;
-        }
-
         public LogEntryBuilder withTotalTime(final long value) {
             this.totalTime = value;
             return this;
         }
     }
-
-    private static final long serialVersionUID = 9149270318492709877L;
-
-    private final long connectionTime;
-    private final Exception exception;
-    private final long executionTime;
-    private final long firstRowTime;
-    private final long iteration;
-    private final long rows;
-    private final String sqlLabel;
-    private final long startTime;
-    private final String taskName;
-    private final String threadName;
-    private final List<DataRow> rowList;
 
     private LogEntry(final LogEntryBuilder builder) {
         this.taskName = builder.taskName;
@@ -221,12 +222,12 @@ public class LogEntry implements Serializable {
         return connectionTime;
     }
 
-    public Exception getException() {
-        return exception;
+    public long getEventTime() {
+        return startTime;
     }
 
-    public long getTotalTime() {
-        return executionTime;
+    public Exception getException() {
+        return exception;
     }
 
     public long getFirstRowTime() {
@@ -237,20 +238,16 @@ public class LogEntry implements Serializable {
         return iteration;
     }
 
-    public long getRows() {
-        return rows;
-    }
-
     public List<DataRow> getRowList() {
         return rowList;
     }
 
-    public String getSqlLabel() {
-        return sqlLabel;
+    public long getRows() {
+        return rows;
     }
 
-    public long getEventTime() {
-        return startTime;
+    public String getSqlLabel() {
+        return sqlLabel;
     }
 
     public String getTaskName() {
@@ -259,5 +256,9 @@ public class LogEntry implements Serializable {
 
     public String getThreadName() {
         return threadName;
+    }
+
+    public long getTotalTime() {
+        return executionTime;
     }
 }

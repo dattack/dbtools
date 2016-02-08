@@ -33,7 +33,7 @@ public final class CSVConfiguration {
     private final char quoteChar;
     private final DateFormat dateFormat;
     private final String separator;
-    
+
     /**
      * Builder class used to build a {@link CSVConfiguration} instance.
      */
@@ -169,7 +169,6 @@ public final class CSVConfiguration {
         }
     }
 
-
     private CSVConfiguration(final CsvConfigurationBuilder builder) {
         this.commentChar = builder.commentChar;
         this.separator = builder.separator;
@@ -182,6 +181,10 @@ public final class CSVConfiguration {
 
     public char getCommentChar() {
         return commentChar;
+    }
+
+    public DateFormat getDateFormat() {
+        return dateFormat;
     }
 
     public String getEol() {
@@ -202,9 +205,5 @@ public final class CSVConfiguration {
 
     public String getSeparator() {
         return separator;
-    }
-
-    public DateFormat getDateFormat() {
-        return dateFormat;
     }
 }

@@ -38,14 +38,14 @@ final class RowDataFactory {
 
     public RowData create(final SourceResult sourceResult) throws SQLException {
 
-        RowData rowData = new RowData(sourceId, keyFieldList);
+        final RowData rowData = new RowData(sourceId, keyFieldList);
 
         if (sourceResult.getResultSet() != null && sourceResult.getResultSet().next()) {
 
-            ResultSetMetaData metaData = sourceResult.getResultSet().getMetaData();
+            final ResultSetMetaData metaData = sourceResult.getResultSet().getMetaData();
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                Identifier name = new IdentifierBuilder().withValue(metaData.getColumnLabel(i)).build();
-                Object value = sourceResult.getResultSet().getObject(i);
+                final Identifier name = new IdentifierBuilder().withValue(metaData.getColumnLabel(i)).build();
+                final Object value = sourceResult.getResultSet().getObject(i);
                 rowData.addField(name, value);
             }
         }
