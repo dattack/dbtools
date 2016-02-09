@@ -39,6 +39,22 @@ public final class FilesystemUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(FilesystemUtils.class);
 
     /**
+     * Gets the extension of a filename.
+     *
+     * @param file
+     *            he file to retrieve the extension of.
+     * @return the extension of the file or an empty string if none exists.
+     */
+    public static String getFileExtension(final File file) {
+        final String fileName = file.getName();
+        final int lastIndexOfDot = fileName.lastIndexOf('.');
+        if (lastIndexOfDot > 0) {
+            return fileName.substring(lastIndexOfDot + 1);
+        }
+        return "";
+    }
+
+    /**
      * Finds the file with the given name.
      *
      * @param path
@@ -70,7 +86,9 @@ public final class FilesystemUtils {
      *            the directory named
      * @throws IOException
      *             if an I/O error occurs creating the directory hierarchy
+     * @deprecated Use {@link org.apache.commons.io.FileUtils#forceMkdir(File)}
      */
+    @Deprecated
     public static void mkdirs(final File directory) throws IOException {
         if (directory.exists()) {
             if (directory.isFile()) {
@@ -92,7 +110,9 @@ public final class FilesystemUtils {
      * @return a <code>String</code> containing the bytes read from the file
      * @throws IOException
      *             if an I/O error occurs reading from the stream
+     * @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File)}
      */
+    @Deprecated
     public static String readFileToString(final Path path) throws IOException {
         return readFileToString(path, Charset.defaultCharset());
     }
@@ -107,7 +127,9 @@ public final class FilesystemUtils {
      * @return a <code>String</code> containing the bytes read from the file
      * @throws IOException
      *             if an I/O error occurs reading from the stream
+     * @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File, Charset)}
      */
+    @Deprecated
     public static String readFileToString(final Path path, final Charset encoding) throws IOException {
         final byte[] encoded = Files.readAllBytes(path);
         return new String(encoded, encoding);
@@ -121,7 +143,9 @@ public final class FilesystemUtils {
      * @return a <code>String</code> containing the bytes read from the file
      * @throws IOException
      *             if an I/O error occurs reading from the stream
+     * @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File)}
      */
+    @Deprecated
     public static String readFileToString(final String path) throws IOException {
         return readFileToString(path, Charset.defaultCharset());
     }
@@ -136,7 +160,9 @@ public final class FilesystemUtils {
      * @return a <code>String</code> containing the bytes read from the file
      * @throws IOException
      *             if an I/O error occurs reading from the stream
+     * @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File, Charset)}
      */
+    @Deprecated
     public static String readFileToString(final String path, final Charset encoding) throws IOException {
         final byte[] encoded = Files.readAllBytes(locate(path).toPath());
         return new String(encoded, encoding);
