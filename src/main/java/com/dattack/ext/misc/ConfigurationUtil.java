@@ -15,6 +15,11 @@
  */
 package com.dattack.ext.misc;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.EnvironmentConfiguration;
@@ -73,6 +78,24 @@ public final class ConfigurationUtil {
         }
 
         return PropertyConverter.interpolate(value, configuration).toString();
+    }
+
+    /**
+     * Reads a {@link Properties} from the input file.
+     * 
+     * @param file
+     *            the File to load
+     * @return the Properties object
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    public static Properties loadProperties(final File file) throws IOException {
+
+        try (FileInputStream fin = new FileInputStream(file)) {
+            final Properties properties = new Properties();
+            properties.load(fin);
+            return properties;
+        }
     }
 
     private ConfigurationUtil() {
