@@ -15,14 +15,17 @@
  */
 package com.dattack.naming.standalone;
 
-import java.text.MessageFormat;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dattack.naming.AbstractContext;
 
@@ -34,18 +37,21 @@ import com.dattack.naming.AbstractContext;
  */
 public class StandaloneContext extends AbstractContext {
 
-    private StandaloneContext(final AbstractContext that) {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneContext.class);
+    
+    private StandaloneContext(final AbstractContext that) throws NamingException {
         super(that);
     }
 
-    public StandaloneContext(final Hashtable<?, ?> env) {
+    public StandaloneContext(final Hashtable<?, ?> env) throws NamingException {
         super(env);
     }
 
     @Override
-    public Context createSubcontext(final Name name) throws NamingException {
+    public Context doCreateSubcontext(final Name name) throws NamingException {
 
-        final Hashtable<Name, Object> subContexts = getSubContexts();
+        LOGGER.debug("Creating subcontext {}/{}", getNameInNamespace(), name.toString());
+        final Map<Name, Object> subContexts = getSubContexts();
 
         if (name.size() > 1) {
             if (subContexts.containsKey(name.getPrefix(1))) {
@@ -53,11 +59,11 @@ public class StandaloneContext extends AbstractContext {
                 return subContext.createSubcontext(name.getSuffix(1));
             }
             throw new NameNotFoundException(
-                    MessageFormat.format("The subcontext ''{0}'' was not found.", name.getPrefix(1)));
+                    String.format("The subcontext '%s' was not found.", name.getPrefix(1)));
         }
 
         if (lookup(name) != null) {
-            throw new NameAlreadyBoundException();
+            throw new NameAlreadyBoundException(name.toString());
         }
 
         final Name contextName = getNameParser((Name) null).parse(getNameInNamespace());

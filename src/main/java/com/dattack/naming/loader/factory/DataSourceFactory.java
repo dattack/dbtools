@@ -15,10 +15,11 @@
  */
 package com.dattack.naming.loader.factory;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
 
+import javax.naming.ConfigurationException;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -44,21 +45,23 @@ public class DataSourceFactory implements ResourceFactory<DataSource> {
     private static final String URL_KEY = "url";
     private static final String USERNAME_KEY = "username";
     private static final String PASSWORD_KEY = "password";
+    public static final String TYPE = "javax.sql.DataSource";
 
     @Override
-    public DataSource getObjectInstance(final Properties properties, final List<String> extraClasspath) {
+    public DataSource getObjectInstance(final Properties properties, final List<String> extraClasspath)
+            throws NamingException {
 
         final CompositeConfiguration configuration = ConfigurationUtil.createEnvSystemConfiguration();
         configuration.addConfiguration(new MapConfiguration(properties));
 
         final String driver = configuration.getString(DRIVER_KEY);
         if (driver == null) {
-            throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", DRIVER_KEY));
+            throw new ConfigurationException(String.format("Missing property '%s'", DRIVER_KEY));
         }
 
         final String url = configuration.getString(URL_KEY);
         if (url == null) {
-            throw new RuntimeException(MessageFormat.format("Missing property ''{0}''", URL_KEY));
+            throw new ConfigurationException(String.format("Missing property '%s'", URL_KEY));
         }
 
         final String user = configuration.getString(USERNAME_KEY);
@@ -70,7 +73,7 @@ public class DataSourceFactory implements ResourceFactory<DataSource> {
             dataSource = BasicDataSourceFactory.createDataSource(props);
         } catch (final Exception e) { // NOPMD by cvarela on 8/02/16 22:28
             // we will use a DataSource without a connection pool
-            LOGGER.warn(e.getMessage());
+            LOGGER.info(e.getMessage());
             dataSource = new SimpleDataSource(driver, url, user, password);
         }
 

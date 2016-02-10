@@ -24,13 +24,11 @@ import java.util.Map;
  */
 public final class ResourceFactoryRegistry {
 
-    private static final String DATASOURCE_TYPE_KEY = "javax.sql.DataSource";
-
     private static final Map<String, ResourceFactory<?>> MAPPING = new HashMap<String, ResourceFactory<?>>();
 
     static {
         // default factory list
-        MAPPING.put(DATASOURCE_TYPE_KEY, new DataSourceFactory());
+        MAPPING.put(DataSourceFactory.TYPE, new DataSourceFactory());
     }
 
     private ResourceFactoryRegistry() {

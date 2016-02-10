@@ -17,7 +17,6 @@ package com.dattack.naming.standalone;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ import com.dattack.naming.loader.NamingLoader;
  */
 public final class StandaloneContextFactory implements InitialContextFactory {
 
-    private static volatile Context context;
+    private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneContextFactory.class);
 
     private static final String CLASSPATH_DIRECTORY_PROPERTY = StandaloneContextFactory.class.getName()
             + ".classpath.directory";
@@ -55,7 +54,26 @@ public final class StandaloneContextFactory implements InitialContextFactory {
     private static final String RESOURCES_DIRECTORY_PROPERTY = StandaloneContextFactory.class.getName()
             + ".resources.directory";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneContextFactory.class);
+    private static volatile Context context;
+
+    private Context createInitialContext(final File dir, final Hashtable<?, ?> environment,
+            final CompositeConfiguration configuration) throws NamingException {
+
+        LOGGER.debug("Scanning directory '{}' for JNDI resources.", dir);
+        try {
+            final StandaloneContext ctx = new StandaloneContext(environment);
+            final NamingLoader loader = new NamingLoader();
+            final List<String> extraClasspath = CollectionUtils
+                    .listAsString(configuration.getList(CLASSPATH_DIRECTORY_PROPERTY));
+            loader.loadDirectory(dir, ctx, extraClasspath);
+
+            LOGGER.debug("JNDI context is ready");
+
+            return ctx;
+        } catch (final IOException e) {
+            throw (NamingException) new NamingException(e.getMessage()).initCause(e);
+        }
+    }
 
     private CompositeConfiguration getConfiguration(final Map<?, ?> environment) {
 
@@ -72,41 +90,36 @@ public final class StandaloneContextFactory implements InitialContextFactory {
     @Override
     public Context getInitialContext(final Hashtable<?, ?> environment) throws NamingException {
 
-        synchronized (StandaloneContextFactory.class) {
-            if (context == null) {
-
-                final CompositeConfiguration configuration = getConfiguration(environment);
-
-                final Object configDir = ConfigurationUtil
-                        .interpolate(configuration.getProperty(RESOURCES_DIRECTORY_PROPERTY), configuration);
-
-                if (configDir != null) {
-
-                    final List<String> extraClasspath = CollectionUtils
-                            .listAsString(configuration.getList(CLASSPATH_DIRECTORY_PROPERTY));
-
-                    final File dir = FilesystemUtils.locate(ObjectUtils.toString(configDir));
-
-                    if ((dir != null) && dir.exists()) {
-                        LOGGER.info("Scanning directory '{}' for JNDI resources.", dir);
-                        try {
-                            final StandaloneContext ctx = new StandaloneContext(environment);
-                            final NamingLoader loader = new NamingLoader();
-                            loader.loadDirectory(dir, ctx, extraClasspath);
-                            context = ctx;
-                        } catch (final IOException e) {
-                            throw (NamingException) new NamingException(e.getMessage()).initCause(e);
-                        }
-                    } else {
-                        throw new ConfigurationException(
-                                MessageFormat.format("JNDI configuration error: directory ''{0}'' not exists", dir));
-                    }
-                } else {
-                    throw new ConfigurationException(MessageFormat.format(
-                            "JNDI configuration error: missing property ''{0}''", RESOURCES_DIRECTORY_PROPERTY));
+        if (context == null) {
+            synchronized (StandaloneContextFactory.class) {
+                if (context == null) {
+                    context = loadInitialContext(environment);
                 }
             }
         }
         return context;
+    }
+
+    private Context loadInitialContext(final Hashtable<?, ?> environment) throws NamingException {
+
+        LOGGER.debug("loadInitialContext: {}", environment);
+        final CompositeConfiguration configuration = getConfiguration(environment);
+
+        final Object configDir = ConfigurationUtil.interpolate(configuration.getProperty(RESOURCES_DIRECTORY_PROPERTY),
+                configuration);
+
+        if (configDir == null) {
+            throw new ConfigurationException(
+                    String.format("JNDI configuration error: missing property '%s'", RESOURCES_DIRECTORY_PROPERTY));
+        }
+
+        final File dir = FilesystemUtils.locate(ObjectUtils.toString(configDir));
+
+        if ((dir != null) && dir.exists()) {
+            return createInitialContext(dir, environment, configuration);
+        }
+
+        throw new ConfigurationException(
+                String.format("JNDI configuration error: directory not exists '%s'", configDir));
     }
 }
