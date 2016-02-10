@@ -38,7 +38,7 @@ Thumbs.db
 
 # Maven files #
 ###############
-.classpath
-.project
-.settings
+#.classpath
+#.project
+#.settings
 target

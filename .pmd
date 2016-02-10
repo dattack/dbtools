@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pmd>
+<pmd rulesetfiles="dattack-pmd-rulesets.xml">
     <useProjectRuleSet>true</useProjectRuleSet>
-    <ruleSetFile>/Users/carlos/workspace/dev/com.dattack/git/dbtools/dattack-pmd-ruleset.xml</ruleSetFile>
-    <includeDerivedFiles>false</includeDerivedFiles>
-    <violationsAsErrors>true</violationsAsErrors>
-    <fullBuildEnabled>true</fullBuildEnabled>
+    <rules/>
 </pmd>
