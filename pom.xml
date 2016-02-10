@@ -71,6 +71,7 @@
 		<findbugs-maven-plugin.version>3.0.3</findbugs-maven-plugin.version>
 		<freemarker.version>2.3.23</freemarker.version>
 		<jacoco-maven-plugin.version>0.7.5.201505241946</jacoco-maven-plugin.version>
+		<junit.version>4.12</junit.version>
 		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 		<maven-changelog-plugin.version>2.3</maven-changelog-plugin.version>
 		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
@@ -132,6 +133,12 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 		<!-- For test only -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
