@@ -23,12 +23,12 @@ import com.dattack.dbtools.drules.beans.Identifier;
  * @author cvarela
  * @since 0.1
  */
-public class IdentifierNotFoundException extends AbstractDrulesException {
+public class IdentifierNotFoundException extends DrulesNestableException {
 
     private static final long serialVersionUID = 8870365523740741549L;
 
     public IdentifierNotFoundException(final Class<?> entityClazz, final Identifier identifier) {
-        super(String.format("%s not found [taskId: %s]", entityClazz.getSimpleName(),
+        super(String.format("%s not found [Id: %s]", entityClazz.getSimpleName(),
                 identifier == null ? null : identifier.getValue()));
     }
 }

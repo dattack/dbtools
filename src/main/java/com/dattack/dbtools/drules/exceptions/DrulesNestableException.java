@@ -16,16 +16,24 @@
 package com.dattack.dbtools.drules.exceptions;
 
 /**
- * Top-level exception that is thrown when the integrator tool fails.
+ * Top-level exception that is thrown when the drules tool fails.
  *
  * @author cvarela
  * @since 0.1
  */
-public abstract class AbstractDrulesException extends RuntimeException {
+public class DrulesNestableException extends Exception {
 
     private static final long serialVersionUID = 8305544418991155317L;
 
-    public AbstractDrulesException(final String message) {
+    public DrulesNestableException(final String message) {
         super(message);
+    }
+
+    public DrulesNestableException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public DrulesNestableException(final Throwable cause) {
+        super(cause);
     }
 }

@@ -29,6 +29,7 @@ import com.dattack.dbtools.drules.beans.EventActionLogBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.drules.beans.SourceBean;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
 import com.dattack.ext.script.JavaScriptEngine;
 
 /**
@@ -62,8 +63,7 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
                     ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
             ThreadContext.getInstance().setProperty(item.getName(), value);
         } catch (final ScriptException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new DrulesNestableRuntimeException(e);
         }
     }
 
@@ -79,7 +79,7 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
                         ConfigurationUtils.cloneConfiguration(ThreadContext.getInstance().getConfiguration()));
                 sourceResult = sourceExecutor.call();
             } catch (final Exception e) {
-                e.printStackTrace();
+                throw new DrulesNestableRuntimeException(e);
             } finally {
                 if (sourceResult != null) {
                     sourceResult.close();

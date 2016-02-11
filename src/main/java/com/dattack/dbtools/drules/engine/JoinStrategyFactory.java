@@ -19,6 +19,8 @@ import java.util.List;
 
 import com.dattack.dbtools.drules.beans.Identifier;
 import com.dattack.dbtools.drules.beans.JoinBean;
+import com.dattack.dbtools.drules.beans.JoinBean.JoinType;
+import com.dattack.dbtools.drules.exceptions.IdentifierNotFoundException;
 
 /**
  * @author cvarela
@@ -46,27 +48,24 @@ public final class JoinStrategyFactory {
      * @return the join strategy
      * @throws IllegalArgumentException
      *             if the join type is unknown
+     * @throws IdentifierNotFoundException 
      */
     public JoinStrategy create(final JoinBean joinBean, final SourceResultGroup sourceResultList)
-            throws IllegalArgumentException {
+            throws IllegalArgumentException, IdentifierNotFoundException {
 
-        switch (joinBean.getType()) {
-
-        case INNER:
+        if (joinBean.getType().equals(JoinType.INNER)) {
             return createInnerJoinStrategy(joinBean, sourceResultList);
-
-        default:
-            throw new IllegalArgumentException(String.format("Unknown JOIN type: {}", joinBean.getType()));
         }
+        throw new IllegalArgumentException(String.format("Unknown JOIN type: {}", joinBean.getType()));
     }
 
-    private InnerJoinStrategy createInnerJoinStrategy(final JoinBean joinBean,
-            final SourceResultGroup sourceResultList) {
+    private InnerJoinStrategy createInnerJoinStrategy(final JoinBean joinBean, final SourceResultGroup sourceResultList)
+            throws IllegalArgumentException, IdentifierNotFoundException {
 
         final List<Identifier> sourceNames = joinBean.getSources();
         if (sourceNames.size() != 2) {
             // TODO: throw other exception or support join over two or more sources
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     String.format("Unsupported join over %d sources [name: %s]", sourceNames.size(), sourceNames));
         }
 

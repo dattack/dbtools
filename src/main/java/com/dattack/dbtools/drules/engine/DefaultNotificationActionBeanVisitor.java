@@ -38,6 +38,7 @@ import com.dattack.dbtools.drules.beans.ConfigurationMailingListBean;
 import com.dattack.dbtools.drules.beans.ConfigurationSmtpBean;
 import com.dattack.dbtools.drules.beans.NotificationActionBeanVisitor;
 import com.dattack.dbtools.drules.beans.NotificationActionSendMailBean;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
 import com.dattack.ext.mail.HtmlEmailBuilder;
 import com.dattack.ext.misc.ConfigurationUtil;
 
@@ -138,7 +139,7 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
             }
 
         } catch (final Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            throw new DrulesNestableRuntimeException(e);
         }
     }
 }

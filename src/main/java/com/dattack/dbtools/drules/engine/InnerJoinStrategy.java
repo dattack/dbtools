@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.dattack.dbtools.drules.beans.Identifier;
 import com.dattack.dbtools.drules.beans.JoinBean;
 import com.dattack.dbtools.drules.beans.JoinResultBean;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 
 /**
  * @author cvarela
@@ -53,7 +54,7 @@ public class InnerJoinStrategy implements JoinStrategy {
     }
 
     @Override
-    public void execute(final FlightRecorder flightRecorder) {
+    public void execute(final FlightRecorder flightRecorder) throws DrulesNestableException {
 
         try {
 
@@ -98,7 +99,7 @@ public class InnerJoinStrategy implements JoinStrategy {
             } while (true);
 
         } catch (final SQLException e) {
-            e.printStackTrace();
+            throw new DrulesNestableException(e);
         }
     }
 

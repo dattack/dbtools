@@ -15,7 +15,6 @@
  */
 package com.dattack.dbtools.drules.engine;
 
-import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import javax.script.ScriptException;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -35,7 +32,6 @@ import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import com.dattack.dbtools.GlobalConfiguration;
 import com.dattack.dbtools.drules.beans.ConfigurationBean;
@@ -51,6 +47,7 @@ import com.dattack.dbtools.drules.beans.NotificationEventBean;
 import com.dattack.dbtools.drules.beans.RowCheckBean;
 import com.dattack.dbtools.drules.beans.SourceBean;
 import com.dattack.dbtools.drules.beans.TaskBean;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 import com.dattack.dbtools.drules.exceptions.IdentifierNotFoundException;
 import com.dattack.ext.concurrent.ThreadFactoryBuilder;
 import com.dattack.ext.script.JavaScriptEngine;
@@ -87,8 +84,8 @@ public class DrulesEngine {
      * @param initialConfiguration
      *            properties required to perform the task
      */
-    public void execute(final String drulesFilename, final Identifier taskId,
-            final Configuration initialConfiguration) {
+    public void execute(final String drulesFilename, final Identifier taskId, final Configuration initialConfiguration)
+            throws DrulesNestableException {
 
         try {
 
@@ -107,14 +104,13 @@ public class DrulesEngine {
 
             execute(taskBean, configurationBean);
 
-        } catch (final Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (final ConfigurationException e) {
+            throw new DrulesNestableException(e);
         }
     }
 
     private void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
-            throws InterruptedException, ExecutionException, ConfigurationException, IOException, JAXBException,
-            SAXException, ParserConfigurationException {
+            throws ConfigurationException, DrulesNestableException {
 
         LOGGER.info("Integrity task (Task ID: {}, Task name: {}): STARTED", taskBean.getId(), taskBean.getName());
 
@@ -149,7 +145,7 @@ public class DrulesEngine {
         LOGGER.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
     }
 
-    private void executeJsEvals(final TaskBean taskBean) {
+    private void executeJsEvals(final TaskBean taskBean) throws DrulesNestableException {
 
         if (CollectionUtils.isNotEmpty(taskBean.getEvalList())) {
             for (final EventActionEvalJsBean item : taskBean.getEvalList()) {
@@ -157,8 +153,7 @@ public class DrulesEngine {
                     final Object value = JavaScriptEngine.eval(item.getExpression());
                     ThreadContext.getInstance().setProperty(item.getName(), value);
                 } catch (final ScriptException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new DrulesNestableException(e);
                 }
             }
         }
@@ -186,12 +181,12 @@ public class DrulesEngine {
     }
 
     private void executeRowChecks(final TaskBean taskBean, final SourceResultGroup sourceResultList,
-            final FlightRecorder flightRecorder) {
+            final FlightRecorder flightRecorder) throws IllegalArgumentException, DrulesNestableException {
 
         for (final RowCheckBean rowCheck : taskBean.getRowChecks()) {
             // TODO: clone the sourceResultList to execute more than one loop
             if (taskBean.getRowChecks().size() > 1) {
-                throw new RuntimeException("TODO: clone the sourceResultList to execute more than one loop");
+                throw new IllegalArgumentException("TODO: clone the sourceResultList to execute more than one loop");
             }
 
             for (final JoinBean joinBean : rowCheck.getJoinList()) {
@@ -200,15 +195,13 @@ public class DrulesEngine {
         }
     }
 
-    private ConfigurationBean getConfigurationBean()
-            throws IOException, JAXBException, SAXException, ParserConfigurationException, ConfigurationException {
+    private ConfigurationBean getConfigurationBean() throws ConfigurationException, DrulesNestableException {
 
         return DrulesParser.parseConfigurationBean(
                 GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_CONFIGURATION_FILE_KEY));
     }
 
-    private SourceResultGroup getSourceResultsList(final List<SourceBean> sourceList)
-            throws InterruptedException, ExecutionException {
+    private SourceResultGroup getSourceResultsList(final List<SourceBean> sourceList) throws DrulesNestableException {
 
         final ExecutorService executorService = Executors.newCachedThreadPool(createThreadFactory());
 
@@ -222,7 +215,11 @@ public class DrulesEngine {
         final SourceResultGroup sourceResultList = new SourceResultGroup();
 
         for (final Future<SourceResult> future : futureList) {
-            sourceResultList.add(future.get());
+            try {
+                sourceResultList.add(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                throw new DrulesNestableException(e);
+            }
         }
         executorService.shutdown();
 

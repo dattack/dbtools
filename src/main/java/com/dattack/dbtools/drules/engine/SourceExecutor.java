@@ -39,6 +39,7 @@ import com.dattack.dbtools.drules.beans.SourceBean;
 import com.dattack.dbtools.drules.beans.SourceCommandBean;
 import com.dattack.dbtools.drules.beans.SourceCommandBeanVisitor;
 import com.dattack.dbtools.drules.beans.SqlQueryBean;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
 import com.dattack.ext.misc.ConfigurationUtil;
 
@@ -185,21 +186,25 @@ final class SourceExecutor implements Callable<SourceResult> {
     }
 
     @Override
-    public SourceResult call() throws Exception {
+    public SourceResult call() throws DrulesNestableException {
 
-        ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
+        try {
+            ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
 
-        final String jndiName = getInterpolatedJndiName();
+            final String jndiName = getInterpolatedJndiName();
 
-        LOGGER.info("Configuring datasource with JNDI name: '{}'", jndiName);
-        final Connection connection = getConnection(jndiName);
+            LOGGER.info("Configuring datasource with JNDI name: '{}'", jndiName);
+            final Connection connection = getConnection(jndiName);
 
-        final DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
-        for (final Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
-            final SourceCommandBean command = it.next();
-            command.accept(visitor);
+            final DefaultSourceCommandBeanVisitor visitor = new DefaultSourceCommandBeanVisitor(connection);
+            for (final Iterator<SourceCommandBean> it = sourceBean.getCommandList().iterator(); it.hasNext();) {
+                final SourceCommandBean command = it.next();
+                command.accept(visitor);
+            }
+            return new SourceResult(sourceBean.getId(), connection, visitor.getLastResultSet());
+        } catch (final SQLException e) {
+            throw new DrulesNestableException(e);
         }
-        return new SourceResult(sourceBean.getId(), connection, visitor.getLastResultSet());
     }
 
     private ResultSet executeStatement(final Statement statement, final String sql) throws SQLException {

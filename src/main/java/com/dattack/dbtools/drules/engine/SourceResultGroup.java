@@ -20,7 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.dattack.dbtools.drules.beans.Identifier;
-import com.dattack.dbtools.drules.exceptions.ConfigurationMistakeException;
+import com.dattack.dbtools.drules.beans.SourceBean;
+import com.dattack.dbtools.drules.exceptions.IdentifierNotFoundException;
 
 /**
  * @author cvarela
@@ -38,14 +39,14 @@ final class SourceResultGroup implements Iterable<SourceResult> {
         this.sourceResults.add(item);
     }
 
-    public SourceResult get(final Identifier sourceName) {
+    public SourceResult get(final Identifier sourceName) throws IdentifierNotFoundException {
 
         for (final SourceResult sourceResult : sourceResults) {
             if (sourceName.equals(sourceResult.getSourceAlias())) {
                 return sourceResult;
             }
         }
-        throw new ConfigurationMistakeException(String.format("Missing source '%s'", sourceName));
+        throw new IdentifierNotFoundException(SourceBean.class, sourceName);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, The Dattack team (http://www.dattack.com)
+ * Copyright (c) 2016, The Dattack team (http://www.dattack.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ package com.dattack.dbtools.drules.exceptions;
  * @author cvarela
  * @since 0.1
  */
-public class ConfigurationMistakeException extends AbstractDrulesException {
+public class DrulesParserException extends DrulesNestableException {
 
-    private static final long serialVersionUID = -1907144195373864929L;
+    private static final long serialVersionUID = 4118277771421918250L;
 
-    public ConfigurationMistakeException(final String message) {
-        super(message);
+    public DrulesParserException(final Throwable cause) {
+        super(cause);
     }
+
 }

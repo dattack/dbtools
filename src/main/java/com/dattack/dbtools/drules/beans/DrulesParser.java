@@ -30,6 +30,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
+import com.dattack.dbtools.drules.exceptions.DrulesParserException;
 import com.dattack.ext.io.FilesystemUtils;
 
 /**
@@ -39,37 +41,38 @@ import com.dattack.ext.io.FilesystemUtils;
 public final class DrulesParser {
 
     private static Object parse(final String filename, final Class<?> clazz)
-            throws JAXBException, SAXException, ParserConfigurationException, IOException {
+            throws DrulesNestableException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setXIncludeAware(true);
         spf.setNamespaceAware(true);
         spf.setValidating(true);
 
-        final XMLReader xmlreader = spf.newSAXParser().getXMLReader();
-
         try (final FileInputStream fileInputStream = new FileInputStream(FilesystemUtils.locate(filename))) {
             final InputSource input = new InputSource(fileInputStream);
+            final XMLReader xmlreader = spf.newSAXParser().getXMLReader();
             final Source source = new SAXSource(xmlreader, input);
 
             final JAXBContext ctx = JAXBContext.newInstance(clazz);
             final Unmarshaller unmarshaller = ctx.createUnmarshaller();
             return unmarshaller.unmarshal(source);
+        } catch (JAXBException | IOException | SAXException | ParserConfigurationException e) {
+            throw new DrulesParserException(e);
         }
     }
 
     public static ConfigurationBean parseConfigurationBean(final String filename)
-            throws JAXBException, SAXException, ParserConfigurationException, IOException {
+            throws DrulesNestableException {
         return (ConfigurationBean) parse(filename, ConfigurationBean.class);
     }
 
     public static DrulesBean parseIntegrityBean(final String filename)
-            throws JAXBException, SAXException, ParserConfigurationException, IOException {
+            throws DrulesNestableException {
         return (DrulesBean) parse(filename, DrulesBean.class);
     }
 
     public static NotificationBean parseNotificationBean(final String filename)
-            throws JAXBException, SAXException, ParserConfigurationException, IOException {
+            throws DrulesNestableException {
         return (NotificationBean) parse(filename, NotificationBean.class);
     }
 

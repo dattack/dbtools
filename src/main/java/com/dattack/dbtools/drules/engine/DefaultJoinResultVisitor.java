@@ -31,6 +31,7 @@ import com.dattack.dbtools.drules.beans.Identifier;
 import com.dattack.dbtools.drules.beans.JoinResultBeanVisitor;
 import com.dattack.dbtools.drules.beans.JoinResultMatchBean;
 import com.dattack.dbtools.drules.beans.JoinResultMissingBean;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
 import com.dattack.ext.script.JavaScriptEngine;
 
 /**
@@ -117,8 +118,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
                 try {
                     execute(checkExprBean);
                 } catch (final ScriptException e) {
-                    // TODO: throw a proper exception
-                    LOGGER.error(e.getMessage(), e);
+                    throw new DrulesNestableRuntimeException(e);
                 }
             }
         }
