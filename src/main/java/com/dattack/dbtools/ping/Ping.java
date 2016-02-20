@@ -97,8 +97,11 @@ public final class Ping {
                 }
             };
 
-            for (final File child : file.listFiles(filter)) {
-                execute(child);
+            final File[] files = file.listFiles(filter);
+            if (files != null) {
+                for (final File child : files) {
+                    execute(child);
+                }
             }
 
         } else {
