@@ -33,6 +33,7 @@ import com.dattack.dbtools.GlobalConfiguration;
 import com.dattack.dbtools.drules.beans.Identifier;
 import com.dattack.dbtools.drules.beans.Identifier.IdentifierBuilder;
 import com.dattack.dbtools.drules.engine.DrulesEngine;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 import com.dattack.ext.misc.ConfigurationUtil;
 
 /**
@@ -78,7 +79,7 @@ public final class DrulesClient {
         return options;
     }
 
-    private static void execute(final String[] args) throws Exception {
+    private static void execute(final String[] args) throws ConfigurationException, DrulesNestableException {
 
         final Options options = createOptions();
 
@@ -127,7 +128,7 @@ public final class DrulesClient {
         try {
             execute(args);
             System.exit(0);
-        } catch (final Throwable e) {
+        } catch (final Throwable e) { // NOPMD by cvarela on 20/02/16 13:19
             LOGGER.error(e.getMessage(), e);
             System.exit(-1);
         }

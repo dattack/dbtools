@@ -40,8 +40,7 @@ import com.dattack.ext.io.FilesystemUtils;
  */
 public final class DrulesParser {
 
-    private static Object parse(final String filename, final Class<?> clazz)
-            throws DrulesNestableException {
+    private static Object parse(final String filename, final Class<?> clazz) throws DrulesNestableException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setXIncludeAware(true);
@@ -61,18 +60,15 @@ public final class DrulesParser {
         }
     }
 
-    public static ConfigurationBean parseConfigurationBean(final String filename)
-            throws DrulesNestableException {
+    public static ConfigurationBean parseConfigurationBean(final String filename) throws DrulesNestableException {
         return (ConfigurationBean) parse(filename, ConfigurationBean.class);
     }
 
-    public static DrulesBean parseIntegrityBean(final String filename)
-            throws DrulesNestableException {
+    public static DrulesBean parseIntegrityBean(final String filename) throws DrulesNestableException {
         return (DrulesBean) parse(filename, DrulesBean.class);
     }
 
-    public static NotificationBean parseNotificationBean(final String filename)
-            throws DrulesNestableException {
+    public static NotificationBean parseNotificationBean(final String filename) throws DrulesNestableException {
         return (NotificationBean) parse(filename, NotificationBean.class);
     }
 

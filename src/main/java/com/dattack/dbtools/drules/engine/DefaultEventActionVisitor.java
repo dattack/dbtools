@@ -29,6 +29,7 @@ import com.dattack.dbtools.drules.beans.EventActionLogBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.drules.beans.SourceBean;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
 import com.dattack.ext.script.JavaScriptEngine;
 
@@ -78,7 +79,7 @@ public class DefaultEventActionVisitor implements EventActionBeanVisitor {
                 final SourceExecutor sourceExecutor = new SourceExecutor(sourceBean,
                         ConfigurationUtils.cloneConfiguration(ThreadContext.getInstance().getConfiguration()));
                 sourceResult = sourceExecutor.call();
-            } catch (final Exception e) {
+            } catch (final DrulesNestableException e) {
                 throw new DrulesNestableRuntimeException(e);
             } finally {
                 if (sourceResult != null) {

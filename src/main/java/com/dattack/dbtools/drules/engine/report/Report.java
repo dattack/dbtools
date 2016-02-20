@@ -31,9 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.GlobalConfiguration;
 import com.dattack.dbtools.TemplateHelper;
+import com.dattack.dbtools.drules.beans.AbstractEventActionThrowableBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
-import com.dattack.dbtools.drules.beans.AbstractEventActionThrowableBean;
 import com.dattack.dbtools.drules.engine.IdentifierValuePair;
 import com.dattack.dbtools.drules.engine.PropertyNames;
 import com.dattack.dbtools.drules.engine.RowData;
@@ -122,18 +122,18 @@ public class Report {
 
     private String log(final List<RowData> rowDataList) {
 
-        final StringBuilder buffer = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder();
         for (final RowData rowData : rowDataList) {
             for (final Iterator<IdentifierValuePair> it = rowData.getFieldValueList().iterator(); it.hasNext();) {
                 final IdentifierValuePair item = it.next();
-                buffer.append(item.getKey()).append(": ").append(item.getValue());
+                stringBuilder.append(item.getKey()).append(": ").append(item.getValue());
                 if (it.hasNext()) {
-                    buffer.append(", ");
+                    stringBuilder.append(", ");
                 }
             }
-            buffer.append("\n");
+            stringBuilder.append("\n");
         }
-        return buffer.toString();
+        return stringBuilder.toString();
     }
 
     @Override

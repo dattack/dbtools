@@ -138,7 +138,7 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
                 sendMail(flightRecorder.getConfigurationBean().getConfigurationSmtpBean(), action);
             }
 
-        } catch (final Exception e) {
+        } catch (final EmailException | AddressException | ConfigurationException | TemplateException | IOException e) {
             throw new DrulesNestableRuntimeException(e);
         }
     }

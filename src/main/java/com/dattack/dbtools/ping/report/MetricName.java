@@ -42,7 +42,7 @@ public class MetricName {
     public static MetricName parse(final String text) {
 
         if (text == null) {
-            throw new NullPointerException("Unable to parse a 'null' value as a metric name");
+            throw new NullPointerException("Unable to parse a 'null' value as a metric name"); // NOPMD by cvarela on 20/02/16 19:29
         }
 
         final String[] tokens = text.split(":");

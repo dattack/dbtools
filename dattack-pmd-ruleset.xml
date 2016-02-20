@@ -314,7 +314,11 @@
 		</properties>
 	</rule>
 	<rule ref="rulesets/java/codesize.xml/NcssMethodCount" />
-	<rule ref="rulesets/java/codesize.xml/TooManyMethods" />
+	<rule ref="rulesets/java/codesize.xml/TooManyMethods">
+		<properties>
+			<property name="maxmethods" value="20" />
+		</properties>
+	</rule>
 
 	<!-- imports -->
 
