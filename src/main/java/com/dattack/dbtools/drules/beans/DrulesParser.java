@@ -61,14 +61,28 @@ public final class DrulesParser {
     }
 
     public static ConfigurationBean parseConfigurationBean(final String filename) throws DrulesNestableException {
+
+        if (filename == null) {
+            throw new IllegalArgumentException(
+                    "The 'ConfigurationBean XML' filename can't be null. Check your configuration");
+        }
         return (ConfigurationBean) parse(filename, ConfigurationBean.class);
     }
 
     public static DrulesBean parseIntegrityBean(final String filename) throws DrulesNestableException {
+
+        if (filename == null) {
+            throw new IllegalArgumentException("The 'DrulesBean XML' filename can't be null. Check your configuration");
+        }
         return (DrulesBean) parse(filename, DrulesBean.class);
     }
 
     public static NotificationBean parseNotificationBean(final String filename) throws DrulesNestableException {
+
+        if (filename == null) {
+            throw new IllegalArgumentException(
+                    "The 'NotificationBean XML' filename can't be null. Check your configuration");
+        }
         return (NotificationBean) parse(filename, NotificationBean.class);
     }
 
