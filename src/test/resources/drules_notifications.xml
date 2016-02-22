@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE notification>
+
+<notification>
+  <onSuccess>
+    <sendMail to="${mailingListSuccess}" subject="Success ${taskName}"/>
+  </onSuccess>
+  <onWarning>
+    <sendMail to="${mailingListWarning}" subject="Warning ${taskName}"/>
+  </onWarning>
+  <onError>
+    <sendMail to="${mailingListError}" subject="ERROR ${taskName}"/>
+  </onError>
+</notification>
