@@ -17,11 +17,13 @@ package com.dattack.dbtools.drules.engine;
 
 import java.util.List;
 
+import com.dattack.dbtools.drules.beans.AbstractEventActionThrowableBean;
 import com.dattack.dbtools.drules.beans.ConfigurationBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowErrorBean;
 import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.drules.beans.TaskBean;
 import com.dattack.dbtools.drules.engine.report.Report;
+import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
 
 /**
  * @author cvarela
@@ -73,13 +75,27 @@ public final class FlightRecorder {
         report.handleLog(rowDataList);
     }
 
-    public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList) {
+    public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList)
+            throws DrulesNestableRuntimeException {
         errorCounter++;
         report.handleError(action, rowDataList);
+        handleEventAction(action);
     }
 
-    public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList) {
+    public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList)
+            throws DrulesNestableRuntimeException {
         warningCounter++;
         report.handleWarning(action, rowDataList);
+        handleEventAction(action);
+    }
+
+    private void handleEventAction(final AbstractEventActionThrowableBean action)
+            throws DrulesNestableRuntimeException {
+        action.incrEvents();
+        if (action.isMaxEventsReached()) {
+            throw new DrulesNestableRuntimeException(
+                    String.format("The maximum number of events has been reached (current: %d, max: %d)",
+                            action.getCurrentEvents(), action.getMaxEvents()));
+        }
     }
 }

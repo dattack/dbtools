@@ -46,7 +46,7 @@ public abstract class AbstractEventActionThrowableBean implements EventActionBea
         return currentEvents;
     }
 
-    int getMaxEvents() {
+    public int getMaxEvents() {
         return maxEvents;
     }
 
