@@ -80,8 +80,9 @@ final class SourceExecutor implements Callable<SourceResult> {
             }
 
             final Identifier identifier = new IdentifierBuilder().withValue(bean.getRef()).build();
-            try (ResultSet resultSet = resultSetMap.get(identifier)) {
+            try {
 
+                ResultSet resultSet = resultSetMap.get(identifier);
                 if (resultSet == null) {
                     throw new NullPointerException(String.format("Missing ResultSet named '%s'", bean.getRef()));
                 }
@@ -165,14 +166,15 @@ final class SourceExecutor implements Callable<SourceResult> {
         @Override
         public void visit(final SqlQueryBean bean) {
 
-            try (Statement statement = connection.createStatement()) {
+            Statement statement = null;
+            try {
 
                 populateConfigurationFromFirstRows();
 
                 final String interpolatedSql = ConfigurationUtil.interpolate(bean.getSql(), configuration);
-                try (ResultSet resultSet = executeStatement(statement, interpolatedSql)) {
-                    setLastValues(bean, resultSet);
-                }
+                statement = connection.createStatement();
+                ResultSet resultSet = executeStatement(statement, interpolatedSql);
+                setLastValues(bean, resultSet);
 
             } catch (final SQLException e) {
                 throw new RuntimeException(e);
