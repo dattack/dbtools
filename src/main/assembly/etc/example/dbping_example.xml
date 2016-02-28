@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dbping>
+<dbping>
+	<task name="salgrade_test" threads="1" executions="10"
+		    timeBetweenExecutions="100" datasource="jdbc/sqlite-db1"
+		    maxRowsToDump="10">
+		<query label="sql-1">SELECT *
+			FROM salgrade
+			WHERE hisal &gt; 2500
+		</query>
+		<query label="sql-2">SELECT * FROM salgrade WHERE losal &lt; 1500</query>
+		<logger classname="">
+		</logger>
+		<log-file>${basedir}/logs/dbping_${task.name}.log</log-file>
+	</task>
+
+	<task name="emp_test" threads="1" executions="10"
+		 timeBetweenExecutions="10" datasource="jdbc/sqlite-db1"
+		 maxRowsToDump="10">
+		<query label="deptno10">SELECT * FROM emp WHERE deptno = 10</query>
+		<query label="deptno20">SELECT * FROM emp WHERE deptno = 20</query>
+		<query label="deptno30">SELECT * FROM emp WHERE deptno = 30</query>
+		<query label="deptno40">SELECT * FROM emp WHERE deptno = 40</query>
+		<query label="mgr">SELECT * FROM emp WHERE mgr IN (7839, 7698)</query>
+		<log-file>${basedir}/logs/dbping_${task.name}.log</log-file>
+	</task>
+	
+    <task name="dept_test" threads="1" executions="10"
+        timeBetweenExecutions="100" datasource="jdbc/sqlite-db2">
+        <query>SELECT * FROM dept</query>
+        <log-file>${basedir}/logs/dbping_${task.name}.log</log-file>
+    </task>
+    <task name="error_test" threads="1" executions="1" datasource="jdbc/sqlite-db2">
+        <query>SELECT * FROM missing_table</query>
+        <log-file>${basedir}/logs/dbping_${task.name}.log</log-file>
+    </task>
+</dbping>

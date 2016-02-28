@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE drules>
-
-<drules xmlns:xi="http://www.w3.org/2001/XInclude">
+<drules>
 
   <task id="varenv" name="Gas Oil variables">
-    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
-    <eval name="successRows" expr="0" />
-    <eval name="warningRows" expr="0" />
-    <eval name="errorRows" expr="0" />
     <source jndi="jdbc/sqlite-db1" id="datasource1">
       <sql>
         <![CDATA[
@@ -27,35 +21,22 @@
       <join type="INNER" using="day, name" source="datasource1, datasource2">
         <onMatch>
           <check expr="datasource1.get('price') == datasource2.get('price')">
-            <onSuccess>
-              <eval name="successRows" expr="successRows + 1" />
-            </onSuccess>
             <onFail>
-              <eval name="warningRows" expr="warningRows + 1" />
-              <throwWarning max="10"/>
+              <throwWarning max="15"/>
             </onFail>
           </check>
         </onMatch>
         <onMissing source="datasource1">
-          <eval name="warningRows" expr="warningRows + 1" />
-          <throwWarning max="10"/>
+          <throwWarning max="5000"/>
         </onMissing>
         <onMissing source="datasource2">
-          <throwError max="10"/>
+          <throwError max="1"/>
         </onMissing>
       </join>
     </rowCheck>
   </task>
 
-<!--
   <task id="error-test" name="Gas Oil check">
-
-    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
-    <eval name="successRows" expr="0" />
-    <eval name="warningRows" expr="0" />
-    <eval name="errorRows" expr="0" />
-    <eval name="aborted" expr="false" />
-
     <source jndi="jdbc/sqlite-db1" id="datasource1">
       <sql scope="pre">
         <![CDATA[
@@ -98,44 +79,40 @@
     <rowCheck constraint="sorted">
       <join type="INNER" using="day, name" source="datasource1, datasource2">
         <onMatch>
-          <check expr="Math.abs(datasource1.get('price') - datasource2.get('price')) &lt; 0.50 * datasource2.get('open_price')">
+          <check>
+            <expr>
+            <![CDATA[
+              Math.abs(datasource1.get('price') - datasource2.get('price')) < 0.50 * datasource2.get('open_price')
+            ]]>
+            </expr>
             <onSuccess>
               <executeSql>
                 <source jndi="jdbc/sqlite-db_stats">
                   <sql>
-                  INSERT INTO dummy (metric, counter)
-                  VALUES ('${datasource1.name}', ${datasource1.volume})
+                  <![CDATA[
+                    INSERT INTO dummy (metric, counter)
+                    VALUES ('${datasource1.name}', ${datasource1.volume})
+                  ]]>
                   </sql>
                 </source>
               </executeSql>
-              <eval name="successRows" expr="successRows + 1" />
             </onSuccess>
             <onFail>
-              <eval name="warningRows" expr="warningRows + 1" />
-              <throwWarning max="10"><xi:include href="html_on_fail_template.xml"/></throwWarning>
+              <throwWarning max="10"/>
             </onFail>
           </check>
         </onMatch>
         <onMissing source="datasource1">
-          <eval name="warningRows" expr="warningRows + 1" />
-          <throwWarning max="10"><xi:include href="html_on_missing_template.xml"/></throwWarning>
+          <throwWarning max="10"/>
         </onMissing>
         <onMissing source="datasource2">
-          <throwError max="10"><xi:include href="html_on_missing_template.xml"/></throwError>
+          <throwError max="10"/>
         </onMissing>
       </join>
     </rowCheck>
-	<xi:include href="notifications.xml" />
   </task>
 
   <task id="test-loop" name="Test loop">
-
-    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
-    <eval name="successRows" expr="0" />
-    <eval name="warningRows" expr="0" />
-    <eval name="errorRows" expr="0" />
-    <eval name="aborted" expr="false" />
-
     <source jndi="jdbc/sqlite-db1" id="datasource1">
       <sql>
         <![CDATA[
@@ -184,36 +161,28 @@
     <rowCheck constraint="sorted">
       <join type="INNER" using="branch" source="datasource1, datasource2">
         <onMatch>
-          <check expr="datasource1.get('value') == datasource2.get('value')">
-            <onSuccess>
-              <eval name="successRows" expr="successRows + 1" />
-            </onSuccess>
+          <check>
+            <expr>
+            <![CDATA[
+              datasource1.get('value') == datasource2.get('value')
+            ]]>
+            </expr>
             <onFail>
-              <eval name="warningRows" expr="warningRows + 1" />
-              <throwWarning max="10"><xi:include href="html_on_fail_template.xml"/></throwWarning>
+              <throwWarning max="10" />
             </onFail>
           </check>
         </onMatch>
         <onMissing source="datasource1">
-          <eval name="warningRows" expr="warningRows + 1" />
-          <throwWarning max="10"><xi:include href="html_on_missing_template.xml"/></throwWarning>
+          <throwWarning max="10" />
         </onMissing>
         <onMissing source="datasource2">
-          <throwError max="10"><xi:include href="html_on_missing_template.xml"/></throwError>
+          <throwError max="10" />
         </onMissing>
       </join>
     </rowCheck>
-    <xi:include href="notifications.xml" />
   </task>
 
   <task id="test-loop-resultset" name="Test loop ResultSet">
-
-    <eval name="executionTimestamp" expr="new Date().getTime().toFixed();" />
-    <eval name="successRows" expr="0" />
-    <eval name="warningRows" expr="0" />
-    <eval name="errorRows" expr="0" />
-    <eval name="aborted" expr="false" />
-
     <source jndi="jdbc/sqlite-db1" id="datasource1">
       <sql>
         <![CDATA[
@@ -276,26 +245,25 @@
     <rowCheck constraint="sorted">
       <join type="INNER" using="branch" source="datasource1, datasource2">
         <onMatch>
-          <check expr="datasource1.get('value') == datasource2.get('value')">
-            <onSuccess>
-              <eval name="successRows" expr="successRows + 1" />
-            </onSuccess>
+          <check>
+            <expr>
+            <![CDATA[
+              datasource1.get('value') == datasource2.get('value')
+            ]]>
+            </expr>
             <onFail>
-              <eval name="warningRows" expr="warningRows + 1" />
-              <throwWarning max="10"><xi:include href="html_on_fail_template.xml"/></throwWarning>
+              <throwWarning max="10" />
             </onFail>
           </check>
         </onMatch>
         <onMissing source="datasource1">
-          <eval name="warningRows" expr="warningRows + 1" />
-          <throwWarning max="10"><xi:include href="html_on_missing_template.xml"/></throwWarning>
+          <throwWarning max="10" />
         </onMissing>
         <onMissing source="datasource2">
-          <throwError max="10"><xi:include href="html_on_missing_template.xml"/></throwError>
+          <throwError max="10" />
         </onMissing>
       </join>
     </rowCheck>
-	<xi:include href="notifications.xml" />
   </task>
--->
+
 </drules>
