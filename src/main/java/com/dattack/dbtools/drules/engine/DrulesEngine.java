@@ -122,27 +122,30 @@ public class DrulesEngine {
         // executes the source' statements and retrieves the ResultSets to check
         final SourceResultGroup sourceResultGroup = getSourceResultsList(taskBean.getSources());
 
-        // execute checks
-        executeRowChecks(taskBean, sourceResultGroup, flightRecorder);
+        try {
+            // execute checks
+            executeRowChecks(taskBean, sourceResultGroup, flightRecorder);
+        } finally {
 
-        // execute global checks
-        // TODO: execute global checks
+            // execute global checks
+            // TODO: execute global checks
 
-        // process the flight recorder and execute notifications
-        if (taskBean.getNotification() != null) {
-            executeNotifications(taskBean.getNotification(), flightRecorder);
-        } else {
-            final String notificationsFile = GlobalConfiguration
-                    .getProperty(GlobalConfiguration.DRULES_NOTIFICATIONS_FILE_KEY);
-            if (StringUtils.isNotBlank(notificationsFile)) {
-                final NotificationBean notification = DrulesParser.parseNotificationBean(notificationsFile);
-                executeNotifications(notification, flightRecorder);
+            // process the flight recorder and execute notifications
+            if (taskBean.getNotification() != null) {
+                executeNotifications(taskBean.getNotification(), flightRecorder);
+            } else {
+                final String notificationsFile = GlobalConfiguration
+                        .getProperty(GlobalConfiguration.DRULES_NOTIFICATIONS_FILE_KEY);
+                if (StringUtils.isNotBlank(notificationsFile)) {
+                    final NotificationBean notification = DrulesParser.parseNotificationBean(notificationsFile);
+                    executeNotifications(notification, flightRecorder);
+                }
             }
+
+            sourceResultGroup.close();
+
+            LOGGER.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
         }
-
-        sourceResultGroup.close();
-
-        LOGGER.info("Integrity task (Task ID: {}, Task name: {}): COMPLETED", taskBean.getId(), taskBean.getName());
     }
 
     private void executeJsEvals(final TaskBean taskBean) throws DrulesNestableException {
