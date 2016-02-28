@@ -78,6 +78,7 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         if (bool == null || !bool) {
             execute(checkExprBean.getOnFail());
         } else {
+            flightRecorder.incrSuccess();
             execute(checkExprBean.getOnSucess());
         }
     }

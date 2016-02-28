@@ -90,6 +90,7 @@ public class DrulesEngine {
         try {
 
             ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
+            ThreadContext.getInstance().setProperty(PropertyNames.EXECUTION_ID, System.currentTimeMillis());
 
             final DrulesBean drulesBean = DrulesParser.parseIntegrityBean(drulesFilename);
 

@@ -33,6 +33,7 @@ public final class FlightRecorder {
 
     private final TaskBean taskBean;
     private final ConfigurationBean configurationBean;
+    private int successCounter;
     private int errorCounter;
     private int warningCounter;
     private final Report report;
@@ -40,6 +41,7 @@ public final class FlightRecorder {
     public FlightRecorder(final TaskBean taskBean, final ConfigurationBean configurationBean) {
         this.taskBean = taskBean;
         this.configurationBean = configurationBean;
+        this.successCounter = 0;
         this.errorCounter = 0;
         this.warningCounter = 0;
         this.report = new Report();
@@ -61,6 +63,22 @@ public final class FlightRecorder {
         return warningCounter > 0;
     }
 
+    public void incrSuccess() {
+        this.successCounter++;
+    }
+
+    public int getSuccessCounter() {
+        return successCounter;
+    }
+
+    public int getErrorCounter() {
+        return errorCounter;
+    }
+
+    public int getWarningCounter() {
+        return warningCounter;
+    }
+
     /**
      * Returns the current report.
      * 
@@ -75,6 +93,16 @@ public final class FlightRecorder {
         report.handleLog(rowDataList);
     }
 
+    /**
+     * Executes the action to handle an error event.
+     * 
+     * @param action
+     *            the action to be performed
+     * @param rowDataList
+     *            the row data list
+     * @throws DrulesMaxEventsException
+     *             if the maximum number of allowed events is reached
+     */
     public void handleError(final EventActionThrowErrorBean action, final List<RowData> rowDataList)
             throws DrulesMaxEventsException {
         errorCounter++;
@@ -82,6 +110,16 @@ public final class FlightRecorder {
         handleEventAction(action);
     }
 
+    /**
+     * Executes the action to handle a warning event.
+     * 
+     * @param action
+     *            the action to be performed
+     * @param rowDataList
+     *            the row data list
+     * @throws DrulesMaxEventsException
+     *             if the maximum number of allowed events is reached
+     */
     public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList)
             throws DrulesMaxEventsException {
         warningCounter++;

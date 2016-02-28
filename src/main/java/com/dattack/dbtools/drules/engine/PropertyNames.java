@@ -26,21 +26,33 @@ public final class PropertyNames {
     /** Property 'check.expr'. */
     public static final String CHECK_EXPR = "checkExpression";
 
-    /** Property 'log'. */
-    public static final String LOG = "log";
+    /** Property 'errorRows'. */
+    public static final String ERROR_ROWS = "errorRows";
 
-    /** Property 'task.name'. */
-    public static final String TASK_NAME = "taskName";
+    /** Property 'executionId'. */
+    public static final String EXECUTION_ID = "executionId";
 
     /** Property 'join.using'. */
     public static final String JOIN_CONDITION = "joinCondition";
 
+    /** Property 'log'. */
+    public static final String LOG = "log";
+
     /** Property 'onMissing.source'. */
     public static final String MISSING_SOURCE = "missingSource";
-
+    
     /** Property 'status'. */
     public static final String STATUS = "status";
-
+    
+    /** Property 'successRows'. */
+    public static final String SUCCESS_ROWS = "successRows";
+    
+    /** Property 'task.name'. */
+    public static final String TASK_NAME = "taskName";
+    
+    /** Property 'warningRows'. */
+    public static final String WARNING_ROWS = "warningRows";
+    
     private PropertyNames() {
         // static class
     }

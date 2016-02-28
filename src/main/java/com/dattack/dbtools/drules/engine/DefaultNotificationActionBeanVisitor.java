@@ -101,6 +101,9 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         configuration.setDelimiterParsingDisabled(true);
         configuration.setProperty(PropertyNames.TASK_NAME, flightRecorder.getTaskBean().getName());
         configuration.setProperty(PropertyNames.LOG, flightRecorder.getReport().toString());
+        configuration.setProperty(PropertyNames.SUCCESS_ROWS, flightRecorder.getSuccessCounter());
+        configuration.setProperty(PropertyNames.ERROR_ROWS, flightRecorder.getErrorCounter());
+        configuration.setProperty(PropertyNames.WARNING_ROWS, flightRecorder.getWarningCounter());
 
         for (final ConfigurationMailingListBean item : config.getMailingLists()) {
             configuration.setProperty(item.getName(), item.getAddressList());
