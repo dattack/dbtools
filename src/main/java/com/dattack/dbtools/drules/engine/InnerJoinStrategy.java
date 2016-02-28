@@ -115,17 +115,16 @@ public class InnerJoinStrategy implements JoinStrategy {
 
     private void setExecutionProperties() {
 
-        final StringBuilder joinUsingBuilder = new StringBuilder();
-        joinUsingBuilder.append("USING[");
+        final StringBuilder joinCondition = new StringBuilder();
         for (int i = 0; i < joinBean.getUsing().size(); i++) {
             final Identifier identifier = joinBean.getUsing().get(i);
             if (i > 0) {
-                joinUsingBuilder.append(", ");
+                joinCondition.append(" AND ");
             }
-            joinUsingBuilder.append(identifier.getValue());
+            joinCondition.append(String.format("%s.%s = %s.%s", joinBean.getSources().get(0).getValue(),
+                    identifier.getValue(), joinBean.getSources().get(1).getValue(), identifier.getValue()));
         }
-        joinUsingBuilder.append(']');
 
-        ThreadContext.getInstance().setProperty(PropertyNames.JOIN_CONDITION, joinUsingBuilder.toString());
+        ThreadContext.getInstance().setProperty(PropertyNames.JOIN_CONDITION, joinCondition.toString());
     }
 }
