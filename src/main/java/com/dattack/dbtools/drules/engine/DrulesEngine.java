@@ -74,27 +74,35 @@ public class DrulesEngine {
                 }).build();
     }
 
+    private final String drulesFilename;
+    private DrulesBean drulesBean;
+
+    public DrulesEngine(final String drulesFilename, final Configuration initialConfiguration) {
+        this.drulesFilename = drulesFilename;
+        ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
+        ThreadContext.getInstance().setProperty(PropertyNames.EXECUTION_ID, System.currentTimeMillis());
+    }
+
+    private synchronized DrulesBean getDrulesBean() throws DrulesNestableException {
+        if (drulesBean == null) {
+            drulesBean = DrulesParser.parseIntegrityBean(drulesFilename);
+        }
+        return drulesBean;
+    }
+
     /**
      * Executes the task defined in the file whose identifier matches the indicated.
      *
-     * @param drulesFilename
-     *            the file name
      * @param taskId
      *            the task identifier
      * @param initialConfiguration
      *            properties required to perform the task
      */
-    public void execute(final String drulesFilename, final Identifier taskId, final Configuration initialConfiguration)
+    public void execute(final Identifier taskId)
             throws DrulesNestableException {
 
         try {
-
-            ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
-            ThreadContext.getInstance().setProperty(PropertyNames.EXECUTION_ID, System.currentTimeMillis());
-
-            final DrulesBean drulesBean = DrulesParser.parseIntegrityBean(drulesFilename);
-
-            final TaskBean taskBean = drulesBean.getTask(taskId);
+            final TaskBean taskBean = getDrulesBean().getTask(taskId);
             if (taskBean == null) {
                 throw new IdentifierNotFoundException(TaskBean.class, taskId);
             }

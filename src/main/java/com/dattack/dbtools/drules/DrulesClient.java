@@ -87,15 +87,17 @@ public final class DrulesClient {
             final CommandLineParser parser = new DefaultParser();
             final CommandLine cmd = parser.parse(options, args);
             final String filename = cmd.getOptionValue(DRULES_OPTION);
-            final Identifier taskId = new IdentifierBuilder().withValue(cmd.getOptionValue(TASK_OPTION)).build();
 
             CompositeConfiguration configuration = null;
             if (cmd.hasOption(PROPERTIES_OPTION)) {
                 configuration = loadProperties(cmd.getOptionValues(PROPERTIES_OPTION));
             }
 
-            final DrulesEngine engine = new DrulesEngine();
-            engine.execute(filename, taskId, configuration);
+            final DrulesEngine engine = new DrulesEngine(filename, configuration);
+            for (String taskName : cmd.getOptionValues(TASK_OPTION)) {
+                final Identifier taskId = new IdentifierBuilder().withValue(taskName).build();
+                engine.execute(taskId);
+            }
         } catch (@SuppressWarnings("unused") final ParseException e) {
             showUsage(options);
         }
