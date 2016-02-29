@@ -40,7 +40,7 @@ public final class DrulesBean implements Serializable {
 
     /**
      * Find a TaskBean by Identifier.
-     * 
+     *
      * @param taskId
      *            the desired identifier
      * @return the TaskBean or null if not exists
@@ -53,5 +53,12 @@ public final class DrulesBean implements Serializable {
             }
         }
         return null;
+    }
+
+    /**
+     * @return the taskBeanList
+     */
+    public List<TaskBean> getTaskBeanList() {
+        return taskBeanList;
     }
 }

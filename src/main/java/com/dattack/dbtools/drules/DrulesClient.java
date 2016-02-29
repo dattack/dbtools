@@ -15,6 +15,8 @@
  */
 package com.dattack.dbtools.drules;
 
+import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -61,7 +63,7 @@ public final class DrulesClient {
                 .build());
 
         options.addOption(Option.builder(TASK_OPTION) //
-                .required(true) //
+                .required(false) //
                 .longOpt("task") //
                 .hasArg(true) //
                 .argName("TASK_NAME") //
@@ -94,12 +96,31 @@ public final class DrulesClient {
             }
 
             final DrulesEngine engine = new DrulesEngine(filename, configuration);
-            for (String taskName : cmd.getOptionValues(TASK_OPTION)) {
-                final Identifier taskId = new IdentifierBuilder().withValue(taskName).build();
-                engine.execute(taskId);
+
+            if (cmd.hasOption(TASK_OPTION)) {
+                for (String taskName : cmd.getOptionValues(TASK_OPTION)) {
+                    final Identifier taskId = new IdentifierBuilder().withValue(taskName).build();
+                    engine.execute(taskId);
+                }
+            } else {
+                // list available tasks
+                showTaskList(engine.listTasks());
+
             }
         } catch (@SuppressWarnings("unused") final ParseException e) {
             showUsage(options);
+        }
+    }
+
+    private static void showTaskList(List<Identifier> taskList) {
+
+        if (taskList == null || taskList.isEmpty()) {
+            System.out.println("There are no tasks available to you yet");
+        } else {
+            System.out.println("Available tasks:");
+            for (int index = 0; index < taskList.size(); index++) {
+                System.out.format("  % 3d) %s%n", index + 1, taskList.get(index).getValue());
+            }
         }
     }
 

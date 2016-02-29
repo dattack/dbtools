@@ -90,6 +90,15 @@ public class DrulesEngine {
         return drulesBean;
     }
 
+    public List<Identifier> listTasks() throws DrulesNestableException {
+        List<TaskBean> taskBeanList = getDrulesBean().getTaskBeanList();
+        List<Identifier> identifierList = new ArrayList<Identifier>(taskBeanList.size());
+        for (TaskBean taskBean : taskBeanList) {
+            identifierList.add(taskBean.getId());
+        }
+        return identifierList;
+    }
+
     /**
      * Executes the task defined in the file whose identifier matches the indicated.
      *
@@ -98,8 +107,7 @@ public class DrulesEngine {
      * @param initialConfiguration
      *            properties required to perform the task
      */
-    public void execute(final Identifier taskId)
-            throws DrulesNestableException {
+    public void execute(final Identifier taskId) throws DrulesNestableException {
 
         try {
             final TaskBean taskBean = getDrulesBean().getTask(taskId);
