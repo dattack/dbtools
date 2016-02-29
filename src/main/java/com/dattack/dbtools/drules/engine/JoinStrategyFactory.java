@@ -48,7 +48,7 @@ public final class JoinStrategyFactory {
      * @return the join strategy
      * @throws IllegalArgumentException
      *             if the join type is unknown
-     * @throws IdentifierNotFoundException 
+     * @throws IdentifierNotFoundException
      */
     public JoinStrategy create(final JoinBean joinBean, final SourceResultGroup sourceResultList)
             throws IllegalArgumentException, IdentifierNotFoundException {
@@ -59,7 +59,8 @@ public final class JoinStrategyFactory {
         throw new IllegalArgumentException(String.format("Unknown JOIN type: {}", joinBean.getType()));
     }
 
-    private InnerJoinStrategy createInnerJoinStrategy(final JoinBean joinBean, final SourceResultGroup sourceResultList)
+    private static InnerJoinStrategy createInnerJoinStrategy(final JoinBean joinBean,
+            final SourceResultGroup sourceResultList)
             throws IllegalArgumentException, IdentifierNotFoundException {
 
         final List<Identifier> sourceNames = joinBean.getSources();

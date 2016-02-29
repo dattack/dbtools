@@ -107,7 +107,7 @@ public final class Identifier implements Serializable {
         return result;
     }
 
-    private String normalize(final String text) {
+    private static String normalize(final String text) {
         return StringUtils.trim(StringUtils.lowerCase(text));
     }
 

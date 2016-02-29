@@ -98,12 +98,12 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         }
     }
 
-    private void registerCheckExpr(final CheckExprBean checkExprBean) {
+    private static void registerCheckExpr(final CheckExprBean checkExprBean) {
         ThreadContext.getInstance().setProperty(PropertyNames.CHECK_EXPR, checkExprBean.getExpression());
         registerMissingSource(null);
     }
 
-    private void registerMissingSource(final Identifier sourceIdentifier) {
+    private static void registerMissingSource(final Identifier sourceIdentifier) {
 
         if (sourceIdentifier == null) {
             ThreadContext.getInstance().clearProperty(PropertyNames.MISSING_SOURCE);

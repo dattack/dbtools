@@ -71,7 +71,7 @@ public class SQLSentenceWeightedRandomProvider implements SQLSentenceProvider {
         return sentenceList.get(sentenceList.size() - 1);
     }
 
-    private float norm(final float weight, final float sumWeight) {
+    private static float norm(final float weight, final float sumWeight) {
         return weight / sumWeight;
     }
 

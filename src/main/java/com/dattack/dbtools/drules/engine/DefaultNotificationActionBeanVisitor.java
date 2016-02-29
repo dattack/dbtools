@@ -59,7 +59,7 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
         this.flightRecorder = flightRecorder;
     }
 
-    private Template createTemplate(final NotificationActionSendMailBean bean)
+    private static Template createTemplate(final NotificationActionSendMailBean bean)
             throws ConfigurationException, IOException {
 
         if (StringUtils.isNotBlank(bean.getMessageTemplateText())) {
@@ -75,7 +75,7 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
                 .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_EMAIL_KEY));
     }
 
-    private String formatMessage(final NotificationActionSendMailBean action, final Configuration configuration)
+    private static String formatMessage(final NotificationActionSendMailBean action, final Configuration configuration)
             throws TemplateException, IOException, ConfigurationException {
 
         final Template template = createTemplate(action);

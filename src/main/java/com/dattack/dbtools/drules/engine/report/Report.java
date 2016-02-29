@@ -64,7 +64,7 @@ public class Report {
         buffer.append(text);
     }
 
-    private Template createTemplate(final AbstractEventActionThrowableBean action)
+    private static Template createTemplate(final AbstractEventActionThrowableBean action)
             throws ConfigurationException, IOException {
 
         if (StringUtils.isNotBlank(action.getTemplateText())) {
@@ -112,7 +112,7 @@ public class Report {
         handle(action, rowDataList, STATUS_WARNING);
     }
 
-    String interpolate(final String message, final String status, final String log) {
+    static String interpolate(final String message, final String status, final String log) {
         final CompositeConfiguration configuration = new CompositeConfiguration(
                 ThreadContext.getInstance().getConfiguration());
         configuration.setProperty(PropertyNames.LOG, log);
@@ -120,7 +120,7 @@ public class Report {
         return ConfigurationUtil.interpolate(message, configuration);
     }
 
-    private String log(final List<RowData> rowDataList) {
+    private static String log(final List<RowData> rowDataList) {
 
         final StringBuilder stringBuilder = new StringBuilder();
         for (final RowData rowData : rowDataList) {

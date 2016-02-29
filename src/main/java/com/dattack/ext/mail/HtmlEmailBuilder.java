@@ -135,7 +135,9 @@ public class HtmlEmailBuilder {
     }
 
     public HtmlEmailBuilder withPort(final Integer value) {
-        this.port = value;
+        if (value != null) {
+            this.port = value.intValue();
+        }
         return this;
     }
 

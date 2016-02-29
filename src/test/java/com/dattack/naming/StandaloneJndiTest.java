@@ -45,7 +45,7 @@ public final class StandaloneJndiTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private String getCompositeName(final String context, final String objectName) {
+    private static String getCompositeName(final String context, final String objectName) {
         return String.format("%s/%s", context, objectName);
     }
 

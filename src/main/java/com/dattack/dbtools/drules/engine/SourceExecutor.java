@@ -222,7 +222,7 @@ final class SourceExecutor implements Callable<SourceResult> {
         return null;
     }
 
-    private Connection getConnection(final String jndiName) throws SQLException {
+    private static Connection getConnection(final String jndiName) throws SQLException {
         return new DataSourceBuilder().withJndiName(jndiName).build().getConnection();
     }
 

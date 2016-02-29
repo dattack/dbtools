@@ -24,7 +24,19 @@ import com.dattack.csv.CSVConfiguration.CsvConfigurationBuilder;
  */
 public class CSVConfigurationFactory {
 
+    private static final String DEFAULT_SEPARATOR = "\t";
+
+    private final String separator;
+
+    public CSVConfigurationFactory() {
+        this(DEFAULT_SEPARATOR);
+    }
+
+    public CSVConfigurationFactory(final String separator) {
+        this.separator = separator;
+    }
+
     public CSVConfiguration create() {
-        return new CsvConfigurationBuilder().withSeparator("\t").build();
+        return new CsvConfigurationBuilder().withSeparator(separator).build();
     }
 }

@@ -134,7 +134,7 @@ public final class Ping {
         }
     }
 
-    private SQLSentenceProvider getSentenceProvider(final String clazzname) {
+    private static SQLSentenceProvider getSentenceProvider(final String clazzname) {
 
         SQLSentenceProvider sentenceProvider = null;
 

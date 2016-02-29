@@ -119,11 +119,11 @@ public class MetricName {
         return result;
     }
 
-    private boolean isEquals(final String text1, final String text2) {
+    private static boolean isEquals(final String text1, final String text2) {
         return text1.equalsIgnoreCase(text2) || StringUtils.isBlank(text1) || StringUtils.isBlank(text2);
     }
 
-    private String normalize(final String text) {
+    private static String normalize(final String text) {
         return StringUtils.trimToEmpty(text).replaceAll("\"", "");
     }
 

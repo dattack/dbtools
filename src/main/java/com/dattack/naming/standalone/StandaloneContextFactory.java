@@ -56,7 +56,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
 
     private static volatile Context context;
 
-    private Context createInitialContext(final File dir, final Hashtable<?, ?> environment,
+    private static Context createInitialContext(final File dir, final Hashtable<?, ?> environment,
             final CompositeConfiguration configuration) throws NamingException {
 
         LOGGER.debug("Scanning directory '{}' for JNDI resources.", dir);
@@ -75,7 +75,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
         }
     }
 
-    private CompositeConfiguration getConfiguration(final Map<?, ?> environment) {
+    private static CompositeConfiguration getConfiguration(final Map<?, ?> environment) {
 
         final BaseConfiguration baseConf = new BaseConfiguration();
         for (final Entry<?, ?> entry : environment.entrySet()) {
@@ -100,7 +100,7 @@ public final class StandaloneContextFactory implements InitialContextFactory {
         return context;
     }
 
-    private Context loadInitialContext(final Hashtable<?, ?> environment) throws NamingException {
+    private static Context loadInitialContext(final Hashtable<?, ?> environment) throws NamingException {
 
         LOGGER.debug("loadInitialContext: {}", environment);
         final CompositeConfiguration configuration = getConfiguration(environment);

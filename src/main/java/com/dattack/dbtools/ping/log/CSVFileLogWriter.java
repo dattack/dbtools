@@ -67,14 +67,14 @@ public class CSVFileLogWriter implements LogWriter {
         String data = null;
         synchronized (csvBuilder) {
             csvBuilder.append(new Date(entry.getEventTime())) //
-                    .append(StringUtils.trimToEmpty(entry.getTaskName())) //
-                    .append(StringUtils.trimToEmpty(entry.getThreadName())) //
-                    .append(entry.getIteration()) //
-                    .append(StringUtils.trimToEmpty(entry.getSqlLabel())) //
-                    .append(entry.getRows()) //
-                    .append(entry.getConnectionTime()) //
-                    .append(entry.getFirstRowTime()) //
-                    .append(entry.getTotalTime());
+            .append(StringUtils.trimToEmpty(entry.getTaskName())) //
+            .append(StringUtils.trimToEmpty(entry.getThreadName())) //
+            .append(entry.getIteration()) //
+            .append(StringUtils.trimToEmpty(entry.getSqlLabel())) //
+            .append(entry.getRows()) //
+            .append(entry.getConnectionTime()) //
+            .append(entry.getFirstRowTime()) //
+            .append(entry.getTotalTime());
 
             if (entry.getException() != null) {
                 csvBuilder.append(normalize(entry.getException().getMessage()));
@@ -104,7 +104,7 @@ public class CSVFileLogWriter implements LogWriter {
                         .append(": ") //
                         .append(normalize(ObjectUtils.toString(header.getProperties().get(key)))) //
                         .toString() //
-                );
+                        );
             }
 
             csvBuilder.comment("SQL Sentences:");
@@ -114,16 +114,16 @@ public class CSVFileLogWriter implements LogWriter {
             }
 
             csvBuilder.comment() //
-                    .append("date") //
-                    .append("task-name") //
-                    .append("thread-name") //
-                    .append("iteration") //
-                    .append("sql-label") //
-                    .append("rows") //
-                    .append("connection-time") //
-                    .append("first-row-time") //
-                    .append("total-time") //
-                    .append("message").eol();
+            .append("date") //
+            .append("task-name") //
+            .append("thread-name") //
+            .append("iteration") //
+            .append("sql-label") //
+            .append("rows") //
+            .append("connection-time") //
+            .append("first-row-time") //
+            .append("total-time") //
+            .append("message").eol();
 
             data = csvBuilder.toString();
             csvBuilder.clear();
@@ -143,7 +143,7 @@ public class CSVFileLogWriter implements LogWriter {
         return new FileOutputStream(file, true);
     }
 
-    private String normalize(final String text) {
+    private static String normalize(final String text) {
         return text.replaceAll("\n", " ");
     }
 

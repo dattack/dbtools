@@ -81,7 +81,7 @@ public final class FlightRecorder {
 
     /**
      * Returns the current report.
-     * 
+     *
      * @return the report
      */
     public Report getReport() {
@@ -95,7 +95,7 @@ public final class FlightRecorder {
 
     /**
      * Executes the action to handle an error event.
-     * 
+     *
      * @param action
      *            the action to be performed
      * @param rowDataList
@@ -112,7 +112,7 @@ public final class FlightRecorder {
 
     /**
      * Executes the action to handle a warning event.
-     * 
+     *
      * @param action
      *            the action to be performed
      * @param rowDataList
@@ -127,7 +127,8 @@ public final class FlightRecorder {
         handleEventAction(action);
     }
 
-    private void handleEventAction(final AbstractEventActionThrowableBean action) throws DrulesMaxEventsException {
+    private static void handleEventAction(final AbstractEventActionThrowableBean action)
+            throws DrulesMaxEventsException {
         action.incrEvents();
         if (action.isMaxEventsReached()) {
             throw new DrulesMaxEventsException(action.getMaxEvents());

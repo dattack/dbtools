@@ -125,20 +125,19 @@ public final class PingAnalyzer {
         } else {
 
             try {
-                final Reporter reporter = new Reporter();
-                reporter.execute(file, context);
+                Reporter.execute(file, context);
             } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
     }
-    
+
     private void execute(final File[] files, final ReportContext context) throws ConfigurationException {
-        
+
         if (files == null) {
             return;
         }
-        
+
         for (final File child : files) {
             execute(child, context);
         }

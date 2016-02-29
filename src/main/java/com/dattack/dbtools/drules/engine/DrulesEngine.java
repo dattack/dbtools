@@ -61,7 +61,7 @@ public class DrulesEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DrulesEngine.class);
 
-    private ThreadFactory createThreadFactory() {
+    private static ThreadFactory createThreadFactory() {
         return new ThreadFactoryBuilder() //
                 .withNamePrefix("source") //
                 .withUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -110,7 +110,7 @@ public class DrulesEngine {
         }
     }
 
-    private void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
+    private static void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
             throws ConfigurationException, DrulesNestableException {
 
         LOGGER.info("Integrity task (Task ID: {}, Task name: {}): STARTED", taskBean.getId(), taskBean.getName());
@@ -149,7 +149,7 @@ public class DrulesEngine {
         }
     }
 
-    private void executeJsEvals(final TaskBean taskBean) throws DrulesNestableException {
+    private static void executeJsEvals(final TaskBean taskBean) throws DrulesNestableException {
 
         if (CollectionUtils.isNotEmpty(taskBean.getEvalList())) {
             for (final EventActionEvalJsBean item : taskBean.getEvalList()) {
@@ -163,7 +163,7 @@ public class DrulesEngine {
         }
     }
 
-    private void executeNotification(final NotificationEventBean bean, final FlightRecorder flightRecorder) {
+    private static void executeNotification(final NotificationEventBean bean, final FlightRecorder flightRecorder) {
 
         final NotificationActionBeanVisitor visitor = new DefaultNotificationActionBeanVisitor(flightRecorder);
         for (final NotificationActionBean action : bean.getActionList()) {
@@ -171,7 +171,8 @@ public class DrulesEngine {
         }
     }
 
-    private void executeNotifications(final NotificationBean notificationBean, final FlightRecorder flightRecorder) {
+    private static void executeNotifications(final NotificationBean notificationBean,
+            final FlightRecorder flightRecorder) {
 
         if (flightRecorder.hasErrors() && notificationBean.getOnError() != null) {
             executeNotification(notificationBean.getOnError(), flightRecorder);
@@ -184,7 +185,7 @@ public class DrulesEngine {
         }
     }
 
-    private void executeRowChecks(final TaskBean taskBean, final SourceResultGroup sourceResultList,
+    private static void executeRowChecks(final TaskBean taskBean, final SourceResultGroup sourceResultList,
             final FlightRecorder flightRecorder) throws IllegalArgumentException, DrulesNestableException {
 
         for (final RowCheckBean rowCheck : taskBean.getRowChecks()) {
@@ -199,13 +200,14 @@ public class DrulesEngine {
         }
     }
 
-    private ConfigurationBean getConfigurationBean() throws ConfigurationException, DrulesNestableException {
+    private static ConfigurationBean getConfigurationBean() throws ConfigurationException, DrulesNestableException {
 
         return DrulesParser.parseConfigurationBean(
                 GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_CONFIGURATION_FILE_KEY));
     }
 
-    private SourceResultGroup getSourceResultsList(final List<SourceBean> sourceList) throws DrulesNestableException {
+    private static SourceResultGroup getSourceResultsList(final List<SourceBean> sourceList)
+            throws DrulesNestableException {
 
         final ExecutorService executorService = Executors.newCachedThreadPool(createThreadFactory());
 

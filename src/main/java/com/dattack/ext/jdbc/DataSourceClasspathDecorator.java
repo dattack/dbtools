@@ -80,8 +80,8 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
         initialized = true;
     }
 
-    private void configureClasspath(final List<URL> urlList) throws NoSuchMethodException, SecurityException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
+    private static void configureClasspath(final List<URL> urlList) throws NoSuchMethodException, SecurityException,
+    IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
 
         try (final URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader()) {
             final Class<?> urlClass = URLClassLoader.class;
@@ -94,8 +94,9 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
         }
     }
 
-    private void configureDirectoryClasspath(final File directory) throws NoSuchMethodException, SecurityException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
+    private static void configureDirectoryClasspath(final File directory)
+            throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, IOException {
 
         final File[] jars = directory.listFiles(new FileFilter() {
             @Override
@@ -117,8 +118,8 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
         configureClasspath(urlList);
     }
 
-    private void configureJarClasspath(final File jar) throws NoSuchMethodException, SecurityException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
+    private static void configureJarClasspath(final File jar) throws NoSuchMethodException, SecurityException,
+    IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
 
         final List<URL> urlList = new ArrayList<URL>();
         try {

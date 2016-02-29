@@ -30,7 +30,7 @@ import com.dattack.dbtools.ping.log.CSVFileLogReader;
  */
 public class Reporter {
 
-    private void createHtml(final PrintWriter writer, final String jsFile, final String logFile) {
+    private static void createHtml(final PrintWriter writer, final String jsFile, final String logFile) {
 
         writer.println("<!DOCTYPE HTML>");
         writer.println("<html>");
@@ -56,8 +56,8 @@ public class Reporter {
         writer.println("</html>");
     }
 
-    private void createJs(final ReportContext context, final PrintWriter writer, final CSVFileLogReader logReader)
-            throws IOException {
+    private static void createJs(final ReportContext context, final PrintWriter writer,
+            final CSVFileLogReader logReader) throws IOException {
 
         final ReportStats reportStats = new ReportStats(context);
 
@@ -145,7 +145,7 @@ public class Reporter {
      * @throws IOException
      *             if an I/O error occurs
      */
-    public void execute(final File dataFile, final ReportContext context) throws IOException {
+    public static void execute(final File dataFile, final ReportContext context) throws IOException {
 
         try (CSVFileLogReader logReader = new CSVFileLogReader(dataFile)) {
 
