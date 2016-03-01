@@ -17,7 +17,6 @@ package com.dattack.ext.jdbc;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -81,22 +80,20 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
     }
 
     private static void configureClasspath(final List<URL> urlList) throws NoSuchMethodException, SecurityException,
-    IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
+    IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-        try (final URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader()) {
-            final Class<?> urlClass = URLClassLoader.class;
-            final Method method = urlClass.getDeclaredMethod("addURL", new Class[] { URL.class });
-            method.setAccessible(true);
+        final Class<?> urlClass = URLClassLoader.class;
+        final Method method = urlClass.getDeclaredMethod("addURL", new Class[] { URL.class });
+        method.setAccessible(true);
 
-            for (final URL u : urlList) {
-                method.invoke(urlClassLoader, new Object[] { u });
-            }
+        for (final URL u : urlList) {
+            method.invoke(ClassLoader.getSystemClassLoader(), new Object[] { u });
         }
     }
 
     private static void configureDirectoryClasspath(final File directory)
             throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException, IOException {
+            InvocationTargetException {
 
         final File[] jars = directory.listFiles(new FileFilter() {
             @Override
@@ -119,7 +116,7 @@ public final class DataSourceClasspathDecorator extends DataSourceDecorator {
     }
 
     private static void configureJarClasspath(final File jar) throws NoSuchMethodException, SecurityException,
-    IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         final List<URL> urlList = new ArrayList<URL>();
         try {
