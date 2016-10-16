@@ -19,7 +19,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import com.dattack.ext.io.FilesystemUtils;
+import com.dattack.jtoolbox.io.FilesystemUtils;
 
 /**
  * @author cvarela
@@ -43,13 +43,9 @@ public final class GlobalConfiguration {
 
     private static volatile Configuration configuration;
 
-    private GlobalConfiguration() {
-
-    }
-
     /**
      * Load the global configuration from 'dbtools.properties' file.
-     * 
+     *
      * @return the global configuration
      * @throws ConfigurationException
      *             if an error occurs
@@ -61,7 +57,7 @@ public final class GlobalConfiguration {
             synchronized (GlobalConfiguration.class) {
                 conf = configuration;
                 if (conf == null) {
-                    conf = new PropertiesConfiguration(FilesystemUtils.locate(DBTOOLS_CONFIGURATION_FILENAME));
+                    conf = new PropertiesConfiguration(FilesystemUtils.locateFile(DBTOOLS_CONFIGURATION_FILENAME));
                     configuration = conf;
                 }
             }
@@ -71,5 +67,9 @@ public final class GlobalConfiguration {
 
     public static String getProperty(final String name) throws ConfigurationException {
         return getConfiguration().getString(name);
+    }
+
+    private GlobalConfiguration() {
+
     }
 }

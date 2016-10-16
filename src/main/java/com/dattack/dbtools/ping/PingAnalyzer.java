@@ -29,7 +29,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import com.dattack.dbtools.ping.report.MetricName;
 import com.dattack.dbtools.ping.report.ReportContext;
 import com.dattack.dbtools.ping.report.Reporter;
-import com.dattack.ext.util.TimeUtils;
+import com.dattack.jtoolbox.util.TimeUtils;
 
 /**
  * @author cvarela

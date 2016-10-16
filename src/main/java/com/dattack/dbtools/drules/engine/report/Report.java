@@ -38,7 +38,7 @@ import com.dattack.dbtools.drules.engine.IdentifierValuePair;
 import com.dattack.dbtools.drules.engine.PropertyNames;
 import com.dattack.dbtools.drules.engine.RowData;
 import com.dattack.dbtools.drules.engine.ThreadContext;
-import com.dattack.ext.misc.ConfigurationUtil;
+import com.dattack.jtoolbox.commons.configuration.ConfigurationUtil;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -56,14 +56,6 @@ public class Report {
 
     private final StringBuilder buffer;
 
-    public Report() {
-        this.buffer = new StringBuilder();
-    }
-
-    void append(final String text) {
-        buffer.append(text);
-    }
-
     private static Template createTemplate(final AbstractEventActionThrowableBean action)
             throws ConfigurationException, IOException {
 
@@ -80,11 +72,43 @@ public class Report {
                 .loadTemplate(GlobalConfiguration.getProperty(GlobalConfiguration.DRULES_TEMPLATE_THROWABLE_KEY));
     }
 
+    static String interpolate(final String message, final String status, final String log) {
+        final CompositeConfiguration configuration = new CompositeConfiguration(
+                ThreadContext.getInstance().getConfiguration());
+        configuration.setProperty(PropertyNames.LOG, log);
+        configuration.setProperty(PropertyNames.STATUS, status);
+        return ConfigurationUtil.interpolate(message, configuration);
+    }
+
+    private static String log(final List<RowData> rowDataList) {
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (final RowData rowData : rowDataList) {
+            for (final Iterator<IdentifierValuePair> it = rowData.getFieldValueList().iterator(); it.hasNext();) {
+                final IdentifierValuePair item = it.next();
+                stringBuilder.append(item.getKey()).append(": ").append(item.getValue());
+                if (it.hasNext()) {
+                    stringBuilder.append(", ");
+                }
+            }
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
+
+    public Report() {
+        this.buffer = new StringBuilder();
+    }
+
+    void append(final String text) {
+        buffer.append(text);
+    }
+
     private void handle(final AbstractEventActionThrowableBean action, final List<RowData> rowDataList,
             final String status) {
 
         try {
-            final Map<Object, Object> dataModel = new HashMap<Object, Object>();
+            final Map<Object, Object> dataModel = new HashMap<>();
             dataModel.putAll(ConfigurationConverter.getMap(ThreadContext.getInstance().getConfiguration()));
             dataModel.put(PropertyNames.STATUS, status);
             dataModel.put("rowDataList", rowDataList);
@@ -110,30 +134,6 @@ public class Report {
 
     public void handleWarning(final EventActionThrowWarningBean action, final List<RowData> rowDataList) {
         handle(action, rowDataList, STATUS_WARNING);
-    }
-
-    static String interpolate(final String message, final String status, final String log) {
-        final CompositeConfiguration configuration = new CompositeConfiguration(
-                ThreadContext.getInstance().getConfiguration());
-        configuration.setProperty(PropertyNames.LOG, log);
-        configuration.setProperty(PropertyNames.STATUS, status);
-        return ConfigurationUtil.interpolate(message, configuration);
-    }
-
-    private static String log(final List<RowData> rowDataList) {
-
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (final RowData rowData : rowDataList) {
-            for (final Iterator<IdentifierValuePair> it = rowData.getFieldValueList().iterator(); it.hasNext();) {
-                final IdentifierValuePair item = it.next();
-                stringBuilder.append(item.getKey()).append(": ").append(item.getValue());
-                if (it.hasNext()) {
-                    stringBuilder.append(", ");
-                }
-            }
-            stringBuilder.append("\n");
-        }
-        return stringBuilder.toString();
     }
 
     @Override

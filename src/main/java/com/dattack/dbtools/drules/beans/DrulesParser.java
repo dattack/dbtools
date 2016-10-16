@@ -32,7 +32,7 @@ import org.xml.sax.XMLReader;
 
 import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 import com.dattack.dbtools.drules.exceptions.DrulesParserException;
-import com.dattack.ext.io.FilesystemUtils;
+import com.dattack.jtoolbox.io.FilesystemUtils;
 
 /**
  * @author cvarela
@@ -47,7 +47,7 @@ public final class DrulesParser {
         spf.setNamespaceAware(true);
         spf.setValidating(true);
 
-        try (final FileInputStream fileInputStream = new FileInputStream(FilesystemUtils.locate(filename))) {
+        try (final FileInputStream fileInputStream = new FileInputStream(FilesystemUtils.locateFile(filename))) {
             final InputSource input = new InputSource(fileInputStream);
             final XMLReader xmlreader = spf.newSAXParser().getXMLReader();
             final Source source = new SAXSource(xmlreader, input);

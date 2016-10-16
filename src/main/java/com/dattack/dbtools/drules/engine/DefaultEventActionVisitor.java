@@ -31,7 +31,7 @@ import com.dattack.dbtools.drules.beans.EventActionThrowWarningBean;
 import com.dattack.dbtools.drules.beans.SourceBean;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
-import com.dattack.ext.script.JavaScriptEngine;
+import com.dattack.jtoolbox.script.JavaScriptEngine;
 
 /**
  * @author cvarela

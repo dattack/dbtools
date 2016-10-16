@@ -36,7 +36,7 @@ import com.dattack.dbtools.drules.beans.Identifier;
 import com.dattack.dbtools.drules.beans.Identifier.IdentifierBuilder;
 import com.dattack.dbtools.drules.engine.DrulesEngine;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
-import com.dattack.ext.misc.ConfigurationUtil;
+import com.dattack.jtoolbox.commons.configuration.ConfigurationUtil;
 
 /**
  * @author cvarela
@@ -98,7 +98,7 @@ public final class DrulesClient {
             final DrulesEngine engine = new DrulesEngine(filename, configuration);
 
             if (cmd.hasOption(TASK_OPTION)) {
-                for (String taskName : cmd.getOptionValues(TASK_OPTION)) {
+                for (final String taskName : cmd.getOptionValues(TASK_OPTION)) {
                     final Identifier taskId = new IdentifierBuilder().withValue(taskName).build();
                     engine.execute(taskId);
                 }
@@ -109,18 +109,6 @@ public final class DrulesClient {
             }
         } catch (@SuppressWarnings("unused") final ParseException e) {
             showUsage(options);
-        }
-    }
-
-    private static void showTaskList(List<Identifier> taskList) {
-
-        if (taskList == null || taskList.isEmpty()) {
-            System.out.println("There are no tasks available to you yet");
-        } else {
-            System.out.println("Available tasks:");
-            for (int index = 0; index < taskList.size(); index++) {
-                System.out.format("  % 3d) %s%n", index + 1, taskList.get(index).getValue());
-            }
         }
     }
 
@@ -154,6 +142,18 @@ public final class DrulesClient {
         } catch (final Throwable e) { // NOPMD by cvarela on 20/02/16 13:19
             LOGGER.error(e.getMessage(), e);
             System.exit(-1);
+        }
+    }
+
+    private static void showTaskList(final List<Identifier> taskList) {
+
+        if (taskList == null || taskList.isEmpty()) {
+            System.out.println("There are no tasks available to you yet");
+        } else {
+            System.out.println("Available tasks:");
+            for (int index = 0; index < taskList.size(); index++) {
+                System.out.format("  % 3d) %s%n", index + 1, taskList.get(index).getValue());
+            }
         }
     }
 

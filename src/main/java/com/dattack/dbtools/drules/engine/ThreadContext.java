@@ -24,7 +24,7 @@ import org.apache.commons.configuration.SystemConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dattack.ext.misc.ConfigurationUtil;
+import com.dattack.jtoolbox.commons.configuration.ConfigurationUtil;
 
 /**
  * @author cvarela
@@ -34,7 +34,7 @@ public final class ThreadContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadContext.class);
 
-    private static final ThreadLocal<ThreadContext> THREAD_LOCAL = new ThreadLocal<ThreadContext>();
+    private static final ThreadLocal<ThreadContext> THREAD_LOCAL = new ThreadLocal<>();
 
     private MapConfiguration internalConfiguration;
 

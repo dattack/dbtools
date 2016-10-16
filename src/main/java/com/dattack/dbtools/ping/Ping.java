@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.dattack.dbtools.ping.log.CSVFileLogWriter;
 import com.dattack.dbtools.ping.log.LogHeader;
 import com.dattack.dbtools.ping.log.LogWriter;
-import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
+import com.dattack.jtoolbox.jdbc.JNDIDataSource;
 
 /**
  * @author cvarela
@@ -47,7 +47,7 @@ public final class Ping {
         private final List<Thread> threadList;
 
         public ThreadPool() {
-            this.threadList = new ArrayList<Thread>();
+            this.threadList = new ArrayList<>();
         }
 
         public void submit(final Runnable task, final String threadName) {
@@ -56,6 +56,25 @@ public final class Ping {
             thread.start();
             threadList.add(thread);
         }
+    }
+
+    private static SQLSentenceProvider getSentenceProvider(final String clazzname) {
+
+        SQLSentenceProvider sentenceProvider = null;
+
+        if (clazzname != null) {
+            try {
+                sentenceProvider = (SQLSentenceProvider) Class.forName(clazzname).newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                LOGGER.trace(String.format("Using default SqlSentenceProvider: %s", e.getMessage()));
+                // ignore
+            }
+        }
+
+        if (sentenceProvider == null) {
+            sentenceProvider = new SQLSentenceRoundRobinProvider();
+        }
+        return sentenceProvider;
     }
 
     /**
@@ -109,7 +128,7 @@ public final class Ping {
             final List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
             for (final PingJobConfiguration pingJobConf : pingJobConfList) {
 
-                final DataSource dataSource = new DataSourceBuilder().withJndiName(pingJobConf.getDatasource()).build();
+                final DataSource dataSource = new JNDIDataSource(pingJobConf.getDatasource());
 
                 final SQLSentenceProvider sentenceProvider = getSentenceProvider(pingJobConf.getProviderClassName());
                 sentenceProvider.setSentences(pingJobConf.getQueryList());
@@ -132,24 +151,5 @@ public final class Ping {
         for (final String filename : args) {
             execute(new File(filename));
         }
-    }
-
-    private static SQLSentenceProvider getSentenceProvider(final String clazzname) {
-
-        SQLSentenceProvider sentenceProvider = null;
-
-        if (clazzname != null) {
-            try {
-                sentenceProvider = (SQLSentenceProvider) Class.forName(clazzname).newInstance();
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                LOGGER.trace(String.format("Using default SqlSentenceProvider: %s", e.getMessage()));
-                // ignore
-            }
-        }
-
-        if (sentenceProvider == null) {
-            sentenceProvider = new SQLSentenceRoundRobinProvider();
-        }
-        return sentenceProvider;
     }
 }

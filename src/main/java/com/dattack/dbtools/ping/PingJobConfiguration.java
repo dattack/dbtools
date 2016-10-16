@@ -23,7 +23,7 @@ import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 
 import com.dattack.dbtools.Builder;
-import com.dattack.ext.misc.ConfigurationUtil;
+import com.dattack.jtoolbox.commons.configuration.ConfigurationUtil;
 
 /**
  * @author cvarela
@@ -80,7 +80,7 @@ public final class PingJobConfiguration implements Serializable {
 
         public PingConfigurationBuilder() {
 
-            queryList = new ArrayList<SQLSentence>();
+            queryList = new ArrayList<>();
             baseConfiguration = new BaseConfiguration();
             configuration = ConfigurationUtil.createEnvSystemConfiguration();
             configuration.addConfiguration(baseConfiguration);

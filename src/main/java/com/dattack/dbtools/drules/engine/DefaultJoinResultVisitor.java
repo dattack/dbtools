@@ -32,7 +32,7 @@ import com.dattack.dbtools.drules.beans.JoinResultBeanVisitor;
 import com.dattack.dbtools.drules.beans.JoinResultMatchBean;
 import com.dattack.dbtools.drules.beans.JoinResultMissingBean;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
-import com.dattack.ext.script.JavaScriptEngine;
+import com.dattack.jtoolbox.script.JavaScriptEngine;
 
 /**
  * @author cvarela
@@ -46,6 +46,20 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     private final List<RowData> rowDataList;
     private final FlightRecorder flightRecorder;
 
+    private static void registerCheckExpr(final CheckExprBean checkExprBean) {
+        ThreadContext.getInstance().setProperty(PropertyNames.CHECK_EXPR, checkExprBean.getExpression());
+        registerMissingSource(null);
+    }
+
+    private static void registerMissingSource(final Identifier sourceIdentifier) {
+
+        if (sourceIdentifier == null) {
+            ThreadContext.getInstance().clearProperty(PropertyNames.MISSING_SOURCE);
+        } else {
+            ThreadContext.getInstance().setProperty(PropertyNames.MISSING_SOURCE, sourceIdentifier.getValue());
+        }
+    }
+
     public DefaultJoinResultVisitor(final List<Identifier> missingSourceList, final List<RowData> rowDataList,
             final FlightRecorder flightRecorder) {
         this.missingSourceList = missingSourceList;
@@ -54,10 +68,10 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
     }
 
     private Map<Object, Object> createJavascriptParametersMap() {
-        final HashMap<Object, Object> params = new HashMap<Object, Object>();
+        final HashMap<Object, Object> params = new HashMap<>();
         for (final RowData rowData : rowDataList) {
 
-            final HashMap<String, Object> sourceParams = new HashMap<String, Object>();
+            final HashMap<String, Object> sourceParams = new HashMap<>();
             params.put(rowData.getSourceId().getValue(), sourceParams);
 
             for (final IdentifierValuePair item : rowData.getFieldValueList()) {
@@ -73,9 +87,9 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
 
         // eval the check expression
         LOGGER.debug(String.format("Executing javascript expression: %s", checkExprBean.getExpression()));
-        final Boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(),
+        final boolean bool = JavaScriptEngine.evalBoolean(checkExprBean.getExpression(),
                 createJavascriptParametersMap());
-        if (bool == null || !bool) {
+        if (!bool) {
             execute(checkExprBean.getOnFail());
         } else {
             flightRecorder.incrSuccess();
@@ -95,20 +109,6 @@ public class DefaultJoinResultVisitor implements JoinResultBeanVisitor {
         final DefaultEventActionVisitor visitor = new DefaultEventActionVisitor(rowDataList, flightRecorder);
         for (final EventActionBean action : actionList) {
             action.accept(visitor);
-        }
-    }
-
-    private static void registerCheckExpr(final CheckExprBean checkExprBean) {
-        ThreadContext.getInstance().setProperty(PropertyNames.CHECK_EXPR, checkExprBean.getExpression());
-        registerMissingSource(null);
-    }
-
-    private static void registerMissingSource(final Identifier sourceIdentifier) {
-
-        if (sourceIdentifier == null) {
-            ThreadContext.getInstance().clearProperty(PropertyNames.MISSING_SOURCE);
-        } else {
-            ThreadContext.getInstance().setProperty(PropertyNames.MISSING_SOURCE, sourceIdentifier.getValue());
         }
     }
 

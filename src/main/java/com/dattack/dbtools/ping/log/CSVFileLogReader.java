@@ -22,11 +22,11 @@ import java.text.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dattack.csv.CSVConfiguration;
-import com.dattack.csv.CSVObject;
-import com.dattack.csv.CSVReader;
 import com.dattack.dbtools.ping.LogEntry;
 import com.dattack.dbtools.ping.LogEntry.LogEntryBuilder;
+import com.dattack.formats.csv.CSVConfiguration;
+import com.dattack.formats.csv.CSVObject;
+import com.dattack.formats.csv.CSVReader;
 
 /**
  * @author cvarela

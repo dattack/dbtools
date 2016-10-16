@@ -49,9 +49,9 @@ import com.dattack.dbtools.drules.beans.SourceBean;
 import com.dattack.dbtools.drules.beans.TaskBean;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
 import com.dattack.dbtools.drules.exceptions.IdentifierNotFoundException;
-import com.dattack.ext.concurrent.ThreadFactoryBuilder;
-import com.dattack.ext.script.JavaScriptEngine;
-import com.dattack.ext.util.CollectionUtils;
+import com.dattack.jtoolbox.concurrent.SimpleThreadFactory.ThreadFactoryBuilder;
+import com.dattack.jtoolbox.script.JavaScriptEngine;
+import com.dattack.jtoolbox.util.CollectionUtils;
 
 /**
  * @author cvarela
@@ -61,9 +61,13 @@ public class DrulesEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DrulesEngine.class);
 
+    private final String drulesFilename;
+
+    private DrulesBean drulesBean;
+
     private static ThreadFactory createThreadFactory() {
         return new ThreadFactoryBuilder() //
-                .withNamePrefix("source") //
+                .withThreadNamePrefix("source") //
                 .withUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
                     @Override
@@ -72,58 +76,6 @@ public class DrulesEngine {
                                 throwable.getMessage());
                     }
                 }).build();
-    }
-
-    private final String drulesFilename;
-    private DrulesBean drulesBean;
-
-    public DrulesEngine(final String drulesFilename, final Configuration initialConfiguration) {
-        this.drulesFilename = drulesFilename;
-        ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
-        ThreadContext.getInstance().setProperty(PropertyNames.EXECUTION_ID, System.currentTimeMillis());
-    }
-
-    private synchronized DrulesBean getDrulesBean() throws DrulesNestableException {
-        if (drulesBean == null) {
-            drulesBean = DrulesParser.parseIntegrityBean(drulesFilename);
-        }
-        return drulesBean;
-    }
-
-    public List<Identifier> listTasks() throws DrulesNestableException {
-        List<TaskBean> taskBeanList = getDrulesBean().getTaskBeanList();
-        List<Identifier> identifierList = new ArrayList<Identifier>(taskBeanList.size());
-        for (TaskBean taskBean : taskBeanList) {
-            identifierList.add(taskBean.getId());
-        }
-        return identifierList;
-    }
-
-    /**
-     * Executes the task defined in the file whose identifier matches the indicated.
-     *
-     * @param taskId
-     *            the task identifier
-     * @param initialConfiguration
-     *            properties required to perform the task
-     */
-    public void execute(final Identifier taskId) throws DrulesNestableException {
-
-        try {
-            final TaskBean taskBean = getDrulesBean().getTask(taskId);
-            if (taskBean == null) {
-                throw new IdentifierNotFoundException(TaskBean.class, taskId);
-            }
-
-            final ConfigurationBean configurationBean = getConfigurationBean();
-
-            LOGGER.info("SMTP hostname: " + configurationBean.getConfigurationSmtpBean().getHostname().toString());
-
-            execute(taskBean, configurationBean);
-
-        } catch (final ConfigurationException e) {
-            throw new DrulesNestableException(e);
-        }
     }
 
     private static void execute(final TaskBean taskBean, final ConfigurationBean configurationBean)
@@ -227,7 +179,7 @@ public class DrulesEngine {
 
         final ExecutorService executorService = Executors.newCachedThreadPool(createThreadFactory());
 
-        final List<Future<SourceResult>> futureList = new ArrayList<Future<SourceResult>>();
+        final List<Future<SourceResult>> futureList = new ArrayList<>();
 
         for (final SourceBean sourceBean : sourceList) {
             futureList.add(executorService.submit(new SourceExecutor(sourceBean,
@@ -246,5 +198,54 @@ public class DrulesEngine {
         executorService.shutdown();
 
         return sourceResultList;
+    }
+
+    public DrulesEngine(final String drulesFilename, final Configuration initialConfiguration) {
+        this.drulesFilename = drulesFilename;
+        ThreadContext.getInstance().setInitialConfiguration(initialConfiguration);
+        ThreadContext.getInstance().setProperty(PropertyNames.EXECUTION_ID, System.currentTimeMillis());
+    }
+
+    /**
+     * Executes the task defined in the file whose identifier matches the indicated.
+     *
+     * @param taskId
+     *            the task identifier
+     * @param initialConfiguration
+     *            properties required to perform the task
+     */
+    public void execute(final Identifier taskId) throws DrulesNestableException {
+
+        try {
+            final TaskBean taskBean = getDrulesBean().getTask(taskId);
+            if (taskBean == null) {
+                throw new IdentifierNotFoundException(TaskBean.class, taskId);
+            }
+
+            final ConfigurationBean configurationBean = getConfigurationBean();
+
+            LOGGER.info("SMTP hostname: " + configurationBean.getConfigurationSmtpBean().getHostname().toString());
+
+            execute(taskBean, configurationBean);
+
+        } catch (final ConfigurationException e) {
+            throw new DrulesNestableException(e);
+        }
+    }
+
+    private synchronized DrulesBean getDrulesBean() throws DrulesNestableException {
+        if (drulesBean == null) {
+            drulesBean = DrulesParser.parseIntegrityBean(drulesFilename);
+        }
+        return drulesBean;
+    }
+
+    public List<Identifier> listTasks() throws DrulesNestableException {
+        final List<TaskBean> taskBeanList = getDrulesBean().getTaskBeanList();
+        final List<Identifier> identifierList = new ArrayList<>(taskBeanList.size());
+        for (final TaskBean taskBean : taskBeanList) {
+            identifierList.add(taskBean.getId());
+        }
+        return identifierList;
     }
 }

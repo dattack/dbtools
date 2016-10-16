@@ -15,8 +15,8 @@
  */
 package com.dattack.dbtools.ping.log;
 
-import com.dattack.csv.CSVConfiguration;
-import com.dattack.csv.CSVConfiguration.CsvConfigurationBuilder;
+import com.dattack.formats.csv.CSVConfiguration;
+import com.dattack.formats.csv.CSVConfiguration.CsvConfigurationBuilder;
 
 /**
  * @author cvarela

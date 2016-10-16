@@ -40,8 +40,8 @@ import com.dattack.dbtools.drules.beans.SourceCommandBean;
 import com.dattack.dbtools.drules.beans.SourceCommandBeanVisitor;
 import com.dattack.dbtools.drules.beans.SqlQueryBean;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableException;
-import com.dattack.ext.jdbc.JNDIDataSource.DataSourceBuilder;
-import com.dattack.ext.misc.ConfigurationUtil;
+import com.dattack.jtoolbox.commons.configuration.ConfigurationUtil;
+import com.dattack.jtoolbox.jdbc.JNDIDataSource;
 
 /**
  * @author cvarela
@@ -64,7 +64,7 @@ final class SourceExecutor implements Callable<SourceResult> {
         DefaultSourceCommandBeanVisitor(final Connection connection) {
             configuration = new CompositeConfiguration(ThreadContext.getInstance().getConfiguration());
             this.connection = connection;
-            this.resultSetMap = new HashMap<Identifier, ResultSet>();
+            this.resultSetMap = new HashMap<>();
         }
 
         private void executeForEachLoop(final ForEachBean bean) {
@@ -82,7 +82,7 @@ final class SourceExecutor implements Callable<SourceResult> {
             final Identifier identifier = new IdentifierBuilder().withValue(bean.getRef()).build();
             try {
 
-                ResultSet resultSet = resultSetMap.get(identifier);
+                final ResultSet resultSet = resultSetMap.get(identifier);
                 if (resultSet == null) {
                     throw new NullPointerException(String.format("Missing ResultSet named '%s'", bean.getRef()));
                 }
@@ -173,13 +173,17 @@ final class SourceExecutor implements Callable<SourceResult> {
 
                 final String interpolatedSql = ConfigurationUtil.interpolate(bean.getSql(), configuration);
                 statement = connection.createStatement();
-                ResultSet resultSet = executeStatement(statement, interpolatedSql);
+                final ResultSet resultSet = executeStatement(statement, interpolatedSql);
                 setLastValues(bean, resultSet);
 
             } catch (final SQLException e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static Connection getConnection(final String jndiName) throws SQLException {
+        return new JNDIDataSource(jndiName).getConnection();
     }
 
     SourceExecutor(final SourceBean sourceBean, final Configuration initialConfiguration) {
@@ -220,10 +224,6 @@ final class SourceExecutor implements Callable<SourceResult> {
         }
 
         return null;
-    }
-
-    private static Connection getConnection(final String jndiName) throws SQLException {
-        return new DataSourceBuilder().withJndiName(jndiName).build().getConnection();
     }
 
     private String getInterpolatedJndiName() {

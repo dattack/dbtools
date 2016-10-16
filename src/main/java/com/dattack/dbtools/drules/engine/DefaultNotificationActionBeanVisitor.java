@@ -39,8 +39,8 @@ import com.dattack.dbtools.drules.beans.ConfigurationSmtpBean;
 import com.dattack.dbtools.drules.beans.NotificationActionBeanVisitor;
 import com.dattack.dbtools.drules.beans.NotificationActionSendMailBean;
 import com.dattack.dbtools.drules.exceptions.DrulesNestableRuntimeException;
-import com.dattack.ext.mail.HtmlEmailBuilder;
-import com.dattack.ext.misc.ConfigurationUtil;
+import com.dattack.jtoolbox.commons.configuration.ConfigurationUtil;
+import com.dattack.jtoolbox.commons.email.HtmlEmailBuilder;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -54,10 +54,6 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNotificationActionBeanVisitor.class);
 
     private final FlightRecorder flightRecorder;
-
-    public DefaultNotificationActionBeanVisitor(final FlightRecorder flightRecorder) {
-        this.flightRecorder = flightRecorder;
-    }
 
     private static Template createTemplate(final NotificationActionSendMailBean bean)
             throws ConfigurationException, IOException {
@@ -80,12 +76,16 @@ public class DefaultNotificationActionBeanVisitor implements NotificationActionB
 
         final Template template = createTemplate(action);
 
-        final Map<Object, Object> dataModel = new HashMap<Object, Object>();
+        final Map<Object, Object> dataModel = new HashMap<>();
         dataModel.putAll(ConfigurationConverter.getMap(configuration));
 
         final StringWriter outputWriter = new StringWriter();
         template.process(dataModel, outputWriter);
         return outputWriter.toString();
+    }
+
+    public DefaultNotificationActionBeanVisitor(final FlightRecorder flightRecorder) {
+        this.flightRecorder = flightRecorder;
     }
 
     private void sendMail(final ConfigurationSmtpBean config, final NotificationActionSendMailBean action)

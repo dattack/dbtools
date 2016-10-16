@@ -62,65 +62,45 @@
     </distributionManagement>
     <properties>
         <appassembler-maven-plugin.version>1.10</appassembler-maven-plugin.version>
-        <checkstyle.version>6.15</checkstyle.version>
-        <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
         <commons-cli.version>1.3.1</commons-cli.version>
-        <commons-configuration.version>1.10</commons-configuration.version>
-        <commons-dbcp.version>1.4</commons-dbcp.version>
-        <commons-email.version>1.4</commons-email.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-math.version>3.6</commons-math.version>
         <compiler.source.version>1.7</compiler.source.version>
         <compiler.target.version>1.7</compiler.target.version>
-        <findbugs-maven-plugin.version>3.0.3</findbugs-maven-plugin.version>
         <freemarker.version>2.3.23</freemarker.version>
-        <jacoco-maven-plugin.version>0.7.5.201505241946</jacoco-maven-plugin.version>
         <junit.version>4.12</junit.version>
-        <maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
-        <maven-changelog-plugin.version>2.3</maven-changelog-plugin.version>
-        <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
-        <maven-compiler-plugin.version>3.5</maven-compiler-plugin.version>
-        <maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
-        <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
-        <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
-        <maven-pmd-plugin.version>3.6</maven-pmd-plugin.version>
-        <maven-project-info-reports-plugin.version>2.8.1</maven-project-info-reports-plugin.version>
-        <maven-scm-provider-gitexe.version>1.9.4</maven-scm-provider-gitexe.version>
-        <maven-site-plugin.version>3.4</maven-site-plugin.version>
-        <maven-sortpom-plugin.version>2.4.0</maven-sortpom-plugin.version>
-        <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
-        <maven-surefire-report-plugin.version>2.19.1</maven-surefire-report-plugin.version>
+				<jtoolbox-commons-email.version>0.1-SNAPSHOT</jtoolbox-commons-email.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.15</slf4j.version>
         <sqlite.version>3.8.11.2</sqlite.version>
-        <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
-        <versions-maven-plugin.version>2.2</versions-maven-plugin.version>
+				<standalone-jndi.version>0.1-SNAPSHOT</standalone-jndi.version>
+        <data-formats.version>0.1-SNAPSHOT</data-formats.version>
     </properties>
     <dependencies>
+			<dependency>
+					<groupId>com.dattack</groupId>
+					<artifactId>standalone-jndi</artifactId>
+					<version>${standalone-jndi.version}</version>
+			</dependency>
+      <dependency>
+					<groupId>com.dattack</groupId>
+					<artifactId>data-formats</artifactId>
+					<version>${data-formats.version}</version>
+			</dependency>
+			<dependency>
+					<groupId>com.dattack</groupId>
+					<artifactId>jtoolbox-commons-email</artifactId>
+					<version>${jtoolbox-commons-email.version}</version>
+			</dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>${commons-cli.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>${commons-configuration.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>${commons-dbcp.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
-            <version>${commons-email.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -131,11 +111,6 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>${freemarker.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <!-- For test only -->
         <dependency>

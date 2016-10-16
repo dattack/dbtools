@@ -19,7 +19,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 
 import com.dattack.dbtools.drules.beans.Identifier;
-import com.dattack.ext.jdbc.JDBCUtils;
+import com.dattack.jtoolbox.jdbc.JDBCUtils;
 
 /**
  * @author cvarela
@@ -37,16 +37,16 @@ final class SourceResult {
         this.resultSet = resultSet;
     }
 
-    public Identifier getSourceAlias() {
-        return sourceAlias;
+    public void close() {
+        JDBCUtils.closeQuietly(resultSet);
+        JDBCUtils.closeQuietly(connection);
     }
 
     public ResultSet getResultSet() {
         return resultSet;
     }
 
-    public void close() {
-        JDBCUtils.closeQuietly(resultSet);
-        JDBCUtils.closeQuietly(connection);
+    public Identifier getSourceAlias() {
+        return sourceAlias;
     }
 }
