@@ -36,9 +36,19 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
-# Maven files #
+# Maven & IDE files #
 ###############
-#.classpath
-#.project
-#.settings
+.checkstyle
+.classpath
+.externalToolBuilders
+.pmd
+.project
+.ruleset
+.settings
+.eclipse-pmd
+maven-eclipse.xml
 target
+
+# Backup files #
+################
+*.bak
