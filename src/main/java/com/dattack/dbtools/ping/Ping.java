@@ -16,7 +16,6 @@
 package com.dattack.dbtools.ping;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.dattack.dbtools.ping.log.CSVFileLogWriter;
 import com.dattack.dbtools.ping.log.LogHeader;
 import com.dattack.dbtools.ping.log.LogWriter;
+import com.dattack.jtoolbox.io.FilesystemUtils;
 import com.dattack.jtoolbox.jdbc.JNDIDataSource;
 
 /**
@@ -108,15 +108,7 @@ public final class Ping {
 
         if (file.isDirectory()) {
 
-            final FilenameFilter filter = new FilenameFilter() {
-
-                @Override
-                public boolean accept(final File dir, final String name) {
-                    return name.toLowerCase().endsWith(".xml");
-                }
-            };
-
-            final File[] files = file.listFiles(filter);
+            final File[] files = file.listFiles(FilesystemUtils.createFilenameFilterByExtension("xml"));
             if (files != null) {
                 for (final File child : files) {
                     execute(child);

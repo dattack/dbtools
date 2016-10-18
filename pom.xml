@@ -10,7 +10,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>dbtools</name>
-		<description>A powerful set of command-line tools that provides a variety of functionality manipulating a database and its data.</description>
+    <description>A powerful set of command-line tools that provides a variety of functionality manipulating a database and its data.</description>
     <url>http://www.dattack.com</url>
     <inceptionYear>2014</inceptionYear>
     <organization>
@@ -67,31 +67,31 @@
         <commons-math.version>3.6</commons-math.version>
         <compiler.source.version>1.7</compiler.source.version>
         <compiler.target.version>1.7</compiler.target.version>
+        <data-formats.version>0.1-SNAPSHOT</data-formats.version>
         <freemarker.version>2.3.23</freemarker.version>
+        <jtoolbox-commons-email.version>0.1-SNAPSHOT</jtoolbox-commons-email.version>
         <junit.version>4.12</junit.version>
-				<jtoolbox-commons-email.version>0.1-SNAPSHOT</jtoolbox-commons-email.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.15</slf4j.version>
         <sqlite.version>3.8.11.2</sqlite.version>
-				<standalone-jndi.version>0.1-SNAPSHOT</standalone-jndi.version>
-        <data-formats.version>0.1-SNAPSHOT</data-formats.version>
+        <standalone-jndi.version>0.1-SNAPSHOT</standalone-jndi.version>
     </properties>
     <dependencies>
-			<dependency>
-					<groupId>com.dattack</groupId>
-					<artifactId>standalone-jndi</artifactId>
-					<version>${standalone-jndi.version}</version>
-			</dependency>
-      <dependency>
-					<groupId>com.dattack</groupId>
-					<artifactId>data-formats</artifactId>
-					<version>${data-formats.version}</version>
-			</dependency>
-			<dependency>
-					<groupId>com.dattack</groupId>
-					<artifactId>jtoolbox-commons-email</artifactId>
-					<version>${jtoolbox-commons-email.version}</version>
-			</dependency>
+        <dependency>
+            <groupId>com.dattack</groupId>
+            <artifactId>data-formats</artifactId>
+            <version>${data-formats.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dattack</groupId>
+            <artifactId>jtoolbox-commons-email</artifactId>
+            <version>${jtoolbox-commons-email.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dattack</groupId>
+            <artifactId>standalone-jndi</artifactId>
+            <version>${standalone-jndi.version}</version>
+        </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
