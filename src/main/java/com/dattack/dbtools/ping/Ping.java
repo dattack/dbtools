@@ -17,10 +17,20 @@ package com.dattack.dbtools.ping;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +48,11 @@ import com.dattack.jtoolbox.jdbc.JNDIDataSource;
 public final class Ping {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Ping.class);
+
+    private static final String FILE_OPTION = "f";
+    private static final String LONG_FILE_OPTION = "file";
+    private static final String TASK_NAME_OPTION = "t";
+    private static final String LONG_TASK_NAME_OPTION = "task";
 
     // private final ExecutorService pool;
     private final ThreadPool pool;
@@ -77,6 +92,40 @@ public final class Ping {
         return sentenceProvider;
     }
 
+    private static Options createOptions() {
+
+        final Options options = new Options();
+
+        options.addOption(Option.builder(FILE_OPTION) //
+                .required(true) //
+                .longOpt(LONG_FILE_OPTION) //
+                .hasArg(true) //
+                .argName("DBPING_FILE") //
+                .desc("the path of the file containing the DBPing configuration") //
+                .build());
+
+        options.addOption(Option.builder(TASK_NAME_OPTION) //
+                .required(false) //
+                .longOpt(LONG_TASK_NAME_OPTION) //
+                .hasArg(true) //
+                .argName("TASK_NAME") //
+                .desc("the name of the task to execute") //
+                .build());
+
+        return options;
+    }
+
+    private static void showUsage(final Options options) {
+        final HelpFormatter formatter = new HelpFormatter();
+        final int descPadding = 5;
+        final int leftPadding = 4;
+        formatter.setDescPadding(descPadding);
+        formatter.setLeftPadding(leftPadding);
+        final String header = "\n";
+        final String footer = "\nPlease report issues at https://github.com/dattack/dbtools/issues";
+        formatter.printHelp("dbping ", header, options, footer, true);
+    }
+
     /**
      * The <code>main</code> method.
      *
@@ -85,16 +134,24 @@ public final class Ping {
      */
     public static void main(final String[] args) {
 
+        final Options options = createOptions();
+
         try {
+            final CommandLineParser parser = new DefaultParser();
+            final CommandLine cmd = parser.parse(options, args);
+            final String[] filenames = cmd.getOptionValues(FILE_OPTION);
+            final String[] taskNames = cmd.getOptionValues(TASK_NAME_OPTION);
 
-            if (args.length < 1) {
-                System.err.println("Usage: Ping <configuration_file> [<configuration_file [...]]");
-                return;
+            HashSet<String> hs = null;
+            if (taskNames != null) {
+                hs = new HashSet<String>(Arrays.asList(taskNames));
             }
-
+            
             final Ping ping = new Ping();
-            ping.execute(args);
+            ping.execute(filenames, hs);
 
+        } catch (@SuppressWarnings("unused") final ParseException e) {
+            showUsage(options);
         } catch (final ConfigurationException e) {
             System.err.println(e.getMessage());
         }
@@ -104,14 +161,14 @@ public final class Ping {
         pool = new ThreadPool();
     }
 
-    private void execute(final File file) throws ConfigurationException {
+    private void execute(final File file, final Set<String> taskNames) throws ConfigurationException {
 
         if (file.isDirectory()) {
 
             final File[] files = file.listFiles(FilesystemUtils.createFilenameFilterByExtension("xml"));
             if (files != null) {
                 for (final File child : files) {
-                    execute(child);
+                    execute(child, taskNames);
                 }
             }
 
@@ -119,6 +176,10 @@ public final class Ping {
 
             final List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
             for (final PingJobConfiguration pingJobConf : pingJobConfList) {
+                
+                if (taskNames != null && !taskNames.isEmpty() && !taskNames.contains(pingJobConf.getName())) {
+                    continue;
+                }
 
                 final DataSource dataSource = new JNDIDataSource(pingJobConf.getDatasource());
 
@@ -138,10 +199,10 @@ public final class Ping {
         }
     }
 
-    private void execute(final String[] args) throws ConfigurationException {
+    private void execute(final String[] filenames, final Set<String> taskNames) throws ConfigurationException {
 
-        for (final String filename : args) {
-            execute(new File(filename));
+        for (final String filename : filenames) {
+            execute(new File(filename), taskNames);
         }
     }
 }
