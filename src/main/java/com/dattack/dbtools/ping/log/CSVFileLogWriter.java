@@ -31,7 +31,10 @@ import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.ping.DataRow;
 import com.dattack.dbtools.ping.LogEntry;
-import com.dattack.dbtools.ping.SQLSentence;
+import com.dattack.dbtools.ping.beans.SqlCommandBean;
+import com.dattack.dbtools.ping.beans.SqlCommandVisitor;
+import com.dattack.dbtools.ping.beans.SqlScriptBean;
+import com.dattack.dbtools.ping.beans.SqlStatementBean;
 import com.dattack.formats.csv.CSVStringBuilder;
 import com.dattack.jtoolbox.io.IOUtils;
 
@@ -112,9 +115,28 @@ public class CSVFileLogWriter implements LogWriter {
             }
 
             csvBuilder.comment("SQL Sentences:");
-            for (final SQLSentence sentence : header.getPingJobConfiguration().getQueryList()) {
-                csvBuilder.comment(new StringBuilder().append("  ").append(sentence.getLabel()).append(": ")
-                        .append(normalize(sentence.getSql())).toString());
+            for (final SqlCommandBean sentence : header.getPingTaskBean().getSqlStatementList()) {
+
+                sentence.accept(new SqlCommandVisitor() {
+
+                    @Override
+                    public void visite(final SqlScriptBean command) {
+                        csvBuilder.comment(
+                                new StringBuilder().append("  ").append(command.getLabel()).append(": ").toString());
+
+                        for (final SqlStatementBean item : command.getStatementList()) {
+                            csvBuilder.comment(new StringBuilder().append(" |-- ").append(item.getLabel()).append(": ")
+                                    .append(normalize(item.getSql())).toString());
+                        }
+                    }
+
+                    @Override
+                    public void visite(final SqlStatementBean command) {
+                        csvBuilder.comment(new StringBuilder().append("  ").append(command.getLabel()).append(": ")
+                                .append(normalize(command.getSql())).toString());
+
+                    }
+                });
             }
 
             csvBuilder.comment() //

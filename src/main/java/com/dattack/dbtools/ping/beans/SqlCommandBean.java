@@ -1,36 +1,37 @@
 /*
- * Copyright (c) 2014, The Dattack team (http://www.dattack.com)
- * 
+ * Copyright (c) 2016, The Dattack team (http://www.dattack.com)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dattack.dbtools.ping;
+package com.dattack.dbtools.ping.beans;
 
-import java.util.List;
+import java.io.Serializable;
 
 /**
- * Defines the interface to be implemented by the provider of the SQL-query executed from a ping job.
- * 
  * @author cvarela
  * @since 0.1
  */
-public interface SQLSentenceProvider {
+public interface SqlCommandBean extends Serializable {
 
-    void setSentences(final List<SQLSentence> sqlList);
+    void accept(final SqlCommandVisitor visitor);
 
     /**
-     * Returns the next SqlSentence to execute.
-     * 
-     * @return the SQL-query to be executed
+     * @return the label
      */
-    SQLSentence nextSql();
+    String getLabel();
+
+    /**
+     * @return the weight
+     */
+    float getWeight();
 }

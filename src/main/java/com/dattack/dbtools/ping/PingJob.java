@@ -26,7 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dattack.dbtools.ping.LogEntry.LogEntryBuilder;
+import com.dattack.dbtools.ping.beans.PingTaskBean;
+import com.dattack.dbtools.ping.beans.SqlCommandBean;
+import com.dattack.dbtools.ping.beans.SqlCommandVisitor;
+import com.dattack.dbtools.ping.beans.SqlScriptBean;
+import com.dattack.dbtools.ping.beans.SqlStatementBean;
 import com.dattack.dbtools.ping.log.LogWriter;
+import com.dattack.jtoolbox.jdbc.JDBCUtils;
 
 /**
  * Executes a ping-job instance.
@@ -38,15 +44,15 @@ class PingJob implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PingJob.class);
 
-    private final PingJobConfiguration configuration;
+    private final PingTaskBean pingTaskBean;
     private final DataSource dataSource;
-    private final SQLSentenceProvider sentenceProvider;
+    private final SqlCommandProvider sentenceProvider;
     private final LogWriter logWriter;
 
-    public PingJob(final PingJobConfiguration configuration, final DataSource dataSource,
-            final SQLSentenceProvider sentenceProvider, final LogWriter logWriter) {
+    public PingJob(final PingTaskBean configuration, final DataSource dataSource,
+            final SqlCommandProvider sentenceProvider, final LogWriter logWriter) {
 
-        this.configuration = configuration;
+        this.pingTaskBean = configuration;
         this.dataSource = dataSource;
         this.sentenceProvider = sentenceProvider;
         this.logWriter = logWriter;
@@ -57,50 +63,76 @@ class PingJob implements Runnable {
 
         final String threadName = Thread.currentThread().getName();
 
-        LOGGER.info("Running job '{}' at thread '{}'", configuration.getName(), threadName);
+        LOGGER.info("Running job '{}' at thread '{}'", pingTaskBean.getName(), threadName);
 
         long iter = 0;
 
-        final LogEntryBuilder logEntryBuilder = new LogEntryBuilder(configuration.getMaxRowsToDump()) //
-                .withTaskName(configuration.getName()) //
+        final LogEntryBuilder logEntryBuilder = new LogEntryBuilder(pingTaskBean.getMaxRowsToDump()) //
+                .withTaskName(pingTaskBean.getName()) //
                 .withThreadName(threadName);
 
         while (testLoop(iter)) {
-            iter++;
+            final long currentIteration = iter++;
             // retrieve the SQL to be executed
-            final SQLSentence sqlSentence = sentenceProvider.nextSql();
+            final SqlCommandBean sqlSentence = sentenceProvider.nextSql();
 
-            try (Connection connection = dataSource.getConnection()) {
+            logEntryBuilder.init().withSqlLabel(sqlSentence.getLabel()) //
+                    .withIteration(iter);
 
-                logEntryBuilder.init().withSqlLabel(sqlSentence.getLabel()) //
-                        .withIteration(iter);
+            // sets the connection time
+            logEntryBuilder.connect();
 
-                // sets the connection time
-                logEntryBuilder.connect();
+            sqlSentence.accept(new SqlCommandVisitor() {
 
-                // execute the query
-                try (Statement stmt = connection.createStatement()) {
-                    try (ResultSet resultSet = stmt.executeQuery(sqlSentence.getSql())) {
+                @Override
+                public void visite(final SqlScriptBean command) {
 
-                        while (resultSet.next()) {
-                            logEntryBuilder.addRow(resultSet);
-                        }
+                    for (final SqlStatementBean item : command.getStatementList()) {
+                        logEntryBuilder.init().withSqlLabel(item.getLabel()) //
+                                .withIteration(currentIteration);
 
-                        // sets the total time
-                        logWriter.write(logEntryBuilder.build());
+                        // sets the connection time
+                        logEntryBuilder.connect();
+                        item.accept(this);
                     }
                 }
 
-            } catch (final SQLException e) {
-                logWriter.write(logEntryBuilder.withException(e).build());
-                LOGGER.warn("Job error (job-name: '{}', thread: '{}'): {}", configuration.getName(), threadName,
-                        e.getMessage());
-            }
+                @Override
+                public void visite(final SqlStatementBean command) {
 
-            if (testLoop(iter) && configuration.getTimeBetweenExecutions() > 0) {
+                    try (Connection connection = dataSource.getConnection()) {
+                        try (Statement stmt = connection.createStatement()) {
+                            ResultSet resultSet = null;
+                            try {
+
+                                final boolean executeResult = stmt.execute(command.getSql());
+                                if (executeResult) {
+                                    resultSet = stmt.getResultSet();
+                                    while (resultSet.next()) {
+                                        logEntryBuilder.addRow(resultSet);
+                                    }
+                                } else {
+                                    // not a ResultSet
+                                }
+
+                                // sets the total time
+                                logWriter.write(logEntryBuilder.build());
+                            } finally {
+                                JDBCUtils.closeQuietly(resultSet);
+                            }
+                        }
+                    } catch (final SQLException e) {
+                        logWriter.write(logEntryBuilder.withException(e).build());
+                        LOGGER.warn("Job error (job-name: '{}', thread: '{}'): {}", pingTaskBean.getName(), threadName,
+                                e.getMessage());
+                    }
+                }
+            });
+
+            if (testLoop(iter) && pingTaskBean.getTimeBetweenExecutions() > 0) {
                 synchronized (this) {
                     try {
-                        wait(configuration.getTimeBetweenExecutions());
+                        wait(pingTaskBean.getTimeBetweenExecutions());
                     } catch (final InterruptedException e) {
                         LOGGER.warn(e.getMessage());
                     }
@@ -108,10 +140,10 @@ class PingJob implements Runnable {
             }
         }
 
-        LOGGER.info("Job finished (job-name: '{}', thread: '{}')", configuration.getName(), threadName);
+        LOGGER.info("Job finished (job-name: '{}', thread: '{}')", pingTaskBean.getName(), threadName);
     }
 
     private boolean testLoop(final long iteration) {
-        return configuration.getExecutions() <= 0 || iteration < configuration.getExecutions();
+        return pingTaskBean.getExecutions() <= 0 || iteration < pingTaskBean.getExecutions();
     }
 }

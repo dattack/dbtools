@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dattack.dbtools.ping.PingJobConfiguration;
+import com.dattack.dbtools.ping.beans.PingTaskBean;
 
 /**
  * @author cvarela
@@ -29,17 +29,17 @@ public class LogHeader implements Serializable {
 
     private static final long serialVersionUID = -1459958170880853467L;
 
-    private final PingJobConfiguration pingJobConfiguration;
+    private final PingTaskBean pingTaskBean;
     private final Map<String, String> properties;
 
-    public LogHeader(final PingJobConfiguration pingJobConfiguration) {
-        this.pingJobConfiguration = pingJobConfiguration;
-        properties = new HashMap<String, String>();
+    public LogHeader(final PingTaskBean pingJobConfiguration) {
+        this.pingTaskBean = pingJobConfiguration;
+        properties = new HashMap<>();
         populateProperties();
     }
 
-    public PingJobConfiguration getPingJobConfiguration() {
-        return pingJobConfiguration;
+    public PingTaskBean getPingTaskBean() {
+        return pingTaskBean;
     }
 
     public Map<String, String> getProperties() {

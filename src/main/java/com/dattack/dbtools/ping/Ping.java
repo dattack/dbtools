@@ -31,13 +31,19 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dattack.dbtools.ping.beans.DbpingBean;
+import com.dattack.dbtools.ping.beans.DbpingParser;
+import com.dattack.dbtools.ping.beans.DbpingParserException;
+import com.dattack.dbtools.ping.beans.PingTaskBean;
 import com.dattack.dbtools.ping.log.CSVFileLogWriter;
 import com.dattack.dbtools.ping.log.LogHeader;
 import com.dattack.dbtools.ping.log.LogWriter;
+import com.dattack.jtoolbox.commons.configuration.ConfigurationUtil;
 import com.dattack.jtoolbox.io.FilesystemUtils;
 import com.dattack.jtoolbox.jdbc.JNDIDataSource;
 
@@ -73,25 +79,6 @@ public final class Ping {
         }
     }
 
-    private static SQLSentenceProvider getSentenceProvider(final String clazzname) {
-
-        SQLSentenceProvider sentenceProvider = null;
-
-        if (clazzname != null) {
-            try {
-                sentenceProvider = (SQLSentenceProvider) Class.forName(clazzname).newInstance();
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                LOGGER.trace(String.format("Using default SqlSentenceProvider: %s", e.getMessage()));
-                // ignore
-            }
-        }
-
-        if (sentenceProvider == null) {
-            sentenceProvider = new SQLSentenceRoundRobinProvider();
-        }
-        return sentenceProvider;
-    }
-
     private static Options createOptions() {
 
         final Options options = new Options();
@@ -115,15 +102,23 @@ public final class Ping {
         return options;
     }
 
-    private static void showUsage(final Options options) {
-        final HelpFormatter formatter = new HelpFormatter();
-        final int descPadding = 5;
-        final int leftPadding = 4;
-        formatter.setDescPadding(descPadding);
-        formatter.setLeftPadding(leftPadding);
-        final String header = "\n";
-        final String footer = "\nPlease report issues at https://github.com/dattack/dbtools/issues";
-        formatter.printHelp("dbping ", header, options, footer, true);
+    private static SqlCommandProvider getSentenceProvider(final String clazzname) {
+
+        SqlCommandProvider sentenceProvider = null;
+
+        if (clazzname != null) {
+            try {
+                sentenceProvider = (SqlCommandProvider) Class.forName(clazzname).newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                LOGGER.trace(String.format("Using default SqlSentenceProvider: %s", e.getMessage()));
+                // ignore
+            }
+        }
+
+        if (sentenceProvider == null) {
+            sentenceProvider = new SqlCommandRoundRobinProvider();
+        }
+        return sentenceProvider;
     }
 
     /**
@@ -144,24 +139,36 @@ public final class Ping {
 
             HashSet<String> hs = null;
             if (taskNames != null) {
-                hs = new HashSet<String>(Arrays.asList(taskNames));
+                hs = new HashSet<>(Arrays.asList(taskNames));
             }
-            
+
             final Ping ping = new Ping();
             ping.execute(filenames, hs);
 
         } catch (@SuppressWarnings("unused") final ParseException e) {
             showUsage(options);
-        } catch (final ConfigurationException e) {
+        } catch (final ConfigurationException | DbpingParserException e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    private static void showUsage(final Options options) {
+        final HelpFormatter formatter = new HelpFormatter();
+        final int descPadding = 5;
+        final int leftPadding = 4;
+        formatter.setDescPadding(descPadding);
+        formatter.setLeftPadding(leftPadding);
+        final String header = "\n";
+        final String footer = "\nPlease report issues at https://github.com/dattack/dbtools/issues";
+        formatter.printHelp("dbping ", header, options, footer, true);
     }
 
     private Ping() {
         pool = new ThreadPool();
     }
 
-    private void execute(final File file, final Set<String> taskNames) throws ConfigurationException {
+    private void execute(final File file, final Set<String> taskNames)
+            throws ConfigurationException, DbpingParserException {
 
         if (file.isDirectory()) {
 
@@ -174,32 +181,38 @@ public final class Ping {
 
         } else {
 
-            final List<PingJobConfiguration> pingJobConfList = PingJobConfigurationParser.parse(file);
-            for (final PingJobConfiguration pingJobConf : pingJobConfList) {
-                
-                if (taskNames != null && !taskNames.isEmpty() && !taskNames.contains(pingJobConf.getName())) {
+            final DbpingBean dbpingBean = DbpingParser.parse(file);
+            for (final PingTaskBean pingTaskBean : dbpingBean.getTaskList()) {
+
+                if (taskNames != null && !taskNames.isEmpty() && !taskNames.contains(pingTaskBean.getName())) {
                     continue;
                 }
 
-                final DataSource dataSource = new JNDIDataSource(pingJobConf.getDatasource());
+                final CompositeConfiguration conf = new CompositeConfiguration();
+                conf.setProperty("task.name", pingTaskBean.getName());
+                conf.addConfiguration(ConfigurationUtil.createEnvSystemConfiguration());
 
-                final SQLSentenceProvider sentenceProvider = getSentenceProvider(pingJobConf.getProviderClassName());
-                sentenceProvider.setSentences(pingJobConf.getQueryList());
+                final DataSource dataSource = new JNDIDataSource(pingTaskBean.getDatasource());
 
-                final LogWriter logWriter = new CSVFileLogWriter(pingJobConf.getLogFile());
+                final SqlCommandProvider sentenceProvider = getSentenceProvider(pingTaskBean.getCommandProvider());
+                sentenceProvider.setSentences(pingTaskBean.getSqlStatementList());
 
-                final LogHeader logHeader = new LogHeader(pingJobConf);
+                final LogWriter logWriter = new CSVFileLogWriter(
+                        ConfigurationUtil.interpolate(pingTaskBean.getLogFile(), conf));
+
+                final LogHeader logHeader = new LogHeader(pingTaskBean);
                 logWriter.write(logHeader);
 
-                for (int i = 0; i < pingJobConf.getThreads(); i++) {
-                    pool.submit(new PingJob(pingJobConf, dataSource, sentenceProvider, logWriter),
-                            pingJobConf.getName() + "@Thread-" + i);
+                for (int i = 0; i < pingTaskBean.getThreads(); i++) {
+                    pool.submit(new PingJob(pingTaskBean, dataSource, sentenceProvider, logWriter),
+                            pingTaskBean.getName() + "@Thread-" + i);
                 }
             }
         }
     }
 
-    private void execute(final String[] filenames, final Set<String> taskNames) throws ConfigurationException {
+    private void execute(final String[] filenames, final Set<String> taskNames)
+            throws ConfigurationException, DbpingParserException {
 
         for (final String filename : filenames) {
             execute(new File(filename), taskNames);

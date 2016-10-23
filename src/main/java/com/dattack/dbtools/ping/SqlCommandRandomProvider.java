@@ -16,38 +16,38 @@
 package com.dattack.dbtools.ping;
 
 import java.util.List;
+import java.util.Random;
+
+import com.dattack.dbtools.ping.beans.SqlCommandBean;
 
 /**
- * Implements the round-robin strategy for SQL-sentence selection.
+ * Selects a random query from the provided list.
  *
  * @author cvarela
  * @since 0.1
  */
-public class SQLSentenceRoundRobinProvider implements SQLSentenceProvider {
+public class SqlCommandRandomProvider implements SqlCommandProvider {
 
-    private List<SQLSentence> sentenceList;
-    private int index;
+    private List<SqlCommandBean> sentenceList;
+    private final Random randomGenerator;
 
-    public SQLSentenceRoundRobinProvider() {
-        index = 0;
+    public SqlCommandRandomProvider() {
+        randomGenerator = new Random();
     }
 
     @Override
-    public synchronized SQLSentence nextSql() {
+    public SqlCommandBean nextSql() {
 
         if (sentenceList == null || sentenceList.isEmpty()) {
             throw new IllegalArgumentException("The sentence list must not be null or empty");
         }
 
-        final SQLSentence sqlSentence = sentenceList.get(index++);
-        if (index >= sentenceList.size()) {
-            index = 0;
-        }
-        return sqlSentence;
+        final int index = randomGenerator.nextInt(sentenceList.size());
+        return sentenceList.get(index);
     }
 
     @Override
-    public void setSentences(final List<SQLSentence> sqlList) {
+    public void setSentences(final List<SqlCommandBean> sqlList) {
         this.sentenceList = sqlList;
     }
 }

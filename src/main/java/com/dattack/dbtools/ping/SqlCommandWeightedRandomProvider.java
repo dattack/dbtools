@@ -18,19 +18,25 @@ package com.dattack.dbtools.ping;
 import java.util.List;
 import java.util.Random;
 
+import com.dattack.dbtools.ping.beans.SqlCommandBean;
+
 /**
  * Selects a query from the provided list using a weighted randon selection algorithm.
  *
  * @author cvarela
  * @since 0.1
  */
-public class SQLSentenceWeightedRandomProvider implements SQLSentenceProvider {
+public class SqlCommandWeightedRandomProvider implements SqlCommandProvider {
 
-    private List<SQLSentence> sentenceList;
+    private List<SqlCommandBean> sentenceList;
     private final Random randomGenerator;
     private float[] cumulativeWeight;
 
-    public SQLSentenceWeightedRandomProvider() {
+    private static float norm(final float weight, final float sumWeight) {
+        return weight / sumWeight;
+    }
+
+    public SqlCommandWeightedRandomProvider() {
         this.randomGenerator = new Random();
     }
 
@@ -38,7 +44,7 @@ public class SQLSentenceWeightedRandomProvider implements SQLSentenceProvider {
     private float[] cdf() {
 
         float totalWeight = 0;
-        for (final SQLSentence sentence : sentenceList) {
+        for (final SqlCommandBean sentence : sentenceList) {
             totalWeight += sentence.getWeight();
         }
 
@@ -56,7 +62,7 @@ public class SQLSentenceWeightedRandomProvider implements SQLSentenceProvider {
     }
 
     @Override
-    public SQLSentence nextSql() {
+    public SqlCommandBean nextSql() {
 
         if (sentenceList == null || sentenceList.isEmpty()) {
             throw new IllegalArgumentException("The sentence list must not be null or empty");
@@ -71,12 +77,8 @@ public class SQLSentenceWeightedRandomProvider implements SQLSentenceProvider {
         return sentenceList.get(sentenceList.size() - 1);
     }
 
-    private static float norm(final float weight, final float sumWeight) {
-        return weight / sumWeight;
-    }
-
     @Override
-    public void setSentences(final List<SQLSentence> sqlList) {
+    public void setSentences(final List<SqlCommandBean> sqlList) {
         this.sentenceList = sqlList;
         this.cumulativeWeight = cdf();
     }
